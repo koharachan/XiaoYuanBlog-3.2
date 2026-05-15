@@ -9,7 +9,7 @@ export const announcementConfig: AnnouncementConfig = {
 	// 公告栏内容
 	content: "欢迎来到小原的blog~",
 	// 公告栏图标
-	icon: "📢",
+	icon: "",
 	// 公告类型
 	type: "info",
 	// 是否可关闭
