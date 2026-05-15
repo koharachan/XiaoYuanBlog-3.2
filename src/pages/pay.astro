@@ -26,6 +26,13 @@ const customSvgMap: Record<string, string> = {
 	"erc20": Erc20Icon,
 };
 
+const iconColorMap: Record<string, string> = {
+	"fa6-brands:weixin": "#07C160",
+	"simple-icons:qq": "#12B7F5",
+	"fa6-brands:alipay": "#1677FF",
+	"fa6-brands:paypal": "#0070BA",
+};
+
 const hasQuickEntry = enabledMethods.length >= 3;
 const quickMethods = ["微信支付", "支付宝", "PayPal"];
 const quickList = hasQuickEntry
@@ -80,7 +87,7 @@ const quickList = hasQuickEntry
           <div class="flex items-center gap-3 mb-4">
             <div class="w-9 h-9 rounded-lg bg-[var(--primary)]/10 flex items-center justify-center flex-shrink-0 group-hover:bg-[var(--primary)]/20 transition-colors duration-300">
               {customSvgMap[method.icon || ""] ? (
-                <span class="w-4.5 h-4.5 text-[var(--primary)]" set:html={customSvgMap[method.icon || ""]} />
+                <span class="w-5 h-5" set:html={customSvgMap[method.icon || ""]} />
               ) : (
                 method.icon ? <Icon icon={method.icon} size="base" class="text-[var(--primary)]" /> : null
               )}

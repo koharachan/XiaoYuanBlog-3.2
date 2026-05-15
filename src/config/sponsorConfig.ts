@@ -58,19 +58,19 @@ export const sponsorConfig: SponsorConfig = {
 			enabled: true,
 		},
 		{
-			name: "ERC20-USDT/USDC",
+			name: "ERC20-Token",
 			icon: "erc20",
 			wallet: "0x66ccFF56ac8D2688801cA7339f2E5049dF466036",
 			link: "ethereum:0x66ccFF56ac8D2688801cA7339f2E5049dF466036",
-			description: "ERC20网络，支持USDT/USDC/ETH",
+			description: "ETH/POL/BNB 等主流链，USDT/USDC 皆可",
 			enabled: true,
 		},
 		{
-			name: "TRON-USDT",
+			name: "TRON-Token",
 			icon: "tron",
 			qrCode: "/assets/images/sponsor/tron.png",
 			link: "tron:TYsGR9sdko7szvt3fJtbBmB3xK9Ejn4VkB",
-			description: "TRC20网络，0 Gas费",
+			description: "TRC20 网络，USDT 或任何 Token",
 			enabled: true,
 		},
 		{
