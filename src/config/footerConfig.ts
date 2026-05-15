@@ -6,9 +6,19 @@ export const footerConfig: FooterConfig = {
 	// 友情链接
 	links: [
 		{
-			name: "惠州新闻网",
-			url: "http://news.huizhou12345.com/",
-			description: "惠州本地新闻资讯平台"
+			name: "api.rainchan.com",
+			url: "https://api.rainchan.com/",
+			description: "雨酱Ai"
+		},
+		{
+			name: "cn.jinao.wang",
+			url: "https://cn.jinao.wang/",
+			description: "jinao的小窝"
+		},
+		{
+			name: "luoaowoo.cn",
+			url: "https://luoaowoo.cn/",
+			description: "洛嗷呜の小站"
 		}
 	]
 };

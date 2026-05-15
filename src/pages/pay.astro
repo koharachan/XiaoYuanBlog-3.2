@@ -65,7 +65,7 @@ const quickList = hasQuickEntry
                 {customSvgMap[m.icon || ""] ? (
                   <span class="w-4 h-4 inline-block" set:html={customSvgMap[m.icon || ""]} />
                 ) : (
-                  m.icon ? <Icon icon={m.icon} size="sm" /> : null
+                  m.icon ? <Icon icon={m.icon} size="sm" color={iconColorMap[m.icon]} /> : null
                 )}
               </span>
               <span>{m.name}</span>
@@ -89,7 +89,7 @@ const quickList = hasQuickEntry
               {customSvgMap[method.icon || ""] ? (
                 <span class="w-5 h-5" set:html={customSvgMap[method.icon || ""]} />
               ) : (
-                method.icon ? <Icon icon={method.icon} size="base" class="text-[var(--primary)]" /> : null
+                method.icon ? <Icon icon={method.icon} size="base" color={iconColorMap[method.icon] || "var(--primary)"} /> : null
               )}
             </div>
             <div>
