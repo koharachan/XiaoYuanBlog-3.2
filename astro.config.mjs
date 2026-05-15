@@ -251,12 +251,11 @@ export default defineConfig({
 					warn(warning);
 				},
 				output: {
-					manualChunks: {
-						vendor: ["react", "react-dom"],
-						"astro-runtime": ["astro/runtime"],
-						ui: ["@fancyapps/ui", "photoswipe"],
-						math: ["katex", "remark-math"],
-						icons: ["@iconify/svelte", "astro-icon"],
+					manualChunks(id) {
+						if (id.includes("node_modules")) {
+							if (id.includes("react") || id.includes("react-dom")) return "vendor";
+							if (id.includes("@iconify")) return "icons";
+						}
 					},
 					assetFileNames: "assets/[name]-[hash][extname]",
 					chunkFileNames: "assets/[name]-[hash].js",
@@ -272,7 +271,7 @@ export default defineConfig({
 			codeSplit: true,
 			cache: true,
 			optimizeDeps: {
-				include: ["react", "react-dom", "astro/runtime"],
+				include: ["react", "react-dom"],
 			},
 		},
 		optimizeDeps: {
