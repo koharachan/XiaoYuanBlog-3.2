@@ -155,3 +155,4 @@ Docs-Firefly/
 cache/
 package/
 .obsidian/
+pnpm-lock.yaml
