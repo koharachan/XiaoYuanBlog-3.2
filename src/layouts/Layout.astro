@@ -348,7 +348,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 
           // 处理主内容区域位置
           const mainContentWrapper = document.querySelector(
-            ".absolute.w-full.z-30"
+            ".relative.w-full.z-30"
           );
           if (mainContentWrapper) {
             const isMobile = window.innerWidth < 1024;
@@ -742,7 +742,7 @@ function disableAnimation() {
 
       const bannerWrapper = document.getElementById("banner-wrapper");
       const mainContentWrapper = document.querySelector(
-        ".absolute.w-full.z-30"
+        ".relative.w-full.z-30"
       ) as HTMLElement | null;
 
       if (isMobile && bannerWrapper && mainContentWrapper) {
