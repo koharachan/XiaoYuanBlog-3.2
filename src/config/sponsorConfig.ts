@@ -2,7 +2,7 @@ import type { SponsorConfig } from "../types/config";
 
 export const sponsorConfig: SponsorConfig = {
 	title: "给小原打钱",
-	description: "给小原打钱，支持服务器维护和内容创作！",
+	description: "支持服务器维护和内容创作",
 	usage: "打钱将用于服务器维护、内容创作和功能开发，帮助我持续提供优质内容。",
 
 	showSponsorsList: true,
@@ -13,7 +13,7 @@ export const sponsorConfig: SponsorConfig = {
 			name: "微信支付",
 			icon: "fa6-brands:weixin",
 			qrCode: "/assets/images/sponsor/wxpay.png",
-			link: "wxp://f2f0rI4W1cnbURMpgnpfyvmkXgnNghISiJvn",
+			link: "weixin://dl/scan",
 			description: "微信扫码或点击唤起支付",
 			enabled: true,
 		},
@@ -29,17 +29,17 @@ export const sponsorConfig: SponsorConfig = {
 			name: "支付宝经营码",
 			icon: "fa6-brands:alipay",
 			qrCode: "/assets/images/sponsor/alipay-shop.png",
-			link: "",
+			link: "https://qr.alipay.com/tsx16384hrlevhpaqkjvuf62",
 			description: "支付宝经营码",
-			enabled: false,
+			enabled: true,
 		},
 		{
 			name: "QQ支付",
 			icon: "simple-icons:qq",
 			qrCode: "/assets/images/sponsor/qqpay.png",
 			link: "",
-			description: "QQ支付个人码",
-			enabled: false,
+			description: "QQ扫码支付",
+			enabled: true,
 		},
 		{
 			name: "数字人民币",
@@ -47,7 +47,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/e-CNY.png",
 			link: "",
 			description: "e-CNY个人码",
-			enabled: false,
+			enabled: true,
 		},
 		{
 			name: "PayPal",
@@ -55,7 +55,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/paypal.png",
 			link: "https://paypal.me/koharachan",
 			description: "全球通用，点击跳转PayPal",
-			enabled: false,
+			enabled: true,
 		},
 		{
 			name: "ERC20-USDT/USDC",
@@ -71,7 +71,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/tron.png",
 			link: "tron:TYsGR9sdko7szvt3fJtbBmB3xK9Ejn4VkB",
 			description: "TRC20网络，0 Gas费",
-			enabled: false,
+			enabled: true,
 		},
 		{
 			name: "Gate.io",
