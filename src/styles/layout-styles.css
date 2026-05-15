@@ -336,6 +336,16 @@
     body.enable-banner.is-home #right-sidebar-sticky {
         top: 5.5rem !important;
     }
+
+    /* 收款页不允许下沉 — 直接放在导航栏下面 */
+    body.enable-banner .relative.w-full.z-30:has(.pay-page) {
+        top: 5.5rem !important;
+        min-height: auto !important;
+    }
+
+    body.enable-banner .relative.w-full.z-30:has(.pay-page) #main-grid {
+        transform: none !important;
+    }
 }
 
 /* 移动端图片优化 */

@@ -34,7 +34,7 @@ const quickList = hasQuickEntry
 ---
 
 <MainGridLayout title={title} description={description}>
-  <div class="w-full max-w-3xl mx-auto">
+  <div class="w-full max-w-3xl mx-auto pay-page pt-6" data-pay-page>
 
     <!-- 头部 -->
     <header class="mb-10 onload-animation">
@@ -219,8 +219,9 @@ const quickList = hasQuickEntry
 </MainGridLayout>
 
 <script>
-  const isMobile = /Android|iPhone|iPad|iPod|webOS/i.test(navigator.userAgent)
-    || ('ontouchstart' in window && window.innerWidth < 1024);
+    document.body.classList.remove("enable-banner");
+    const bw = document.getElementById("banner-wrapper");
+    if (bw) bw.classList.add("hidden");
 
   document.querySelectorAll("[data-copy]").forEach((btn) => {
     btn.addEventListener("click", async () => {
