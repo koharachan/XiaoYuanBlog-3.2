@@ -3,78 +3,78 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getCategoryUrl } from "@utils/url-utils";
 
-// // Retrieve posts and sort them by publication date
-async function getRawSortedPosts() {
-	const allBlogPosts = await getCollection("posts", ({ data }) => {
+declare global {
+	interface ImportMeta {
+		readonly env: {
+			readonly PROD: boolean;
+			readonly DEV: boolean;
+		};
+	}
+}
+
+type RawPost = CollectionEntry<"posts">;
+
+let _postsCache: RawPost[] | null = null;
+
+async function getAllPosts(): Promise<RawPost[]> {
+	if (_postsCache) return _postsCache;
+
+	_postsCache = await getCollection("posts", ({ data }) => {
 		return import.meta.env.PROD ? data.draft !== true : true;
 	});
 
-	const sorted = allBlogPosts.sort((a, b) => {
-		// 首先按置顶状态排序，置顶文章在前
+	_postsCache.sort((a, b) => {
 		if (a.data.pinned && !b.data.pinned) return -1;
 		if (!a.data.pinned && b.data.pinned) return 1;
-
-		// 如果置顶状态相同，则按发布日期排序
-		const dateA = new Date(a.data.published);
-		const dateB = new Date(b.data.published);
-		return dateA > dateB ? -1 : 1;
+		const dateA = new Date(a.data.published).getTime();
+		const dateB = new Date(b.data.published).getTime();
+		return dateB - dateA;
 	});
-	return sorted;
+
+	return _postsCache;
 }
 
-export async function getSortedPosts() {
-	const sorted = await getRawSortedPosts();
-
-	for (let i = 1; i < sorted.length; i++) {
-		sorted[i].data.nextSlug = sorted[i - 1].id;
-		sorted[i].data.nextTitle = sorted[i - 1].data.title;
+export async function getSortedPosts(): Promise<RawPost[]> {
+	const posts = await getAllPosts();
+	for (let i = 1; i < posts.length; i++) {
+		posts[i].data.nextSlug = posts[i - 1].id;
+		posts[i].data.nextTitle = posts[i - 1].data.title;
 	}
-	for (let i = 0; i < sorted.length - 1; i++) {
-		sorted[i].data.prevSlug = sorted[i + 1].id;
-		sorted[i].data.prevTitle = sorted[i + 1].data.title;
+	for (let i = 0; i < posts.length - 1; i++) {
+		posts[i].data.prevSlug = posts[i + 1].id;
+		posts[i].data.prevTitle = posts[i + 1].data.title;
 	}
-
-	return sorted;
+	return posts;
 }
+
 export type PostForList = {
 	id: string;
-	data: CollectionEntry<"posts">["data"];
+	data: RawPost["data"];
 };
+
 export async function getSortedPostsList(): Promise<PostForList[]> {
-	const sortedFullPosts = await getRawSortedPosts();
-
-	// delete post.body
-	const sortedPostsList = sortedFullPosts.map((post) => ({
-		id: post.id,
-		data: post.data,
-	}));
-
-	return sortedPostsList;
+	const posts = await getAllPosts();
+	return posts.map((post) => ({ id: post.id, data: post.data }));
 }
+
 export type Tag = {
 	name: string;
 	count: number;
 };
 
 export async function getTagList(): Promise<Tag[]> {
-	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
-		return import.meta.env.PROD ? data.draft !== true : true;
-	});
+	const posts = await getAllPosts();
+	const countMap: Record<string, number> = {};
 
-	const countMap: { [key: string]: number } = {};
-	allBlogPosts.forEach((post: { data: { tags: string[] } }) => {
-		post.data.tags.forEach((tag: string) => {
-			if (!countMap[tag]) countMap[tag] = 0;
-			countMap[tag]++;
-		});
-	});
+	for (const post of posts) {
+		for (const tag of post.data.tags) {
+			countMap[tag] = (countMap[tag] || 0) + 1;
+		}
+	}
 
-	// sort tags
-	const keys: string[] = Object.keys(countMap).sort((a, b) => {
-		return a.toLowerCase().localeCompare(b.toLowerCase());
-	});
-
-	return keys.map((key) => ({ name: key, count: countMap[key] }));
+	return Object.keys(countMap)
+		.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+		.map((key) => ({ name: key, count: countMap[key] }));
 }
 
 export type Category = {
@@ -84,36 +84,17 @@ export type Category = {
 };
 
 export async function getCategoryList(): Promise<Category[]> {
-	const allBlogPosts = await getCollection<"posts">("posts", ({ data }) => {
-		return import.meta.env.PROD ? data.draft !== true : true;
-	});
-	const count: { [key: string]: number } = {};
-	allBlogPosts.forEach((post: { data: { category: string | null } }) => {
-		if (!post.data.category) {
-			const ucKey = i18n(I18nKey.uncategorized);
-			count[ucKey] = count[ucKey] ? count[ucKey] + 1 : 1;
-			return;
-		}
+	const posts = await getAllPosts();
+	const count: Record<string, number> = {};
+	const uncategorizedKey = i18n(I18nKey.uncategorized);
 
-		const categoryName =
-			typeof post.data.category === "string"
-				? post.data.category.trim()
-				: String(post.data.category).trim();
-
-		count[categoryName] = count[categoryName] ? count[categoryName] + 1 : 1;
-	});
-
-	const lst = Object.keys(count).sort((a, b) => {
-		return a.toLowerCase().localeCompare(b.toLowerCase());
-	});
-
-	const ret: Category[] = [];
-	for (const c of lst) {
-		ret.push({
-			name: c,
-			count: count[c],
-			url: getCategoryUrl(c),
-		});
+	for (const post of posts) {
+		const category = post.data.category?.trim() || "";
+		const key = category || uncategorizedKey;
+		count[key] = (count[key] || 0) + 1;
 	}
-	return ret;
+
+	return Object.keys(count)
+		.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+		.map((key) => ({ name: key, count: count[key], url: getCategoryUrl(key) }));
 }

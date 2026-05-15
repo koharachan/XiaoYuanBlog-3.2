@@ -92,7 +92,6 @@ Firefly 项目中所有可复用组件的集中管理。组件按照功能和职
 - `SpineModel.astro` - Spine 看板娘组件
 
 **功能组件**
-- `MusicPlayer.astro` - 音乐播放器
 
 ### 📃 pages/ - 页面特定组件
 

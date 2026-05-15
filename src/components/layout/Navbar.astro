@@ -68,13 +68,6 @@ let links: NavBarLink[] = navBarConfig.links.map(
                 "flex flex-row items-center text-md",
                 siteConfig.navbar.followTheme ? "text-[var(--primary)]" : "dark:text-white text-black"
             ]}>
-                                {siteConfig.navbar.logo?.type === "icon" ? (
-                                    <Icon name={siteConfig.navbar.logo.value || "material-symbols:home-pin-outline"} class="text-[1.75rem] mb-1 mr-2" />
-                                ) : siteConfig.navbar.logo?.type === "image" ? (
-                                    <img src={url(siteConfig.navbar.logo.value)} alt={siteConfig.navbar.logo.alt || siteConfig.title} class="h-[1.75rem] w-[1.75rem] mb-1 mr-2 object-contain" loading="lazy" />
-                                ) : (
-                                    <Icon name="material-symbols:home-pin-outline" class="text-[1.75rem] mb-1 mr-2" />
-                                )}
                 {navbarTitle}
             </div>
         </a>

@@ -1,23 +1,24 @@
 import type { AnnouncementConfig } from "../types/config";
 
+/**
+ * 公告栏配置
+ */
 export const announcementConfig: AnnouncementConfig = {
-	// 公告标题
-	title: "公告",
-
-	// 公告内容
-	content: "欢迎来到我的博客！这是一则示例公告。",
-
-	// 是否允许用户关闭公告
+	// 公告栏标题
+	title: "站点公告",
+	// 公告栏内容
+	content: "欢迎来到小原的blog~",
+	// 公告栏图标
+	icon: "📢",
+	// 公告类型
+	type: "info",
+	// 是否可关闭
 	closable: true,
-
+	// 链接配置
 	link: {
-		// 启用链接
-		enable: true,
-		// 链接文本
-		text: "了解更多",
-		// 链接 URL
-		url: "/about/",
-		// 内部链接
-		external: false,
-	},
+		enable: false,
+		text: "查看详情",
+		url: "/",
+		external: false
+	}
 };

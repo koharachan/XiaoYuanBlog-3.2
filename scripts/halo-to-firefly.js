@@ -26,6 +26,29 @@ const DEFAULT_JSON = path.join(ROOT, "extracted_posts.json");
 const OUTPUT_DIR = path.join(ROOT, "src", "content", "posts");
 const HALO_UPLOAD_PREFIX = "/upload/";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** 判断是否为 UUID 形式（无标题时 Halo 可能用 id 当 title） */
+function isLikelyUuid(s) {
+	return typeof s === "string" && UUID_REGEX.test(s.trim());
+}
+
+/** 从 HTML 中提取第一段纯文本作为备用标题（限长） */
+function extractFirstLineFromHtml(html, maxLen = 28) {
+	if (!html) return "";
+	const dom = new JSDOM(`<!DOCTYPE html><body>${html}</body>`);
+	const text = (dom.window.document.body?.textContent || "").trim().replace(/\s+/g, " ");
+	const first = text.split(/[。！？\n]/)[0]?.trim() || text.slice(0, maxLen);
+	return first.slice(0, maxLen).trim() || "";
+}
+
+/** 从 HTML 中提取第一张图片的 src 作为封面 */
+function extractFirstImageFromHtml(html) {
+	if (!html) return "";
+	const match = html.match(/<img[^>]+src=["']([^"']+)["']/i);
+	return match ? match[1].trim() : "";
+}
+
 /** 从 Halo 的 content 字段解析出纯 HTML 字符串 */
 function extractHtmlFromContent(content) {
 	if (!content) return "";
@@ -223,22 +246,25 @@ function main() {
 	let skipped = 0;
 
 	for (const post of posts) {
-		const title = post.title?.trim();
+		const html = extractHtmlFromContent(post.content);
+		const rawTitle = post.title?.trim();
+		const title = rawTitle && !isLikelyUuid(rawTitle)
+			? rawTitle
+			: (extractFirstLineFromHtml(html) || "未命名文章");
 		if (!title) {
 			skipped++;
 			continue;
 		}
 
-		const html = extractHtmlFromContent(post.content);
 		const body = htmlToMarkdown(html);
 
-		const slug = toSlug(post.slug || title, post.id, existingSlugs);
+		const slug = toSlug(post.slug || rawTitle || title, post.id, existingSlugs);
 		const filePath = path.join(OUTPUT_DIR, `${slug}.md`);
 
 		const published = post.published || post.create_time || post.createTime || new Date().toISOString();
 		const updated = post.updated || post.update_time || post.updateTime || published;
 		const description = (post.description || post.summary || "").trim().slice(0, 300);
-		const image = post.cover || post.image || "";
+		const image = (post.cover || post.image || extractFirstImageFromHtml(html) || "").trim();
 		let tags = post.tags;
 		if (!Array.isArray(tags)) {
 			try {
@@ -248,6 +274,7 @@ function main() {
 			}
 		}
 		tags = tags.map((t) => (typeof t === "object" && t?.name ? t.name : String(t))).filter(Boolean);
+		if (tags.length === 0) tags = ["未标签"];
 		let category = post.category;
 		if (category == null || category === "") {
 			try {
@@ -259,7 +286,7 @@ function main() {
 				category = "";
 			}
 		}
-		category = String(category || "").trim();
+		category = String(category || "").trim() || "未分类";
 
 		const frontmatter = {
 			title,

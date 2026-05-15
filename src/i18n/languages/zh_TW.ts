@@ -179,23 +179,23 @@ export const zh_TW: Translation = {
 	[Key.wallpaperOverlayMode]: "全屏透明",
 	[Key.wallpaperNoneMode]: "純色背景",
 
-	// 贊助頁面
-	[Key.sponsor]: "贊助",
-	[Key.sponsorTitle]: "贊助支持",
+	// 收款頁面
+	[Key.sponsor]: "打錢",
+	[Key.sponsorTitle]: "給小原打錢 💰",
 	[Key.sponsorDescription]:
-		"如果我的內容對你有幫助，歡迎通過以下方式贊助我，你的支持是我持續創作的動力！",
-	[Key.sponsorMethods]: "贊助方式",
-	[Key.sponsorList]: "贊助列表",
-	[Key.sponsorEmpty]: "暫無贊助記錄",
+		"如果我的內容對你有幫助，歡迎通過以下方式給我打錢，你的支持是我持續創作的動力！",
+	[Key.sponsorMethods]: "收款方式",
+	[Key.sponsorList]: "收款記錄",
+	[Key.sponsorEmpty]: "暫無收款記錄",
 	[Key.sponsorAmount]: "金額",
 	[Key.sponsorDate]: "日期",
 	[Key.sponsorMessage]: "留言",
 	[Key.sponsorAnonymous]: "匿名",
-	[Key.scanToSponsor]: "掃碼贊助",
-	[Key.sponsorGoTo]: "前往贊助",
+	[Key.scanToSponsor]: "掃碼打錢",
+	[Key.sponsorGoTo]: "前往打錢",
 	[Key.sponsorButton]: "支持與分享",
 	[Key.sponsorButtonText]:
-		"如果這篇文章對你有幫助，歡迎分享給更多人或贊助支持！",
+		"如果這篇文章對你有幫助，歡迎分享給更多人或者給老登打錢！",
 
 	[Key.shareOnSocial]: "文章分享",
 	[Key.shareOnSocialDescription]: "如果這篇文章對你有幫助，歡迎分享給更多人！",

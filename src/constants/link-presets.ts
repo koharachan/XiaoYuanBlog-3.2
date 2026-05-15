@@ -25,8 +25,8 @@ export const LinkPresets: { [key in LinkPreset]: NavBarLink } = {
 	},
 	[LinkPreset.Sponsor]: {
 		name: i18n(I18nKey.sponsor),
-		url: "/sponsor/",
-		icon: "material-symbols:favorite",
+		url: "/pay/",
+		icon: "material-symbols:payments",
 	},
 	[LinkPreset.Guestbook]: {
 		name: i18n(I18nKey.guestbook),

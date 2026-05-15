@@ -208,8 +208,8 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
 <!-- Navbar -->
 <slot slot="head" name="head"></slot>
-<div id="top-row" class="z-50 pointer-events-none relative transition-all duration-700 mx-auto" class:list={[navbarWidthFull ? "" : "max-w-[var(--page-width)] px-0 md:px-4"]}>
-    <div id="navbar-wrapper" class="pointer-events-auto sticky top-0 transition-all">
+<div id="top-row" class="z-50 relative transition-all duration-700 mx-auto" class:list={[navbarWidthFull ? "" : "max-w-[var(--page-width)] px-0 md:px-4"]}>
+    <div id="navbar-wrapper" class="sticky top-0 transition-all z-50">
         <Navbar></Navbar>
     </div>
 </div>
@@ -296,7 +296,7 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     
     <!-- Water waves effect - 始终渲染以便动态切换 -->
     {(wavesEnabledOnDesktop || wavesEnabledOnMobile) ? (
-    <div class={`waves absolute -bottom-[1px] h-[10vh] max-h-[9.375rem] min-h-[3.125rem] w-full md:h-[15vh] 
+    <div class={`waves absolute -bottom-[1px] h-[6vh] max-h-[5rem] min-h-[2rem] w-full md:h-[8vh] 
         ${!wavesEnabledOnMobile ? 'hidden' : ''} ${!wavesEnabledOnDesktop ? 'md:hidden' : ''} ${wavesEnabledOnDesktop ? 'md:block' : ''}`} 
         id="header-waves" 
         style="transform: translateZ(0); will-change: fill;">
@@ -304,14 +304,14 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             class="waves"
             xmlns="http://www.w3.org/2000/svg"
             xmlns:xlink="http://www.w3.org/1999/xlink"
-            viewBox="0 24 150 28"
+            viewBox="0 24 150 20"
             preserveAspectRatio="none"
             shape-rendering="geometricPrecision"
         >
             <defs>
                 <path
                     id="gentle-wave"
-                    d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v48h-352z"
+                    d="M-160 44c30 0 58-12 88-12s 58 12 88 12 58-12 88-12 58 12 88 12 v36h-352z"
                 >
                 </path>
             </defs>
@@ -325,19 +325,19 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
                 <use
                     xlink:href="#gentle-wave"
                     x="48"
-                    y="3"
+                    y="2"
                     class="opacity-50 fill-[var(--page-bg)]"
                 ></use>
                 <use
                     xlink:href="#gentle-wave"
                     x="48"
-                    y="5"
+                    y="3"
                     class="opacity-65 fill-[var(--page-bg)]"
                 ></use>
                 <use
                     xlink:href="#gentle-wave"
                     x="48"
-                    y="7"
+                    y="4"
                     class=" opacity-75 fill-[var(--page-bg)]"
                 ></use>
             </g>

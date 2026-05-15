@@ -8,33 +8,28 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	// 背景图片配置
 	src: {
 		// 桌面背景图片
-		desktop: "/assets/images/d1.webp",
+		desktop: "/upload/129812709_p0_master1200.jpg",
 		// 移动背景图片
-		mobile: "/assets/images/m1.webp",
+		mobile: "/upload/129812709_p0_master1200.jpg",
 	},
 	// Banner模式特有配置
 	banner: {
 		// 图片位置
 		// 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
 		// 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
-		position: "0% 20%",
+		position: "top",
 
 		// 主页横幅文字
 		homeText: {
 			// 是否启用主页横幅文字
-			enable: true,
+			enable: false,
 			// 主页横幅主标题
-			title: "Lovely firefly!",
+			title: "小原blog 3.0",
 			// 主页横幅主标题字体大小
 			titleSize: "3.8rem",
 			// 主页横幅副标题
 			subtitle: [
-				"In Reddened Chrysalis, I Once Rest",
-				"From Shattered Sky, I Free Fall",
-				"Amidst Silenced Stars, I Deep Sleep",
-				"Upon Lighted Fyrefly, I Soon Gaze",
-				"From Undreamt Night, I Thence Shine",
-				"In Finalized Morrow, I Full Bloom",
+				"万物可爱QwQ",
 			],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",
@@ -42,7 +37,7 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 				// 是否启用打字机效果
 				// 打字机开启 → 循环显示所有副标题
 				// 打字机关闭 → 每次刷新随机显示一条副标题
-				enable: true,
+				enable: false,
 				// 打字速度（毫秒）
 				speed: 100,
 				// 删除速度（毫秒）
@@ -55,21 +50,21 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 		credit: {
 			enable: {
 				// 桌面端显示横幅图片来源文本
-				desktop: true,
+				desktop: false,
 				// 移动端显示横幅图片来源文本
-				mobile: true,
+				mobile: false,
 			},
 			text: {
 				// 桌面端要显示的来源文本
-				desktop: "Pixiv - 晚晚喵",
+				desktop: "",
 				// 移动端要显示的来源文本
-				mobile: "Pixiv - KiraraShss",
+				mobile: "",
 			},
 			url: {
 				// 桌面端原始艺术品或艺术家页面的 URL 链接
-				desktop: "https://www.pixiv.net/artworks/135490046",
+				desktop: "",
 				// 移动端原始艺术品或艺术家页面的 URL 链接
-				mobile: "https://www.pixiv.net/users/42715864",
+				mobile: "",
 			},
 		},
 		// 横幅导航栏配置

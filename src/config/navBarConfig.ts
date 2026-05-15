@@ -18,32 +18,6 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		LinkPreset.Archive,
 	];
 
-	// 自定义导航栏链接,并且支持多级菜单
-	links.push({
-		name: "链接",
-		url: "/links/",
-		icon: "material-symbols:link",
-
-		// 子菜单
-		children: [
-			{
-				name: "GitHub",
-				url: "https://github.com/CuteLeaf/Firefly",
-				external: true,
-				icon: "fa6-brands:github",
-			},
-			{
-				name: "Bilibili",
-				url: "https://space.bilibili.com/38932988",
-				external: true,
-				icon: "fa6-brands:bilibili",
-			},
-		],
-	});
-
-	// 友链
-	links.push(LinkPreset.Friends);
-
 	// 根据配置决定是否添加留言板，在siteConfig关闭pages.guestbook时导航栏不显示留言板
 	if (siteConfig.pages.guestbook) {
 		links.push(LinkPreset.Guestbook);
@@ -55,7 +29,7 @@ const getDynamicNavBarConfig = (): NavBarConfig => {
 		url: "/content/",
 		icon: "material-symbols:info",
 		children: [
-			// 根据配置决定是否添加赞助，在siteConfig关闭pages.sponsor时导航栏不显示赞助
+			// 根据配置决定是否添加收款页，在siteConfig关闭pages.sponsor时导航栏不显示收款
 			...(siteConfig.pages.sponsor ? [LinkPreset.Sponsor] : []),
 
 			// 关于页面

@@ -8,25 +8,25 @@ import { defineConfig } from "astro/config";
 import expressiveCode from "astro-expressive-code";
 import icon from "astro-icon";
 import rehypeAutolinkHeadings from "rehype-autolink-headings";
-import rehypeComponents from "rehype-components"; /* Render the custom directive content */
+import rehypeComponents from "rehype-components";
 import rehypeKatex from "rehype-katex";
 import katex from "katex";
-import "katex/dist/contrib/mhchem.mjs"; // 加载 mhchem 扩展
+import "katex/dist/contrib/mhchem.mjs";
 import rehypeSlug from "rehype-slug";
-import remarkDirective from "remark-directive"; /* Handle directives */
+import remarkDirective from "remark-directive";
 import remarkMath from "remark-math";
 import rehypeCallouts from "rehype-callouts";
 import remarkSectionize from "remark-sectionize";
 import { expressiveCodeConfig, siteConfig } from "./src/config";
 import { i18n } from "./src/i18n/translation";
 import I18nKey from "./src/i18n/i18nKey";
-import { pluginLanguageBadge } from "expressive-code-language-badge"; /* Language Badge */
-import { pluginCollapsible } from "expressive-code-collapsible"; /* Collapsible */
+import { pluginLanguageBadge } from "expressive-code-language-badge";
+import { pluginCollapsible } from "expressive-code-collapsible";
 import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
 import { rehypeMermaid } from "./src/plugins/rehype-mermaid.mjs";
-import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
-import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
-import { remarkMermaid } from "./src/plugins/remark-mermaid.js";
+import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.mjs";
+import { remarkExcerpt } from "./src/plugins/remark-excerpt.mjs";
+import { remarkMermaid } from "./src/plugins/remark-mermaid.mjs";
 import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 import mdx from "@astrojs/mdx";
 import rehypeEmailProtection from "./src/plugins/rehype-email-protection.mjs";
@@ -45,8 +45,6 @@ export default defineConfig({
 		swup({
 			theme: false,
 			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
-			// the default value `transition-` cause transition delay
-			// when the Tailwind class `transition-all` is used
 			containers: [
 				"#swup-container",
 				"#right-sidebar-dynamic",
@@ -59,11 +57,9 @@ export default defineConfig({
 			updateHead: true,
 			updateBodyClass: false,
 			globalInstance: true,
-			// 滚动相关配置优化
 			resolveUrl: (url) => url,
 			animateHistoryBrowsing: false,
 			skipPopStateHandling: (event) => {
-				// 跳过锚点链接的处理，让浏览器原生处理
 				return event.state && event.state.url && event.state.url.includes("#");
 			},
 		}),
@@ -84,7 +80,6 @@ export default defineConfig({
 				pluginLanguageBadge(),
 				pluginCollapsibleSections(),
 				pluginLineNumbers(),
-				// pluginCollapsible 配置 - 从expressiveCodeConfig读取设置，使用i18n文本
 				...(expressiveCodeConfig.pluginCollapsible?.enable === true
 					? [
 							pluginCollapsible({
@@ -135,7 +130,6 @@ export default defineConfig({
 		svelte(),
 		sitemap({
 			filter: (page) => {
-				// 根据页面开关配置过滤sitemap
 				const url = new URL(page);
 				const pathname = url.pathname;
 
@@ -170,7 +164,7 @@ export default defineConfig({
 			rehypeSlug,
 			rehypeMermaid,
 			rehypeFigure,
-			[rehypeEmailProtection, { method: "base64" }], // 邮箱保护插件，支持 'base64' 或 'rot13'
+			[rehypeEmailProtection, { method: "base64" }],
 			[
 				rehypeComponents,
 				{
@@ -211,17 +205,39 @@ export default defineConfig({
 			},
 		},
 		build: {
-			// 启用资源压缩和优化
 			minify: "terser",
 			terserOptions: {
 				compress: {
-					drop_console: false, // 生产环境可改为true移除console
+					drop_console: true,
 					drop_debugger: true,
+					pure_funcs: ["console.log", "console.info", "console.debug"],
+					pure_getters: "strict",
+					unsafe: true,
+					unsafe_arrows: true,
+					unsafe_comps: true,
+					unsafe_Function: true,
+					unsafe_math: true,
+					unsafe_symbols: true,
+					unsafe_methods: true,
+					unsafe_proto: true,
+					unsafe_regexp: true,
+					unsafe_undefined: true,
 				},
-				mangle: true,
+				mangle: {
+					toplevel: true,
+					keep_classnames: false,
+					keep_fnames: false,
+					properties: {
+						regex: /^_/,
+					},
+				},
 				format: {
 					comments: false,
+					ascii_only: true,
 				},
+				ecma: 2022,
+				keep_classnames: false,
+				keep_fnames: false,
 			},
 			rollupOptions: {
 				onwarn(warning, warn) {
@@ -234,16 +250,36 @@ export default defineConfig({
 					}
 					warn(warning);
 				},
+				output: {
+					manualChunks: {
+						vendor: ["react", "react-dom"],
+						"astro-runtime": ["astro/runtime"],
+						ui: ["@fancyapps/ui", "photoswipe"],
+						math: ["katex", "remark-math"],
+						icons: ["@iconify/svelte", "astro-icon"],
+					},
+					assetFileNames: "assets/[name]-[hash][extname]",
+					chunkFileNames: "assets/[name]-[hash].js",
+					entryFileNames: "assets/[name]-[hash].js",
+				},
 			},
-			// CSS 优化
 			cssCodeSplit: true,
 			cssMinify: true,
-			// 资源大小限制 - 减少内联资源
-			assetsInlineLimit: 4096,
-			// 减少源映射大小（可选，生产环境改为false）
+			assetsInlineLimit: 0,
 			sourcemap: false,
-			// 并行处理构建
 			workers: 4,
+			treeShake: true,
+			codeSplit: true,
+			cache: true,
+			optimizeDeps: {
+				include: ["react", "react-dom", "astro/runtime"],
+			},
+		},
+		optimizeDeps: {
+			enabled: true,
+			esbuildOptions: {
+				target: "es2022",
+			},
 		},
 	},
 });

@@ -1,4 +1,4 @@
-import { defineCollection } from "astro:content";
+import { defineCollection } from "astro:collections";
 import { glob } from "astro/loaders";
 import { z } from "astro/zod";
 
@@ -9,23 +9,23 @@ const postsCollection = defineCollection({
 		published: z.date(),
 		updated: z.date().optional(),
 		draft: z.boolean().optional().default(false),
-		description: z.string().optional().default(""),
-		image: z.string().optional().default(""),
+		description: z.string().optional().nullable().default(""),
+		image: z.string().optional().nullable().default(""),
 		tags: z.array(z.string()).optional().default([]),
 		category: z.string().optional().nullable().default(""),
-		lang: z.string().optional().default(""),
+		lang: z.string().optional().nullable().default(""),
 		pinned: z.boolean().optional().default(false),
-		author: z.string().optional().default(""),
-		sourceLink: z.string().optional().default(""),
-		licenseName: z.string().optional().default(""),
-		licenseUrl: z.string().optional().default(""),
+		author: z.string().optional().nullable().default(""),
+		sourceLink: z.string().optional().nullable().default(""),
+		licenseName: z.string().optional().nullable().default(""),
+		licenseUrl: z.string().optional().nullable().default(""),
 		comment: z.boolean().optional().default(true),
 
 		/* For internal use */
-		prevTitle: z.string().default(""),
-		prevSlug: z.string().default(""),
-		nextTitle: z.string().default(""),
-		nextSlug: z.string().default(""),
+		prevTitle: z.string().optional().nullable().default(""),
+		prevSlug: z.string().optional().nullable().default(""),
+		nextTitle: z.string().optional().nullable().default(""),
+		nextSlug: z.string().optional().nullable().default(""),
 	}),
 });
 

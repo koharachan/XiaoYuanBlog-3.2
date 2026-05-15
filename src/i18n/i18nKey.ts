@@ -173,7 +173,7 @@ enum I18nKey {
 	wallpaperOverlayMode = "wallpaperOverlayMode",
 	wallpaperNoneMode = "wallpaperNoneMode",
 
-	// 赞助页面
+	// 收款页面
 	sponsor = "sponsor",
 	sponsorTitle = "sponsorTitle",
 	sponsorDescription = "sponsorDescription",

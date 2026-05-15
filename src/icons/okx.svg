@@ -1,0 +1,7 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <rect x="5" y="5" width="28" height="28" rx="2" fill="currentColor"/>
+  <rect x="67" y="5" width="28" height="28" rx="2" fill="currentColor"/>
+  <rect x="36" y="36" width="28" height="28" rx="2" fill="currentColor"/>
+  <rect x="5" y="67" width="28" height="28" rx="2" fill="currentColor"/>
+  <rect x="67" y="67" width="28" height="28" rx="2" fill="currentColor"/>
+</svg>

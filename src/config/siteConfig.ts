@@ -7,33 +7,45 @@ const SITE_LANG = "zh_CN";
 
 export const siteConfig: SiteConfig = {
 	// 站点标题
-	title: "Firefly",
+	title: "小原blog 3.2",
 
 	// 站点副标题
-	subtitle: "Demo site",
+	subtitle: "万物可爱QwQ",
 
 	// 站点 URL
-	site_url: "https://firefly.cuteleaf.cn",
+	site_url: "https://blog.meowhead.cn",
 
 	// 站点描述
 	description:
-		"Firefly 是一款基于 Astro 框架和 Fuwari 模板开发的清新美观且现代化个人博客主题模板，专为技术爱好者和内容创作者设计。该主题融合了现代 Web 技术栈，提供了丰富的功能模块和高度可定制的界面，让您能够轻松打造出专业且美观的个人博客网站。",
+		"小原blog - 专注于技术实践与学习资源的个人博客。小原blog（原yszmnl2233的blog）提供实用的技术教程和学习资源。内容涵盖服务器运维（Docker命令行部署、CentOS环境配置）、网站优化（缓存策略）、区块链开发（如Doro币智能合约代码）以及2025广东中考备考指南。分享原创技术模板（IDC法律声明、处分撤销申请）、初中数学系统复习资料，并探讨前沿技术应用（如Halo接入DeepSeek AI自动写作）。关注中国互联网文化现象。追求简洁高效的技术实践与知识共享。",
 
 	// 站点关键词
 	keywords: [
-		"Firefly",
-		"Fuwari",
-		"Astro",
-		"ACGN",
+		"web",
+		"web3",
+		"科技",
+		"blog",
 		"博客",
-		"技术博客",
-		"静态博客",
+		"yszmnl2233",
+		"前端",
+		"个人",
+		"技术交流",
+		"小原酱",
+		"计算机技术",
+		"小原酱的blog",
+		"ogata kohara",
+		"ogata_kohara",
+		"区块链开发",
+		"学习",
+		"xyn",
+		"实用工具",
+		"ai",
 	],
 
 	// 主题色
 	themeColor: {
 		// 主题色的默认色相，范围从 0 到 360。例如：红色：0，青色：200，蓝绿色：250，粉色：345
-		hue: 165,
+		hue: 250,
 		// 是否对访问者隐藏主题色选择器
 		fixed: false,
 		// 默认模式："light" 亮色，"dark" 暗色，"system" 跟随系统
@@ -66,12 +78,12 @@ export const siteConfig: SiteConfig = {
 		// { type: "image", value: "/assets/images/logo.webp", alt: "Firefly Logo" }
 		// { type: "image", value: "https://example.com/logo.png", alt: "Firefly Logo" }
 		logo: {
-			type: "image",
-			value: "/assets/images/firefly.png",
-			alt: "🍀",
+			type: "icon",
+			value: "material-symbols:home",
+			alt: "🏠",
 		},
 		// 导航栏标题
-		title: "Firefly",
+		title: "小原blog 3.2 - 万物可爱QwQ",
 		// 全宽导航栏，导航栏是否占满屏幕宽度，true：占满，false：不占满
 		widthFull: false,
 		// 导航栏图标和标题是否跟随主题色
@@ -79,7 +91,7 @@ export const siteConfig: SiteConfig = {
 	},
 
 	// 站点开始日期，用于统计运行天数
-	siteStartDate: "2025-01-01",
+	siteStartDate: "2023-01-01",
 
 	// 站点时区（IANA 时区字符串），用于格式化bangumi、rss里的构建日期时间等等..
 	// 示例："Asia/Shanghai", "UTC", 如果为空，则按照构建服务器的时区进行时区转换
@@ -103,21 +115,14 @@ export const siteConfig: SiteConfig = {
 	// OpenGraph图片功能,注意开启后要渲染很长时间，不建议本地调试的时候开启
 	generateOgImages: false,
 
-	// bangumi配置
-	bangumi: {
-		// Bangumi用户ID
-		userId: "1163581",
-	},
-
 	// 页面开关配置 - 控制特定页面的访问权限，设为false会返回404
-	// bangumi的数据为编译时获取的，所以不是实时数据，请配置bangumi.userId
 	pages: {
-		// 赞助页面开关
+		// 收款页面开关
 		sponsor: true,
 		// 留言板页面开关，需要配置评论系统
 		guestbook: true,
 		// 番组计划页面开关，含追番、游戏、书籍和音乐，dev调试时只获取一页数据，build才会获取全部数据
-		bangumi: true,
+		bangumi: false,
 	},
 
 	// 文章列表布局配置

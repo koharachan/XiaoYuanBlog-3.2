@@ -17,10 +17,25 @@
  * ============================================
  */
 
-/* ============================================
+/* ============================================ *
  * 基础导航栏样式
  * 适用: 所有模式，所有设备
  * ============================================ */
+#top-row {
+    position: relative;
+    z-index: 50;
+}
+
+#navbar-wrapper {
+    background: var(--card-bg);
+    border: 1px solid transparent;
+    border-radius: 0 0 0.75rem 0.75rem;
+    transition: all var(--duration-medium) var(--ease-standard);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
 #navbar>div {
     background: var(--card-bg);
     border: 1px solid transparent;
@@ -36,6 +51,16 @@
 @media (min-width: 1024px) {
 
     /* "semi" */
+    #banner-wrapper~* #navbar-wrapper,
+    body:has(#banner-wrapper) #navbar-wrapper {
+        backdrop-filter: blur(var(--navbar-glass-blur, 20px)) !important;
+        background: rgba(255, 255, 255, var(--opacity-55)) !important;
+        border: 1px solid rgba(255, 255, 255, var(--opacity-55)) !important;
+        border-radius: 0 0 0.75rem 0.75rem !important;
+        box-shadow: var(--shadow-navbar) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
     #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
     body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
         backdrop-filter: blur(var(--navbar-glass-blur, 20px)) !important;
@@ -87,6 +112,16 @@
 @media (max-width: 1023px) {
 
     /* "semi" */
+    #banner-wrapper~* #navbar-wrapper,
+    body:has(#banner-wrapper) #navbar-wrapper {
+        backdrop-filter: blur(var(--navbar-glass-blur, 20px)) !important;
+        background: rgba(255, 255, 255, var(--opacity-55)) !important;
+        border: 1px solid rgba(255, 255, 255, var(--opacity-55)) !important;
+        border-radius: 0 0 0.75rem 0.75rem !important;
+        box-shadow: var(--shadow-navbar) !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
     #banner-wrapper~* #navbar[data-transparent-mode="semi"][data-is-home="true"]>div,
     body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-is-home="true"]>div {
         backdrop-filter: blur(var(--navbar-glass-blur, 20px)) !important;
@@ -137,6 +172,13 @@
 @media (min-width: 1024px) {
 
     /* "semi" */
+    :root.dark #banner-wrapper~* #navbar-wrapper,
+    :root.dark body:has(#banner-wrapper) #navbar-wrapper {
+        background: rgba(0, 0, 0, var(--opacity-55)) !important;
+        border: 1px solid rgba(0, 0, 0, var(--opacity-55)) !important;
+        box-shadow: var(--shadow-navbar-dark) !important;
+    }
+
     :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semi"]>div,
     :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"]>div {
         background: rgba(0, 0, 0, var(--opacity-55)) !important;
@@ -175,6 +217,13 @@
 @media (max-width: 1023px) {
 
     /* "semi" */
+    :root.dark #banner-wrapper~* #navbar-wrapper,
+    :root.dark body:has(#banner-wrapper) #navbar-wrapper {
+        background: rgba(0, 0, 0, var(--opacity-55)) !important;
+        border: 1px solid rgba(0, 0, 0, var(--opacity-55)) !important;
+        box-shadow: var(--shadow-navbar-dark) !important;
+    }
+
     :root.dark #banner-wrapper~* #navbar[data-transparent-mode="semi"][data-is-home="true"]>div,
     :root.dark body:has(#banner-wrapper) #navbar[data-transparent-mode="semi"][data-is-home="true"]>div {
         background: rgba(0, 0, 0, var(--opacity-55)) !important;

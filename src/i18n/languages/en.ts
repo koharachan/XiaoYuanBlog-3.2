@@ -185,23 +185,23 @@ export const en: Translation = {
 	[Key.wallpaperOverlayMode]: "Overlay Wallpaper",
 	[Key.wallpaperNoneMode]: "None Wallpaper",
 
-	// Sponsor Page
+	// Pay Page
 	[Key.sponsor]: "Sponsor",
-	[Key.sponsorTitle]: "Support Me",
+	[Key.sponsorTitle]: "Pay Me",
 	[Key.sponsorDescription]:
-		"If my content has been helpful to you, welcome to sponsor me through the following methods. Your support is the driving force for my continued creation!",
+		"If my content has been helpful to you, feel free to send some money my way! Your support keeps me going!",
 	[Key.sponsorMethods]: "Payment Methods",
-	[Key.sponsorList]: "Sponsors",
-	[Key.sponsorEmpty]: "No sponsors yet",
+	[Key.sponsorList]: "Payments",
+	[Key.sponsorEmpty]: "No payments yet",
 	[Key.sponsorAmount]: "Amount",
 	[Key.sponsorDate]: "Date",
 	[Key.sponsorMessage]: "Message",
 	[Key.sponsorAnonymous]: "Anonymous",
-	[Key.scanToSponsor]: "Scan to Sponsor",
-	[Key.sponsorGoTo]: "Go to Sponsor",
+	[Key.scanToSponsor]: "Scan to Pay",
+	[Key.sponsorGoTo]: "Go Pay",
 	[Key.sponsorButton]: "Support & Share",
 	[Key.sponsorButtonText]:
-		"If this article helped you, please share or support!",
+		"If this article helped you, please share or send some money!",
 
 	[Key.shareOnSocial]: "Share Article",
 	[Key.shareOnSocialDescription]:

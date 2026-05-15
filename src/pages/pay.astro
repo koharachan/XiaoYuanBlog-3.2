@@ -1,0 +1,177 @@
+---
+import { siteConfig, sponsorConfig } from "@/config";
+import { i18n } from "@/i18n/translation";
+import I18nKey from "@/i18n/i18nKey";
+import MainGridLayout from "@/layouts/MainGridLayout.astro";
+import { url } from "@/utils/url-utils";
+import Icon from "@/components/common/Icon.astro";
+import GateIcon from "@/icons/gate.svg?raw";
+import ECnyIcon from "@/icons/e-cny.svg?raw";
+import TronIcon from "@/icons/tron.svg?raw";
+import OkxIcon from "@/icons/okx.svg?raw";
+import Erc20Icon from "@/icons/erc20.svg?raw";
+
+if (!siteConfig.pages.sponsor) {
+	return Astro.redirect("/404/");
+}
+
+const title = sponsorConfig.title || i18n(I18nKey.sponsorTitle);
+const description = sponsorConfig.description || i18n(I18nKey.sponsorDescription);
+const enabledMethods = sponsorConfig.methods.filter((m) => m.enabled);
+const customSvgMap: Record<string, string> = {
+	"e-cny": ECnyIcon,
+	"gate": GateIcon,
+	"tron": TronIcon,
+	"okx": OkxIcon,
+	"erc20": Erc20Icon,
+};
+---
+
+<MainGridLayout title={title} description={description}>
+  <div class="flex w-full rounded-[var(--radius-large)] overflow-hidden relative min-h-32">
+    <div class="card-base z-10 px-6 py-6 relative w-full">
+      <!-- 标题 -->
+      <div class="mb-6">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="h-8 w-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-white">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.91s4.18 1.39 4.18 3.91c-.01 1.83-1.38 2.83-3.12 3.16z"/></svg>
+          </div>
+          <h1 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{title}</h1>
+        </div>
+        {description && (
+          <p class="text-base text-neutral-600 dark:text-neutral-400">{description}</p>
+        )}
+      </div>
+
+      <!-- 快捷入口 -->
+      <div id="pay-now" class="mb-8 p-5 rounded-xl bg-gradient-to-r from-[var(--primary)]/10 to-[var(--primary)]/5 border border-[var(--primary)]/20">
+        <p class="text-sm font-semibold text-[var(--primary)] mb-3 uppercase tracking-wide">⚡ 快速打钱</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          {enabledMethods.slice(0, 4).map((m) => (
+            <a
+              href={m.link && m.link.startsWith("http") ? m.link : `#method-${m.name}`}
+              target={m.link?.startsWith("http") ? "_blank" : undefined}
+              rel="noopener noreferrer"
+              class="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 hover:border-[var(--primary)] hover:bg-[var(--primary)]/5 transition-all font-medium text-sm text-neutral-800 dark:text-neutral-200"
+            >
+              {customSvgMap[m.icon || ""] ? (
+                <span class="w-5 h-5 inline-block" set:html={customSvgMap[m.icon || ""]} />
+              ) : (
+                m.icon ? <Icon icon={m.icon} size="sm" /> : null
+              )}
+              {m.name.split("-")[0]}
+            </a>
+          ))}
+        </div>
+      </div>
+
+      <!-- 收款方式网格 -->
+      <div class="mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {enabledMethods.map((method) => (
+            <div
+              id={`method-${method.name}`}
+              class="flex flex-col p-5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200 dark:border-neutral-800 hover:border-[var(--primary)]/50 hover:shadow-md transition-all scroll-mt-24"
+            >
+              <!-- 图标 + 名称 -->
+              <div class="flex items-center gap-3 mb-3">
+                <div class="w-10 h-10 rounded-lg bg-white dark:bg-neutral-800 flex items-center justify-center border border-neutral-200 dark:border-neutral-700 shadow-sm flex-shrink-0">
+                  {customSvgMap[method.icon || ""] ? (
+                    <span class="w-6 h-6 text-neutral-800 dark:text-neutral-200" set:html={customSvgMap[method.icon || ""]} />
+                  ) : (
+                    method.icon ? <Icon icon={method.icon} size="xl" class="text-neutral-800 dark:text-neutral-200" /> : null
+                  )}
+                </div>
+                <div>
+                  <h3 class="font-semibold text-neutral-900 dark:text-neutral-100 leading-tight">{method.name}</h3>
+                  {method.description && (
+                    <p class="text-xs text-neutral-500 dark:text-neutral-400">{method.description}</p>
+                  )}
+                </div>
+              </div>
+
+              <!-- 二维码 -->
+              {method.qrCode && (
+                <div class="relative w-full max-w-[180px] mx-auto aspect-square bg-white rounded-lg p-3 shadow-sm mb-3 border border-neutral-100 dark:border-neutral-700">
+                  <img src={url(method.qrCode)} alt={method.name} class="w-full h-full object-contain" loading="lazy" />
+                </div>
+              )}
+
+              <!-- 钱包地址 -->
+              {method.wallet && (
+                <div class="mb-3 p-3 rounded-lg bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
+                  <p class="text-[10px] uppercase tracking-wider text-neutral-400 mb-1">Wallet Address</p>
+                  <code class="text-xs text-neutral-700 dark:text-neutral-300 break-all font-mono leading-relaxed select-all">{method.wallet}</code>
+                  <button
+                    class="mt-2 text-xs flex items-center gap-1 text-[var(--primary)] hover:underline"
+                    data-copy={method.wallet}
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    <span>复制地址</span>
+                  </button>
+                </div>
+              )}
+
+              <!-- 操作按钮 -->
+              <div class="mt-auto flex gap-2 flex-wrap">
+                {method.link && (
+                  <a
+                    href={method.link}
+                    target={method.link.startsWith("http") ? "_blank" : "_self"}
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1.5 px-4 py-2 bg-[var(--primary)] text-white rounded-lg text-sm font-medium hover:opacity-90 active:scale-95 transition-all"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    一键支付
+                  </a>
+                )}
+                {method.wallet && (
+                  <button
+                    data-copy={method.wallet}
+                    class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-neutral-300 dark:border-neutral-600 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 active:scale-95 transition-all"
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    复制地址
+                  </button>
+                )}
+                {!method.link && !method.wallet && (
+                  <span class="text-xs text-neutral-400 italic">请扫描上方二维码</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+    </div>
+  </div>
+</MainGridLayout>
+
+<script>
+  document.querySelectorAll("[data-copy]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const text = btn.getAttribute("data-copy") || "";
+      try {
+        await navigator.clipboard.writeText(text);
+        const span = btn.querySelector("span");
+        const orig = span?.textContent || "";
+        if (span) span.textContent = "已复制 ✓";
+        btn.classList.add("text-green-600", "border-green-400");
+        setTimeout(() => {
+          if (span) span.textContent = orig;
+          btn.classList.remove("text-green-600", "border-green-400");
+        }, 2000);
+      } catch {
+        // fallback: select text
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+      }
+    });
+  });
+</script>

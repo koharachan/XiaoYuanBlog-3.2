@@ -72,7 +72,7 @@ export type SiteConfig = {
 
 	// 页面开关配置
 	pages: {
-		sponsor: boolean; // 赞助页面开关
+		sponsor: boolean; // 收款页面开关
 		guestbook: boolean; // 留言板页面开关
 		bangumi: boolean;
 	};
@@ -300,6 +300,11 @@ export type FontConfig = {
 export type FooterConfig = {
 	enable: boolean; // 是否启用Footer HTML注入功能
 	customHtml?: string; // 自定义HTML内容，用于添加备案号等信息
+	links?: {
+		name: string;
+		url: string;
+		description?: string;
+	}[]; // 友情链接列表
 };
 
 export type CoverImageConfig = {
@@ -597,132 +602,32 @@ export type FriendsPageConfig = {
 	columns: 2 | 3; // 显示列数：2列或3列
 };
 
-// 音乐播放器配置
-export type MusicPlayerConfig = {
-	// 基础功能开关
-	enable: boolean; // 启用音乐播放器功能
-
-	// 使用方式：'meting' 或 'local'
-	mode?: "meting" | "local"; // "meting" 使用 Meting API，"local" 使用本地音乐列表
-
-	// Meting API 配置
-	meting?: {
-		// Meting API 地址
-		api?: string;
-
-		// 音乐平台：netease=网易云音乐, tencent=QQ音乐, kugou=酷狗音乐, xiami=虾米音乐, baidu=百度音乐
-		server?: "netease" | "tencent" | "kugou" | "xiami" | "baidu";
-
-		// 类型：song=单曲, playlist=歌单, album=专辑, search=搜索, artist=艺术家
-		type?: "song" | "playlist" | "album" | "search" | "artist";
-
-		// 歌单/专辑/单曲 ID 或搜索关键词
-		id?: string;
-
-		// 认证 token（可选）
-		auth?: string;
-
-		// 备用 API 配置（当主 API 失败时使用）
-		fallbackApis?: string[];
-
-		// MetingJS 脚本路径（默认使用 CDN，也可配置为本地路径）
-		jsPath?: string;
-	};
-
-	// 本地音乐配置（当 mode 为 'local' 时使用）
-	local?: {
-		playlist?: Array<{
-			name: string; // 歌曲名称
-			artist: string; // 艺术家
-			url: string; // 音乐文件路径（相对于 public 目录）
-			cover?: string; // 封面图片路径（相对于 public 目录）
-			lrc?: string; // 歌词内容，支持 LRC 格式
-		}>;
-	};
-
-	// APlayer 配置选项
-	player?: {
-		// 是否固定模式（固定在页面底部）
-		fixed?: boolean;
-
-		// 是否迷你模式
-		mini?: boolean;
-
-		// 是否自动播放
-		autoplay?: boolean;
-
-		// 主题色
-		theme?: string;
-
-		// 循环模式：'all'=列表循环, 'one'=单曲循环, 'none'=不循环
-		loop?: "all" | "one" | "none";
-
-		// 播放顺序：'list'=列表顺序, 'random'=随机播放
-		order?: "list" | "random";
-
-		// 预加载：'none'=不预加载, 'metadata'=预加载元数据, 'auto'=自动
-		preload?: "none" | "metadata" | "auto";
-
-		// 默认音量 (0-1)
-		volume?: number;
-
-		// 是否互斥播放（同时只能播放一个播放器）
-		mutex?: boolean;
-
-		// 歌词类型：0=不显示, 1=显示（需要提供 lrc 字段）, 2=显示（从 HTML 内容读取）, 3=异步加载（从 API 获取）
-		lrcType?: 0 | 1 | 2 | 3;
-
-		// 歌词是否默认隐藏（当 lrcType 不为 0 时，可以通过此选项控制初始显示状态）
-		lrcHidden?: boolean;
-
-		// 播放列表是否默认折叠
-		listFolded?: boolean;
-
-		// 播放列表最大高度
-		listMaxHeight?: string;
-
-		// localStorage 存储键名
-		storageName?: string;
-	};
-
-	// 响应式配置
-	responsive?: {
-		// 移动端配置
-		mobile?: {
-			// 在移动端是否隐藏
-			hide?: boolean;
-
-			// 移动端断点（小于此宽度时应用移动端配置）
-			breakpoint?: number;
-		};
-	};
-};
-
-// 赞助方式类型
+// 收款方式类型
 export type SponsorMethod = {
-	name: string; // 赞助方式名称，如 "支付宝"、"微信"、"PayPal"
+	name: string; // 收款方式名称，如 "支付宝"、"微信"、"PayPal"
 	icon?: string; // 图标名称（Iconify 格式），如 "fa6-brands:alipay"
 	qrCode?: string; // 收款码图片路径（相对于 public 目录），可选
-	link?: string; // 赞助链接 URL，可选。如果提供，会显示跳转按钮
+	link?: string; // 收款链接 URL，可选。如果提供，会显示跳转按钮
+	wallet?: string; // 钱包地址（加密货币用），可选
 	description?: string; // 描述文本
 	enabled: boolean; // 是否启用
 };
 
-// 赞助者列表项
+// 收款记录项
 export type SponsorItem = {
-	name: string; // 赞助者名称，如果想显示匿名，可以直接设置为"匿名"或使用 i18n
-	amount?: string; // 赞助金额（可选）
-	date?: string; // 赞助日期（可选，ISO 格式）
+	name: string; // 付款人名称，如果想显示匿名，可以直接设置为"匿名"或使用 i18n
+	amount?: string; // 金额（可选）
+	date?: string; // 日期（可选，ISO 格式）
 	message?: string; // 留言（可选）
 };
 
-// 赞助配置
+// 收款配置
 export type SponsorConfig = {
 	title?: string; // 页面标题，默认使用 i18n
 	description?: string; // 页面描述文本
-	usage?: string; // 赞助用途说明
-	methods: SponsorMethod[]; // 赞助方式列表
-	sponsors?: SponsorItem[]; // 赞助者列表（可选）
-	showSponsorsList?: boolean; // 是否显示赞助者列表，默认 true
-	showButtonInPost?: boolean; // 是否在文章详情页底部显示赞助按钮，默认 true
+	usage?: string; // 收款用途说明
+	methods: SponsorMethod[]; // 收款方式列表
+	sponsors?: SponsorItem[]; // 收款记录列表（可选）
+	showSponsorsList?: boolean; // 是否显示收款记录，默认 true
+	showButtonInPost?: boolean; // 是否在文章详情页底部显示打钱按钮，默认 true
 };

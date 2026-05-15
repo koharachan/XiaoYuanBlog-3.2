@@ -186,23 +186,23 @@ export const ru: Translation = {
 	[Key.wallpaperOverlayMode]: "Прозрачный",
 	[Key.wallpaperNoneMode]: "Однотонный фон",
 
-	// Страница спонсоров
-	[Key.sponsor]: "Спонсор",
-	[Key.sponsorTitle]: "Поддержать меня",
+	// Страница оплаты
+	[Key.sponsor]: "Донат",
+	[Key.sponsorTitle]: "Поддержать",
 	[Key.sponsorDescription]:
-		"Если мой контент был полезен для вас, добро пожаловать поддержать меня следующими способами. Ваша поддержка - это движущая сила моего постоянного творчества!",
+		"Если мой контент был полезен, поддержите донатом! Ваша поддержка — топливо для творчества!",
 	[Key.sponsorMethods]: "Способы оплаты",
-	[Key.sponsorList]: "Спонсоры",
-	[Key.sponsorEmpty]: "Пока нет спонсоров",
+	[Key.sponsorList]: "Донатеры",
+	[Key.sponsorEmpty]: "Пока нет донатов",
 	[Key.sponsorAmount]: "Сумма",
 	[Key.sponsorDate]: "Дата",
 	[Key.sponsorMessage]: "Сообщение",
 	[Key.sponsorAnonymous]: "Анонимно",
-	[Key.scanToSponsor]: "Сканировать для поддержки",
-	[Key.sponsorGoTo]: "Перейти к спонсору",
+	[Key.scanToSponsor]: "Скан для доната",
+	[Key.sponsorGoTo]: "Задонатить",
 	[Key.sponsorButton]: "Поддержка и Поделиться",
 	[Key.sponsorButtonText]:
-		"Если эта статья помогла вам, пожалуйста, поделитесь или поддержите!",
+		"Если статья помогла — поделись или задонать!",
 
 	[Key.shareOnSocial]: "Поделиться статьей",
 	[Key.shareOnSocialDescription]:

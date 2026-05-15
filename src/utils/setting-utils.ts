@@ -120,28 +120,29 @@ export function applyThemeToDocument(theme: LIGHT_DARK_MODE) {
 		: expressiveCodeConfig.lightTheme;
 	const needsCodeThemeUpdate = currentTheme !== expectedTheme;
 
-	// 如果既不需要主题切换也不需要代码主题更新，直接返回
 	if (!needsThemeChange && !needsCodeThemeUpdate) {
 		return;
 	}
 
-	// 批量 DOM 操作，减少重绘
-	if (needsThemeChange) {
-		// 添加过渡保护类（但会导致大量重绘，所以使用更轻量的方式）
-		// document.documentElement.classList.add("is-theme-transitioning");
-
-		// 直接切换主题，利用 CSS 变量的特性让浏览器优化过渡
-		if (targetIsDark) {
-			document.documentElement.classList.add("dark");
-		} else {
-			document.documentElement.classList.remove("dark");
+	const flip = () => {
+		if (needsThemeChange) {
+			if (targetIsDark) {
+				document.documentElement.classList.add("dark");
+			} else {
+				document.documentElement.classList.remove("dark");
+			}
 		}
+		if (needsCodeThemeUpdate) {
+			document.documentElement.setAttribute("data-theme", expectedTheme);
+		}
+	};
+
+	if (!needsThemeChange || !(document as any).startViewTransition) {
+		flip();
+		return;
 	}
 
-	// Set the theme for Expressive Code based on current mode
-	if (needsCodeThemeUpdate) {
-		document.documentElement.setAttribute("data-theme", expectedTheme);
-	}
+	(document as any).startViewTransition(() => flip());
 }
 
 // 系统主题监听器引用

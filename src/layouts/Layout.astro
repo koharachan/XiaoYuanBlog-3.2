@@ -4,7 +4,6 @@ import MicrosoftClarity from "@components/analytics/MicrosoftClarity.astro";
 import FancyboxManager from "@components/features/FancyboxManager.astro";
 import FontManager from "@components/features/FontManager.astro";
 import KatexManager from "@components/features/KatexManager.astro";
-import MusicPlayer from "@components/features/MusicPlayer.astro";
 import SakuraEffect from "@components/features/SakuraEffect.astro";
 import ConfigCarrier from "@components/layout/ConfigCarrier.astro";
 
@@ -141,6 +140,9 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
+    
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6041318726736667" crossorigin="anonymous"></script>
+    
     {
       favicons.map((favicon) => (
         <link
@@ -429,9 +431,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     {shouldShowTopHighlight && <div class="top-gradient-highlight" />}
     <ConfigCarrier />
     <slot />
-
-    <!-- Music Player -->
-    <MusicPlayer />
 
     <!-- increase the page height during page transition to prevent the scrolling animation from jumping -->
     <div id="page-height-extend" class="hidden h-[300vh]"></div>

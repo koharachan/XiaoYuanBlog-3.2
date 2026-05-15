@@ -184,20 +184,20 @@ export const ja: Translation = {
 	[Key.wallpaperOverlayMode]: "透明",
 	[Key.wallpaperNoneMode]: "単色背景",
 
-	// スポンサーページ
-	[Key.sponsor]: "スポンサー",
+	// お支払いページ
+	[Key.sponsor]: "投げ銭",
 	[Key.sponsorTitle]: "サポート",
 	[Key.sponsorDescription]:
-		"私のコンテンツがあなたの役に立ったなら、以下の方法で私をスポンサーしてください。あなたのサポートは私の継続的な創作の原動力です！",
+		"コンテンツが役に立ったなら、以下の方法で投げ銭を！サポートは継続的な創作の原動力です！",
 	[Key.sponsorMethods]: "支払い方法",
-	[Key.sponsorList]: "スポンサーリスト",
-	[Key.sponsorEmpty]: "スポンサー記録なし",
+	[Key.sponsorList]: "投げ銭リスト",
+	[Key.sponsorEmpty]: "投げ銭記録なし",
 	[Key.sponsorAmount]: "金額",
 	[Key.sponsorDate]: "日付",
 	[Key.sponsorMessage]: "メッセージ",
 	[Key.sponsorAnonymous]: "匿名",
-	[Key.scanToSponsor]: "スキャンしてスポンサー",
-	[Key.sponsorGoTo]: "スポンサーへ",
+	[Key.scanToSponsor]: "スキャンして投げ銭",
+	[Key.sponsorGoTo]: "投げ銭へ",
 	[Key.sponsorButton]: "サポートと共有",
 	[Key.sponsorButtonText]:
 		"この記事が役に立ったなら、共有またはサポートをお願いします！",

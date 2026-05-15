@@ -35,53 +35,23 @@ html {
 }
 
 @layer components {
-    /* View Transitions API 主题切换动画 */
-    /* 为整个文档根元素设置视图过渡 */
-    ::view-transition-old(root),
-    ::view-transition-new(root) {
-        animation-duration: 0.5s;
-        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-        /* 使用混合模式使颜色过渡更平滑 */
-        mix-blend-mode: normal;
-    }
-    
-    /* 视图过渡组 - 使用交叉淡化效果 */
-    ::view-transition-group(root) {
-        animation-duration: 0.5s;
-        animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    
-    /* 淡出旧视图 - 使用更平滑的曲线 */
+    /* View Transitions API 主题切换动画 — 黑圈从右上角扩散 */
     ::view-transition-old(root) {
-        animation-name: theme-fade-out;
-        /* 确保背景色同步切换 */
-        z-index: 2;
-    }
-    
-    /* 淡入新视图 - 使用更平滑的曲线 */
-    ::view-transition-new(root) {
-        animation-name: theme-fade-in;
-        /* 确保新视图在上层 */
+        animation: none;
         z-index: 1;
     }
-    
-    /* 定义淡出动画 - 使用更平滑的缓动函数 */
-    @keyframes theme-fade-out {
-        0% {
-            opacity: 1;
-        }
-        100% {
-            opacity: 0;
-        }
+
+    ::view-transition-new(root) {
+        animation: theme-expand 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 2;
     }
-    
-    /* 定义淡入动画 - 从下层淡入 */
-    @keyframes theme-fade-in {
+
+    @keyframes theme-expand {
         0% {
-            opacity: 0;
+            clip-path: circle(0% at 100% 0);
         }
         100% {
-            opacity: 1;
+            clip-path: circle(150% at 100% 0);
         }
     }
     
@@ -115,8 +85,6 @@ html {
     /* 禁用复杂选择器元素的过渡 - 仅在非 View Transitions 模式下 */
     .is-theme-transitioning:not(.use-view-transition) .float-panel,
     .is-theme-transitioning:not(.use-view-transition) .float-panel *,
-    .is-theme-transitioning:not(.use-view-transition) .music-player,
-    .is-theme-transitioning:not(.use-view-transition) .music-player *,
     .is-theme-transitioning:not(.use-view-transition) .widget,
     .is-theme-transitioning:not(.use-view-transition) .widget *,
     .is-theme-transitioning:not(.use-view-transition) .dropdown-content,
