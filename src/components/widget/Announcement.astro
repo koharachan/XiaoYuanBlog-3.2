@@ -1,0 +1,43 @@
+---
+import { announcementConfig } from "@/config";
+
+export interface Props {
+	class?: string;
+}
+---
+
+<div class:list={[Astro.props.class]} data-widget-type="announcement">
+	<div class={`p-4 rounded-lg border text-neutral-800 dark:text-neutral-200 ${{
+		info: 'border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-900/20',
+		warning: 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-900/20',
+		success: 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/20',
+		error: 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-900/20'
+	}[announcementConfig.type || 'info']}`}>
+		{/* 公告标题 */}
+		{announcementConfig.title && (
+			<div class="flex items-center gap-2 mb-2">
+				{announcementConfig.icon && (
+					<span class="text-lg">{announcementConfig.icon}</span>
+				)}
+				<h3 class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{announcementConfig.title}</h3>
+			</div>
+		)}
+		
+		{/* 公告内容 */}
+		<div class="text-sm mb-3">
+			{announcementConfig.content}
+		</div>
+		
+		{/* 公告链接 */}
+		{announcementConfig.link?.enable && (
+			<a 
+				href={announcementConfig.link.url}
+				target={announcementConfig.link.external ? '_blank' : '_self'}
+				rel={announcementConfig.link.external ? 'noopener noreferrer' : ''}
+				class="text-sm text-blue-600 hover:underline dark:text-blue-400"
+			>
+				{announcementConfig.link.text}
+			</a>
+		)}
+	</div>
+</div>

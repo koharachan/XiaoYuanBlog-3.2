@@ -1,0 +1,144 @@
+/* ==========================================================================
+   Page Transition Animations (Swup) & Global Animations
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Swup Page Transitions
+   -------------------------------------------------------------------------- */
+
+/* Main Content Transition */
+.transition-main {
+    transition: 
+        opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Leaving Animation */
+.transition-leaving {
+    transition:
+        transform 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19),
+        opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+/* State: Changing (Swup) */
+html.is-changing .transition-main {
+    transition: 
+        opacity 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+html.is-leaving .transition-main {
+    transition: 
+        opacity 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19),
+        transform 200ms cubic-bezier(0.55, 0.055, 0.675, 0.19);
+}
+
+/* State: Animating (Entering) */
+html.is-animating .transition-main {
+    opacity: 0;
+    transform: translateY(1.5rem) translateX(0.5rem);
+}
+
+/* State: Leaving */
+html.is-animating.is-leaving .transition-leaving {
+    transform: translateY(-1rem) translateX(-0.5rem);
+    opacity: 0;
+}
+
+/* Swup Fade Fallback */
+html.is-changing .transition-swup-fade {
+    transition: all 300ms ease-out;
+}
+
+html.is-animating .transition-swup-fade {
+    opacity: 0;
+    transform: translateY(1.5rem);
+}
+
+/* --------------------------------------------------------------------------
+   2. Keyframes
+   -------------------------------------------------------------------------- */
+
+@keyframes fade-in-up {
+    from {
+        opacity: 0;
+        transform: translateY(1.5rem) translateX(0.5rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) translateX(0);
+    }
+}
+
+/* --------------------------------------------------------------------------
+   3. Onload Animations
+   -------------------------------------------------------------------------- */
+
+.onload-animation {
+    opacity: 0;
+    animation: fade-in-up 400ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* 渐进式动画延迟 — staggered cascade */
+.onload-animation:nth-child(1) { animation-delay: 0ms; }
+.onload-animation:nth-child(2) { animation-delay: 60ms; }
+.onload-animation:nth-child(3) { animation-delay: 120ms; }
+.onload-animation:nth-child(4) { animation-delay: 180ms; }
+.onload-animation:nth-child(5) { animation-delay: 240ms; }
+.onload-animation:nth-child(6) { animation-delay: 300ms; }
+.onload-animation:nth-child(7) { animation-delay: 350ms; }
+.onload-animation:nth-child(8) { animation-delay: 400ms; }
+
+/* 卡片加载动画 — scale + fade */
+@keyframes card-load-in {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.post-card {
+    opacity: 0;
+    animation: card-load-in 450ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+.post-card:nth-child(1)  { animation-delay: 40ms; }
+.post-card:nth-child(2)  { animation-delay: 90ms; }
+.post-card:nth-child(3)  { animation-delay: 140ms; }
+.post-card:nth-child(4)  { animation-delay: 190ms; }
+.post-card:nth-child(5)  { animation-delay: 240ms; }
+.post-card:nth-child(6)  { animation-delay: 290ms; }
+.post-card:nth-child(7)  { animation-delay: 330ms; }
+.post-card:nth-child(8)  { animation-delay: 370ms; }
+
+/* 按钮图标切换动画 — 旋转 + 淡入淡出 */
+.btn-plain .absolute {
+    transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-plain:active .absolute:not(.opacity-0) {
+    transform: scale(0.85);
+}
+
+/* 导航栏按钮悬停微动效 */
+.btn-plain.scale-animation:hover {
+    transform: scale(1.08);
+}
+
+.btn-plain.scale-animation:active {
+    transform: scale(0.92);
+}
+
+/* 内容区入场过渡增强 */
+.transition-main {
+    transition: 
+        opacity 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+        transform 300ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+

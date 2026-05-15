@@ -1,0 +1,510 @@
+---
+import Live2DWidget from "@components/features/Live2DWidget.astro";
+import OverlayWallpaper from "@components/features/OverlayWallpaper.astro";
+import SpineModel from "@components/features/SpineModel.astro";
+import Footer from "@components/layout/Footer.astro";
+import Navbar from "@components/layout/Navbar.astro";
+import SideBar from "@components/layout/SideBar.astro";
+import type { MarkdownHeading } from "astro";
+import { Icon } from "astro-icon/components";
+import ImageWrapper from "@/components/common/ImageWrapper.astro";
+import FloatingControls from "@/components/controls/FloatingControls.astro";
+import TypewriterText from "@/components/features/TypewriterText.astro";
+import IconifyLoader from "@/components/misc/IconifyLoader.astro";
+import {
+	backgroundWallpaper,
+	live2dModelConfig,
+	sidebarLayoutConfig,
+	siteConfig,
+} from "@/config";
+import { getBackgroundImages, isHomePage } from "@/utils/layout-utils";
+import {
+	generateGridClasses,
+	generateMainContentClasses,
+	generateRightSidebarClasses,
+	generateSidebarClasses,
+	getResponsiveSidebarConfig,
+	type ResponsiveSidebarConfig,
+} from "@/utils/responsive-utils";
+import Layout from "./Layout.astro";
+
+interface Props {
+	title?: string;
+	banner?: string;
+	description?: string;
+	lang?: string;
+	setOGTypeArticle?: boolean;
+	postSlug?: string;
+	headings?: MarkdownHeading[];
+}
+
+const backgroundImages = getBackgroundImages();
+
+const {
+	title,
+	banner,
+	description,
+	lang,
+	setOGTypeArticle,
+	postSlug,
+	headings = [],
+} = Astro.props;
+
+// 检查背景壁纸模式和是否允许切换
+const isBannerMode = backgroundWallpaper.mode === "banner";
+const isOverlayMode = backgroundWallpaper.mode === "overlay";
+const isBackgroundEnabled = backgroundWallpaper.mode !== "none";
+const isWallpaperSwitchable = backgroundWallpaper.switchable ?? true;
+
+// 检查是否启用波浪动画效果
+const wavesConfig = backgroundWallpaper.banner?.waves?.enable;
+// 处理分设备控制的波浪动画
+const wavesEnabledOnDesktop =
+	typeof wavesConfig === "object" ? wavesConfig.desktop : wavesConfig;
+const wavesEnabledOnMobile =
+	typeof wavesConfig === "object" ? wavesConfig.mobile : wavesConfig;
+
+// 处理分设备控制的横幅信贷显示
+const creditEnableConfig = backgroundWallpaper.banner?.credit?.enable;
+const creditEnabledOnDesktop =
+	typeof creditEnableConfig === "object"
+		? creditEnableConfig.desktop
+		: creditEnableConfig;
+const creditEnabledOnMobile =
+	typeof creditEnableConfig === "object"
+		? creditEnableConfig.mobile
+		: creditEnableConfig;
+
+const hasBannerCredit =
+	isBannerMode && isBackgroundEnabled && creditEnableConfig;
+
+// 处理分设备控制的横幅信贷文本和链接
+const creditTextConfig = backgroundWallpaper.banner?.credit?.text;
+const creditTextDesktop =
+	typeof creditTextConfig === "object"
+		? creditTextConfig.desktop
+		: creditTextConfig;
+const creditTextMobile =
+	typeof creditTextConfig === "object"
+		? creditTextConfig.mobile
+		: creditTextConfig;
+
+const creditUrlConfig = backgroundWallpaper.banner?.credit?.url;
+const creditUrlDesktop =
+	typeof creditUrlConfig === "object"
+		? creditUrlConfig.desktop
+		: creditUrlConfig;
+const creditUrlMobile =
+	typeof creditUrlConfig === "object"
+		? creditUrlConfig.mobile
+		: creditUrlConfig;
+
+// 检查是否为首页
+const isHomePageCheck = isHomePage(Astro.url.pathname);
+
+// 检查是否在文章详情页
+const isPostPage = !!postSlug;
+
+// 随机选择副标题（当打字机关闭且为数组时）
+const getRandomSubtitle = () => {
+	const subtitle = backgroundWallpaper.banner?.homeText?.subtitle;
+	if (Array.isArray(subtitle)) {
+		const randomIndex = Math.floor(Math.random() * subtitle.length);
+		return subtitle[randomIndex];
+	}
+	return subtitle;
+};
+const randomSubtitle = getRandomSubtitle();
+
+// 主页横幅文本只在首页且全局开关为 true 时显示，不区分设备
+const homeTextEnable = backgroundWallpaper.banner?.homeText?.enable;
+const showHomeText = isBannerMode && !!homeTextEnable && isHomePageCheck;
+// 手机端非首页不显示banner的CSS类
+const mobileNonHomeBannerClass = !isHomePageCheck ? "mobile-hide-banner" : "";
+
+// 获取响应式侧边栏配置
+const sidebarConfig = getResponsiveSidebarConfig();
+
+// 在文章页面且启用了showRightSidebarOnPostPage时，要确保有右侧组件并参与网格计算
+const shouldShowRightSidebarOnPostPage: boolean =
+	isPostPage &&
+	sidebarLayoutConfig.position === "left" &&
+	!!sidebarLayoutConfig.showRightSidebarOnPostPage;
+
+const effectiveIsBothSidebars: boolean =
+	sidebarConfig.isBothSidebars || shouldShowRightSidebarOnPostPage;
+const effectiveHasRightComponents: boolean =
+	sidebarConfig.hasRightComponents ||
+	(shouldShowRightSidebarOnPostPage &&
+		sidebarLayoutConfig.rightComponents.some((comp) => comp.enable));
+
+// 使用effective值重新生成网格类
+const updatedGridConfig: ResponsiveSidebarConfig = {
+	...sidebarConfig,
+	isBothSidebars: effectiveIsBothSidebars,
+	hasRightComponents: effectiveHasRightComponents,
+};
+
+const { gridCols } = generateGridClasses(updatedGridConfig);
+const sidebarClass = generateSidebarClasses();
+const rightSidebarClass = effectiveIsBothSidebars
+	? generateRightSidebarClasses()
+	: "";
+const mainContentClass = generateMainContentClasses(updatedGridConfig);
+
+// 检查是否应该启用半透明效果
+const shouldEnableTransparency = isOverlayMode && isBackgroundEnabled;
+
+// 为组件添加半透明效果的CSS类
+const transparentClass = shouldEnableTransparency
+	? "wallpaper-transparent"
+	: "";
+
+const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
+
+const navbarTransparentMode =
+	backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
+const shouldShowTopHighlight =
+	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
+
+const bannerDisplayDesktop = backgroundWallpaper.banner?.display?.desktop;
+const bannerDisplayMobile = backgroundWallpaper.banner?.display?.mobile;
+
+const desktopImgStyle = [
+	`object-fit: ${bannerDisplayDesktop?.fitMode || "cover"}`,
+	bannerDisplayDesktop?.position ? `object-position: ${bannerDisplayDesktop.position}` : `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
+	bannerDisplayDesktop?.size ? `width: ${bannerDisplayDesktop.size.split(" ")[0]}; height: ${bannerDisplayDesktop.size.split(" ")[1] || "auto"}` : "",
+	bannerDisplayDesktop?.repeat ? `background-repeat: ${bannerDisplayDesktop.repeat}` : "",
+	bannerDisplayDesktop?.backgroundColor ? `background-color: ${bannerDisplayDesktop.backgroundColor}` : "",
+].filter(Boolean).join("; ");
+
+const mobileImgStyle = [
+	`object-fit: ${bannerDisplayMobile?.fitMode || "cover"}`,
+	bannerDisplayMobile?.position ? `object-position: ${bannerDisplayMobile.position}` : `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
+	bannerDisplayMobile?.size ? `width: ${bannerDisplayMobile.size.split(" ")[0]}; height: ${bannerDisplayMobile.size.split(" ")[1] || "auto"}` : "",
+].filter(Boolean).join("; ");
+
+const desktopImgClass = bannerDisplayDesktop?.fitMode && bannerDisplayDesktop.fitMode !== "cover"
+	? ["hidden lg:block h-full transition duration-700 opacity-100"]
+	: ["hidden lg:block object-cover h-full transition duration-700 opacity-100"];
+const mobileImgClass = bannerDisplayMobile?.fitMode && bannerDisplayMobile.fitMode !== "cover"
+	? ["block lg:hidden h-full w-full transition duration-700 opacity-100"]
+	: ["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"];
+---
+
+<Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug}>
+
+
+<!-- 全屏透明覆盖壁纸 - 如果允许切换则始终渲染，否则只渲染当前模式 -->
+{(isWallpaperSwitchable || isOverlayMode) && (
+	<OverlayWallpaper config={{
+		src: {
+			desktop: typeof backgroundImages.desktop === 'string' ? backgroundImages.desktop : '',
+			mobile: typeof backgroundImages.mobile === 'string' ? backgroundImages.mobile : ''
+		},
+		zIndex: backgroundWallpaper.overlay?.zIndex,
+		opacity: backgroundWallpaper.overlay?.opacity,
+		blur: backgroundWallpaper.overlay?.blur,
+	}} 
+	className={isWallpaperSwitchable && !isOverlayMode ? "hidden opacity-0" : undefined} />
+)}
+
+<!-- 全局图标加载器 -->
+<IconifyLoader />
+
+<!-- 为全屏壁纸模式添加body类 -->
+{shouldEnableTransparency && (
+	<script>
+		document.body.classList.add('wallpaper-transparent');
+	</script>
+)}
+
+<!-- Navbar -->
+<slot slot="head" name="head"></slot>
+<div id="top-row" class="z-50 relative transition-all duration-700 mx-auto" class:list={[navbarWidthFull ? "" : "max-w-[var(--page-width)] px-0 md:px-4"]}>
+    <div id="navbar-wrapper" class="sticky top-0 transition-all z-50">
+        <Navbar></Navbar>
+    </div>
+</div>
+
+<!-- Banner - 全屏固定背景，CSS控制显示 -->
+<div id="banner-wrapper" class={`fixed inset-0 z-0 w-full h-screen overflow-hidden transition-all duration-700 ease-in-out ${mobileNonHomeBannerClass}`}>
+    <!-- 页面顶部渐变高光效果 -->
+    {shouldShowTopHighlight && <div class="top-gradient-highlight" />}
+    <!-- 背景图片显示 -->
+    <div class="relative h-full w-full" style={bannerDisplayDesktop?.backgroundColor ? `background-color: ${bannerDisplayDesktop.backgroundColor}` : undefined}>
+        <!-- Mobile: use mobile-specific image -->
+        <ImageWrapper 
+            alt="Mobile background image of the blog" 
+            class:list={mobileImgClass}
+            src={typeof backgroundImages.mobile === 'string' ? backgroundImages.mobile : (typeof backgroundImages.desktop === 'string' ? backgroundImages.desktop : '')} 
+            position={mobileImgStyle}
+        />
+        <!-- Desktop: use desktop-specific image -->
+        <ImageWrapper 
+            id="banner" 
+            alt="Desktop background image of the blog" 
+            class:list={desktopImgClass}
+            src={typeof backgroundImages.desktop === 'string' ? backgroundImages.desktop : (typeof backgroundImages.mobile === 'string' ? backgroundImages.mobile : '')} 
+            position={desktopImgStyle}
+        />
+    </div>
+    
+    <!-- Home page text overlay - 始终渲染以便切换模式时控制显示 -->
+    {(isWallpaperSwitchable || showHomeText) && homeTextEnable && (
+        <div class={`banner-text-overlay absolute inset-0 z-20 flex items-center justify-center ${!showHomeText ? 'hidden' : ''}`}>
+            <div class="w-4/5 lg:w-3/4 text-center mb-0">
+                <div class="flex flex-col">
+                    {backgroundWallpaper.banner?.homeText?.title && (
+                        <h1 class="banner-title font-bold text-white mb-2 lg:mb-4 leading-tight" style={{ fontSize: backgroundWallpaper.banner.homeText.titleSize || "3rem" }}>
+                            {backgroundWallpaper.banner.homeText.title}
+                        </h1>
+                    )}
+                    {backgroundWallpaper.banner?.homeText?.subtitle && (
+                        <h2 id="banner-subtitle" class="banner-subtitle text-white/90 leading-snug" style={{ fontSize: backgroundWallpaper.banner.homeText.subtitleSize || "1.5rem" }} data-subtitles={JSON.stringify(backgroundWallpaper.banner.homeText.subtitle)}>
+                            {backgroundWallpaper.banner.homeText.typewriter?.enable ? (
+                                <TypewriterText 
+                                    text={backgroundWallpaper.banner.homeText.subtitle}
+                                    speed={backgroundWallpaper.banner.homeText.typewriter.speed}
+                                    deleteSpeed={backgroundWallpaper.banner.homeText.typewriter.deleteSpeed}
+                                    pauseTime={backgroundWallpaper.banner.homeText.typewriter.pauseTime}
+                                />
+                            ) : (
+                                randomSubtitle
+                            )}
+                        </h2>
+                    )}
+                </div>
+            </div>
+        </div>
+    )}
+    
+    <script is:inline>
+        function setRandomSubtitle() {
+            const subtitleElement = document.getElementById('banner-subtitle');
+            if (!subtitleElement) return;
+            
+            const subtitlesData = subtitleElement.dataset.subtitles;
+            if (!subtitlesData) return;
+            
+            try {
+                const subtitles = JSON.parse(subtitlesData);
+                // Only randomize if it's an array and typewriter is NOT enabled (check for typewriter class)
+                if (Array.isArray(subtitles) && subtitles.length > 0 && !subtitleElement.querySelector('.typewriter')) {
+                    // Use a global variable to persist the subtitle across Swup navigations
+                    // This variable will be reset on full page reload (F5), meeting the requirement
+                    if (!window.fireflyCachedSubtitle) {
+                        const randomIndex = Math.floor(Math.random() * subtitles.length);
+                        window.fireflyCachedSubtitle = subtitles[randomIndex];
+                    }
+                    subtitleElement.textContent = window.fireflyCachedSubtitle;
+                }
+            } catch (e) {
+                console.error("Failed to parse subtitles", e);
+            }
+        }
+
+        // Run on initial load
+        setRandomSubtitle();
+    </script>
+    
+</div>
+
+<!-- Main content -->
+<div class={`relative w-full z-30 pointer-events-none ${transparentClass}`}>
+    <!-- Water waves effect - 随页面滚动，仅Banner模式显示 -->
+    <div class={`waves -mt-[1px] h-[3vh] max-h-[3rem] min-h-[1.5rem] w-full md:h-[4vh] transition-all duration-700 ease-in-out
+        ${!wavesEnabledOnMobile ? 'hidden' : ''} ${!wavesEnabledOnDesktop ? 'md:hidden' : ''}`}
+        id="header-waves" 
+        style="transform: translateZ(0); will-change: fill;">
+        <svg
+            class="waves"
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            viewBox="0 24 150 20"
+            preserveAspectRatio="none"
+            shape-rendering="geometricPrecision"
+        >
+            <defs>
+                <path
+                    id="gentle-wave"
+                    d="M-160 44c30 0 58-12 88-12s 58 12 88 12 58-12 88-12 58 12 88 12 v36h-352z"
+                >
+                </path>
+            </defs>
+            <g class="parallax">
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="0"
+                    class="opacity-25 fill-[var(--page-bg)]"
+                ></use>
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="2"
+                    class="opacity-50 fill-[var(--page-bg)]"
+                ></use>
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="3"
+                    class="opacity-65 fill-[var(--page-bg)]"
+                ></use>
+                <use
+                    xlink:href="#gentle-wave"
+                    x="48"
+                    y="4"
+                    class=" opacity-75 fill-[var(--page-bg)]"
+                ></use>
+            </g>
+        </svg>
+    </div>
+    <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
+    <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
+        <div id="main-grid"
+          class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 p-[10px] md:p-4 rounded-2xl bg-[var(--card-bg-transparent)] backdrop-blur-sm ${!sidebarConfig.mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
+          data-sidebar-position={sidebarLayoutConfig.position}
+          data-show-right-sidebar-on-post={sidebarLayoutConfig.showRightSidebarOnPostPage ? "true" : "false"}
+        >
+            <!-- Background image credit - Desktop -->
+            {hasBannerCredit && creditEnabledOnDesktop && <a 
+                href={creditUrlDesktop || "#"} 
+                id="banner-credit-desktop" 
+                target={creditUrlDesktop ? "_blank" : "_self"}
+                rel={creditUrlDesktop ? "noopener" : ""}
+                aria-label="Visit image source"
+                class:list={[
+                    "group onload-animation transition-all absolute justify-center items-center rounded-full " +
+                    "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9 hidden md:flex", 
+                    {"hover:pr-9 active:bg-black/80": creditUrlDesktop}
+                ]}
+            >
+                <Icon class="text-white/75 text-[1.25rem] mr-1" name="material-symbols:copyright-outline-rounded" ></Icon>
+                <div class="text-white/75 text-xs">{creditTextDesktop}</div>
+                {creditUrlDesktop && <Icon class:list={["transition absolute text-[oklch(0.75_0.14_var(--hue))] right-4 text-[0.75rem] opacity-0 group-hover:opacity-100"]}
+                      name="fa6-solid:arrow-up-right-from-square">
+                </Icon>}
+            </a>}
+
+            <!-- Background image credit - Mobile -->
+            {hasBannerCredit && creditEnabledOnMobile && <a 
+                href={creditUrlMobile || "#"} 
+                id="banner-credit-mobile" 
+                target={creditUrlMobile ? "_blank" : "_self"}
+                rel={creditUrlMobile ? "noopener" : ""}
+                aria-label="Visit image source"
+                class:list={[
+                    "group onload-animation transition-all absolute justify-center items-center rounded-full " +
+                    "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9 flex md:hidden", 
+                    {"hover:pr-9 active:bg-black/80": creditUrlMobile}
+                ]}
+            >
+                <Icon class="text-white/75 text-[1.25rem] mr-1" name="material-symbols:copyright-outline-rounded" ></Icon>
+                <div class="text-white/75 text-xs">{creditTextMobile}</div>
+                {creditUrlMobile && <Icon class:list={["transition absolute text-[oklch(0.75_0.14_var(--hue))] right-4 text-[0.75rem] opacity-0 group-hover:opacity-100"]}
+                      name="fa6-solid:arrow-up-right-from-square">
+                </Icon>}
+            </a>}
+
+
+            {/* 渲染侧边栏 - 769px及以上显示 */}
+            <div id="left-sidebar-wrapper" class="contents" style="contain: layout style paint;">
+                {sidebarConfig.hasLeftComponents && (
+                    <SideBar
+                        side={sidebarConfig.isBothSidebars ? "left" : undefined}
+                        class={`${sidebarClass} ${transparentClass}`}
+                        headings={headings}
+                    />
+                )}
+            </div>
+                    
+            {/* 主内容区 - 始终渲染，确保 Swup 容器存在 */}
+            <main id="swup-container" class={`${mainContentClass} transition-main`}>
+                {/* 携带网格布局类名，用于JS更新父容器 */}
+                <div id="grid-class-carrier" data-grid-class={gridCols} class="hidden"></div>
+                {/* 备用 h1 标题 - 当主页横幅文本未启用时，提供隐藏的主标题 */}
+                {isHomePageCheck && !showHomeText && (
+                        <h1 class="sr-only">{siteConfig.title}</h1>
+                )}
+                <div id="content-wrapper" class="onload-animation transition-leaving">
+                    <slot></slot>
+                    <div class="footer col-span-1 md:col-span-2 lg:col-span-2 xl:col-span-3 onload-animation hidden lg:block">
+                        <Footer></Footer>
+                    </div>
+                </div>
+            </main>
+            
+            {/* 右侧边栏 - 仅双侧边栏模式 */}
+            {/*
+                如果全局配置为双侧栏(position: both)，则使用静态容器(不被swup替换)，避免闪烁。
+                如果全局配置为单侧栏(position: left)，则使用动态容器(被swup替换)，以便在文章页显示右侧栏。
+                注意：为了满足swup要求所有containers必须存在，我们在两种模式下都必须渲染 #right-sidebar-dynamic。
+                右侧边栏在1280px以下隐藏（CSS处理）。
+            */}
+            {sidebarLayoutConfig.position === "both" ? (
+                <>
+                    <div id="right-sidebar-static" class="contents">
+                        {effectiveIsBothSidebars && effectiveHasRightComponents && (
+                            <SideBar side="right" class={`${rightSidebarClass} ${transparentClass}`} headings={headings}></SideBar>
+                        )}
+                    </div>
+                    <div id="right-sidebar-dynamic" class="hidden transition-swup-fade"></div>
+                </>
+            ) : (
+                <div id="right-sidebar-dynamic" class="contents transition-swup-fade">
+                    {effectiveIsBothSidebars && effectiveHasRightComponents && (
+                        <SideBar side="right" class={`${rightSidebarClass} ${transparentClass}`} headings={headings}></SideBar>
+                    )}
+                </div>
+            )}
+
+            {/* 移动端底部组件 - 768px及以下显示 */}
+            {sidebarLayoutConfig.mobileBottomComponents && sidebarLayoutConfig.mobileBottomComponents.length > 0 && (
+                <div id="mobile-bottom-sidebar" class="col-span-1 block md:hidden mt-4">
+                    <SideBar side="bottom" class={`${transparentClass}`} headings={headings}></SideBar>
+                </div>
+            )}
+
+            <div class="footer col-span-1 md:col-span-2 lg:col-span-2 onload-animation block lg:hidden">
+                <Footer></Footer>
+            </div>
+        </div>
+
+        <SpineModel></SpineModel>
+        {live2dModelConfig.enable && <Live2DWidget config={live2dModelConfig} />}
+    </div>
+</div>
+
+<FloatingControls headings={headings} />
+
+
+</Layout>
+
+<style is:global>
+  /* 右侧栏平滑过渡 */
+  #right-sidebar {
+    transition: opacity 0.35s ease-in-out,
+                transform 0.35s ease-in-out;
+  }
+
+
+  @keyframes swupFadeOut {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0.95;
+    }
+  }
+
+  /* 横幅文字阴影 - 更柔和的扩散效果 */
+  .banner-title {
+    text-shadow: 0 4px 24px rgba(0, 0, 0, 0.6);
+  }
+
+  .banner-subtitle {
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+  }
+</style>
+

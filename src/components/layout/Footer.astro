@@ -1,0 +1,79 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import { footerConfig, profileConfig } from "@/config";
+import { url } from "@/utils/url-utils";
+
+const currentYear = new Date().getFullYear();
+
+// 读取FooterConfig.html文件内容
+let customFooterHtml = "";
+if (footerConfig.enable) {
+	try {
+		const footerConfigPath = path.join(
+			process.cwd(),
+			"src",
+			"config",
+			"FooterConfig.html",
+		);
+		customFooterHtml = fs.readFileSync(footerConfigPath, "utf-8");
+		// 移除HTML注释
+		customFooterHtml = customFooterHtml.replace(/<!--[\s\S]*?-->/g, "").trim();
+	} catch (error) {
+		console.warn("FooterConfig.html文件读取失败:", error.message);
+	}
+}
+
+// 获取友情链接
+const friendLinks = footerConfig.links || [];
+---
+
+<!--<div class="border-t border-[var(&#45;&#45;primary)] mx-16 border-dashed py-8 max-w-[var(&#45;&#45;page-width)] flex flex-col items-center justify-center px-6">-->
+<div
+  class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"
+>
+</div>
+<!--<div class="transition bg-[oklch(92%_0.01_var(&#45;&#45;hue))] dark:bg-black rounded-2xl py-8 mt-4 mb-8 flex flex-col items-center justify-center px-6">-->
+<div
+  class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl py-6 mb-12 flex flex-col items-center justify-center px-6 bg-[var(--card-bg)]"
+>
+  <div class="transition text-50 text-sm text-center">
+    <div class="mb-2">
+      {customFooterHtml && <div set:html={customFooterHtml} />}
+    </div>
+    
+    <!-- 友情链接 -->
+    {friendLinks.length > 0 && (
+      <div class="mb-4">
+        <div class="flex flex-wrap justify-center gap-4 mb-2">
+          {friendLinks.map((link, index) => (
+            <a
+              class="transition link text-[var(--primary)] font-medium hover:text-[var(--btn-content)]"
+              target="_blank"
+              href={link.url}
+              rel="noopener"
+              title={link.description}
+            >
+              {link.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+    
+    <div class="m-0.5">
+      &copy; <span id="copyright-year">{currentYear}</span>
+      {profileConfig.name}. All Rights Reserved. /
+      <a
+        class="transition link text-[var(--primary)] font-medium"
+        target="_blank"
+        href={url("rss.xml")}>RSS</a
+      > /
+      <a
+        class="transition link text-[var(--primary)] font-medium"
+        target="_blank"
+        href={url("sitemap-index.xml")}>Sitemap</a
+      >
+    </div>
+  </div>
+</div>
