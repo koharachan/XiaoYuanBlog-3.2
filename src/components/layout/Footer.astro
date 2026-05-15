@@ -48,7 +48,6 @@ const friendLinks = footerConfig.links || [];
         <div class="flex flex-wrap justify-center gap-4 mb-2">
           {friendLinks.map((link, index) => (
             <a
-              key={index}
               class="transition link text-[var(--primary)] font-medium hover:text-[var(--btn-content)]"
               target="_blank"
               href={link.url}
