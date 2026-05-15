@@ -7,10 +7,8 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	switchable: true,
 	// 背景图片配置
 	src: {
-		// 桌面背景图片
-		desktop: "/upload/129812709_p0_master1200.jpg",
-		// 移动背景图片
-		mobile: "/upload/129812709_p0_master1200.jpg",
+		desktop: "/upload/banner-desktop.jpg",
+		mobile: "/upload/banner-mobile.jpg",
 	},
 	// Banner模式特有配置
 	banner: {

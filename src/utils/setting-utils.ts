@@ -364,7 +364,6 @@ function ensureWallpaperState(mode: WALLPAPER_MODE) {
 }
 
 function showBannerMode() {
-	// 隐藏全屏壁纸（通过CSS类和display控制）
 	const overlayContainer = document.querySelector(
 		"[data-overlay-wallpaper]",
 	) as HTMLElement;
@@ -375,19 +374,15 @@ function showBannerMode() {
 		overlayContainer.classList.remove("opacity-100");
 	}
 
-	// 显示banner壁纸（通过CSS类和display控制）
 	const bannerWrapper = document.getElementById("banner-wrapper");
 	if (bannerWrapper) {
-		// 检查当前是否为首页
 		const isHomePage = checkIsHomePage(window.location.pathname);
 		const isMobile = window.innerWidth < 1024;
 
-		// 移动端非首页时，不显示banner；桌面端始终显示
 		if (isMobile && !isHomePage) {
 			bannerWrapper.style.display = "none";
 			bannerWrapper.classList.add("mobile-hide-banner");
 		} else {
-			// 首页或桌面端：先设置display，然后使用requestAnimationFrame确保渲染
 			bannerWrapper.style.display = "block";
 			bannerWrapper.style.setProperty("display", "block", "important");
 			requestAnimationFrame(() => {
@@ -399,22 +394,15 @@ function showBannerMode() {
 		}
 	}
 
-	// 显示横幅图片来源文本
 	const creditDesktop = document.getElementById("banner-credit-desktop");
 	const creditMobile = document.getElementById("banner-credit-mobile");
 	if (creditDesktop) creditDesktop.style.display = "";
 	if (creditMobile) creditMobile.style.display = "";
 
-	// 显示横幅首页文本（如果启用且是首页）
 	const bannerTextOverlay = document.querySelector(".banner-text-overlay");
 	if (bannerTextOverlay) {
-		// 检查是否启用 homeText
 		const homeTextEnabled = backgroundWallpaper.banner?.homeText?.enable;
-
-		// 检查当前是否为首页
 		const isHomePage = checkIsHomePage(window.location.pathname);
-
-		// 只有在启用且在首页时才显示
 		if (homeTextEnabled && isHomePage) {
 			bannerTextOverlay.classList.remove("hidden");
 		} else {
@@ -422,34 +410,12 @@ function showBannerMode() {
 		}
 	}
 
-	// 调整主内容位置
-	adjustMainContentPosition("banner");
-
-	// 处理移动端非首页主内容区域位置
-	const mainContentWrapper = document.querySelector(".absolute.w-full.z-30");
-	if (mainContentWrapper) {
-		const isHomePage = checkIsHomePage(window.location.pathname);
-		const isMobile = window.innerWidth < 1024;
-		// 只在移动端非首页时调整主内容位置
-		if (isMobile && !isHomePage) {
-			mainContentWrapper.classList.add("mobile-main-no-banner");
-		} else {
-			mainContentWrapper.classList.remove("mobile-main-no-banner");
-		}
-	}
-
-	// 移除透明效果（横幅模式不使用半透明）
-	adjustMainContentTransparency(false);
-
-	// 调整导航栏透明度
 	const navbar = document.getElementById("navbar");
 	if (navbar) {
-		// 获取导航栏透明模式配置（banner模式）
 		const transparentMode =
 			backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
 		navbar.setAttribute("data-transparent-mode", transparentMode);
 
-		// 重新初始化半透明模式滚动检测（如果需要）
 		if (
 			transparentMode === "semifull" &&
 			typeof window.initSemifullScrollDetection === "function"
@@ -460,12 +426,10 @@ function showBannerMode() {
 }
 
 function showOverlayMode() {
-	// 显示全屏壁纸（通过CSS类和display控制）
 	const overlayContainer = document.querySelector(
 		"[data-overlay-wallpaper]",
 	) as HTMLElement;
 	if (overlayContainer) {
-		// 先设置display，然后使用requestAnimationFrame确保渲染
 		overlayContainer.style.display = "block";
 		overlayContainer.style.setProperty("display", "block", "important");
 		requestAnimationFrame(() => {
@@ -475,7 +439,6 @@ function showOverlayMode() {
 		});
 	}
 
-	// 隐藏banner壁纸（通过CSS类和display控制）
 	const bannerWrapper = document.getElementById("banner-wrapper");
 	if (bannerWrapper) {
 		bannerWrapper.style.display = "none";
@@ -484,27 +447,18 @@ function showOverlayMode() {
 		bannerWrapper.classList.remove("opacity-100");
 	}
 
-	// 隐藏横幅图片来源文本
 	const creditDesktop = document.getElementById("banner-credit-desktop");
 	const creditMobile = document.getElementById("banner-credit-mobile");
 	if (creditDesktop) creditDesktop.style.display = "none";
 	if (creditMobile) creditMobile.style.display = "none";
 
-	// 隐藏横幅首页文本
 	const bannerTextOverlay = document.querySelector(".banner-text-overlay");
 	if (bannerTextOverlay) {
 		bannerTextOverlay.classList.add("hidden");
 	}
-
-	// 调整主内容透明度
-	adjustMainContentTransparency(true);
-
-	// 调整布局为紧凑模式
-	adjustMainContentPosition("overlay");
 }
 
 function hideAllWallpapers() {
-	// 隐藏所有壁纸（通过CSS类和display控制）
 	const bannerWrapper = document.getElementById("banner-wrapper");
 	const overlayContainer = document.querySelector(
 		"[data-overlay-wallpaper]",
@@ -523,21 +477,15 @@ function hideAllWallpapers() {
 		overlayContainer.classList.remove("opacity-100");
 	}
 
-	// 隐藏横幅图片来源文本
 	const creditDesktop = document.getElementById("banner-credit-desktop");
 	const creditMobile = document.getElementById("banner-credit-mobile");
 	if (creditDesktop) creditDesktop.style.display = "none";
 	if (creditMobile) creditMobile.style.display = "none";
 
-	// 隐藏横幅首页文本
 	const bannerTextOverlay = document.querySelector(".banner-text-overlay");
 	if (bannerTextOverlay) {
 		bannerTextOverlay.classList.add("hidden");
 	}
-
-	// 调整主内容位置和透明度
-	adjustMainContentPosition("none");
-	adjustMainContentTransparency(false);
 }
 
 function updateNavbarTransparency(mode: WALLPAPER_MODE) {
@@ -589,53 +537,6 @@ function updateNavbarTransparency(mode: WALLPAPER_MODE) {
 		// 移除滚动监听器
 		window.removeEventListener("scroll", window.semifullScrollHandler);
 		delete window.semifullScrollHandler;
-	}
-}
-
-function adjustMainContentPosition(
-	mode: WALLPAPER_MODE | "banner" | "none" | "overlay",
-) {
-	const mainContent = document.querySelector(
-		".absolute.w-full.z-30",
-	) as HTMLElement;
-	if (!mainContent) return;
-
-	// 移除现有的位置类
-	mainContent.classList.remove("mobile-main-no-banner", "no-banner-layout");
-
-	switch (mode) {
-		case "banner":
-			// Banner模式：主内容在banner下方
-			mainContent.style.top = "calc(var(--banner-height) - 3rem)";
-			break;
-		case "overlay":
-			// Overlay模式：使用紧凑布局，主内容从导航栏下方开始
-			mainContent.classList.add("no-banner-layout");
-			mainContent.style.top = "5.5rem";
-			break;
-		case "none":
-			// 无壁纸模式：主内容从导航栏下方开始
-			mainContent.classList.add("no-banner-layout");
-			mainContent.style.top = "5.5rem";
-			break;
-		default:
-			mainContent.style.top = "5.5rem";
-			break;
-	}
-}
-
-function adjustMainContentTransparency(enable: boolean) {
-	const mainContent = document.querySelector(".absolute.w-full.z-30");
-	const body = document.body;
-
-	if (!mainContent || !body) return;
-
-	if (enable) {
-		mainContent.classList.add("wallpaper-transparent");
-		body.classList.add("wallpaper-transparent");
-	} else {
-		mainContent.classList.remove("wallpaper-transparent");
-		body.classList.remove("wallpaper-transparent");
 	}
 }
 

@@ -127,17 +127,6 @@ const showHomeText = isBannerMode && !!homeTextEnable && isHomePageCheck;
 // 手机端非首页不显示banner的CSS类
 const mobileNonHomeBannerClass = !isHomePageCheck ? "mobile-hide-banner" : "";
 
-// 计算主内容区域位置，考虑手机端非首页时banner被隐藏
-const mainPanelTop =
-	isBannerMode && isBackgroundEnabled
-		? `calc(${BANNER_HEIGHT}vh - ${MAIN_PANEL_OVERLAPS_BANNER_HEIGHT}rem)`
-		: "5.5rem";
-
-// 当banner模式被禁用时，主内容区域应该始终从顶栏下面开始
-// 非首页在小于1024px时会通过 mobile-main-no-banner CSS类覆盖top值为5.5rem
-const finalMainPanelTop =
-	isBannerMode && isBackgroundEnabled ? mainPanelTop : "5.5rem";
-
 // 获取响应式侧边栏配置
 const sidebarConfig = getResponsiveSidebarConfig();
 
@@ -214,11 +203,15 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
     </div>
 </div>
 
-<!-- Banner - 如果允许切换则始终渲染，否则只渲染当前模式 -->
-{(isWallpaperSwitchable || isBannerMode) && (
-<div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden ${mobileNonHomeBannerClass}`} style={isWallpaperSwitchable ? `top: -${BANNER_HEIGHT_EXTEND}vh; display: none;` : `top: -${BANNER_HEIGHT_EXTEND}vh`}>
-    <!-- 背景图片显示 -->
+<!-- Banner - 全屏固定背景，CSS控制显示 -->
+<div id="banner-wrapper" class={`fixed inset-0 z-0 w-full h-screen overflow-hidden transition-all duration-700 ease-in-out ${mobileNonHomeBannerClass}`}>
+    <!-- 背景图片显示 + H1 标题 -->
     <div class="relative h-full w-full">
+        <!-- H1 标题叠加在背景图上 -->
+        <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
+            <h1 class="text-white font-bold text-5xl md:text-7xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] tracking-wider">小原blog 3.2</h1>
+            <p class="text-white/90 text-xl md:text-3xl mt-3 ml-[6.18em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] tracking-wide">—— 万物可爱QwQ</p>
+        </div>
         <!-- Mobile: use mobile-specific image -->
         <ImageWrapper 
             alt="Mobile background image of the blog" 
@@ -294,10 +287,13 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
         setRandomSubtitle();
     </script>
     
-    <!-- Water waves effect - 始终渲染以便动态切换 -->
-    {(wavesEnabledOnDesktop || wavesEnabledOnMobile) ? (
-    <div class={`waves absolute -bottom-[1px] h-[6vh] max-h-[5rem] min-h-[2rem] w-full md:h-[8vh] 
-        ${!wavesEnabledOnMobile ? 'hidden' : ''} ${!wavesEnabledOnDesktop ? 'md:hidden' : ''} ${wavesEnabledOnDesktop ? 'md:block' : ''}`} 
+</div>
+
+<!-- Main content -->
+<div class={`relative w-full z-30 pointer-events-none ${transparentClass}`}>
+    <!-- Water waves effect - 随页面滚动，仅Banner模式显示 -->
+    <div class={`waves -mt-[1px] h-[3vh] max-h-[3rem] min-h-[1.5rem] w-full md:h-[4vh] transition-all duration-700 ease-in-out
+        ${!wavesEnabledOnMobile ? 'hidden' : ''} ${!wavesEnabledOnDesktop ? 'md:hidden' : ''}`}
         id="header-waves" 
         style="transform: translateZ(0); will-change: fill;">
         <svg
@@ -343,12 +339,6 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
             </g>
         </svg>
     </div>
-    ) : null}
-</div>
-)}
-
-<!-- Main content -->
-<div class={`absolute w-full z-30 pointer-events-none ${mobileNonHomeBannerClass ? 'mobile-main-no-banner' : ''} ${!(isBannerMode && isBackgroundEnabled) ? 'no-banner-layout' : ''} ${transparentClass}`} style={`top: ${finalMainPanelTop}`}>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
     <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
         <div id="main-grid"

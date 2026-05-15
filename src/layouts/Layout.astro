@@ -484,9 +484,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     .enable-banner.is-home #right-sidebar-sticky {
       @apply top-[calc(1rem_-_var(--banner-height-extend))];
     }
-    .navbar-hidden {
-      @apply opacity-0 -translate-y-16;
-    }
   }
 </style>
 
@@ -649,16 +646,7 @@ function disableAnimation() {
       // 添加页面切换保护，防止导航栏闪烁
       document.documentElement.classList.add("is-page-transitioning");
 
-      // 简化navbar处理逻辑
-      if (bannerEnabled) {
-        const navbar = document.getElementById("navbar-wrapper");
-        if (navbar && document.body.classList.contains("lg:is-home")) {
-          const threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 88;
-          if (document.documentElement.scrollTop >= threshold) {
-            navbar.classList.add("navbar-hidden");
-          }
-        }
-      }
+      // 简化navbar处理逻辑 — navbar始终显示
     });
     window.swup.hooks.on("content:replace", () => {
       // 更新侧边栏组件的可见性（根据新页面的 URL）
@@ -930,17 +918,7 @@ function disableAnimation() {
 
     if (bannerEnabled && navbar) {
       operations.push(() => {
-        const isHome =
-          document.body.classList.contains("lg:is-home") &&
-          window.innerWidth >= 1024;
-        const currentBannerHeight = isHome ? BANNER_HEIGHT_HOME : BANNER_HEIGHT;
-        const threshold = window.innerHeight * (currentBannerHeight / 100) - 88;
-
-        if (scrollTop >= threshold) {
-          navbar.classList.add("navbar-hidden");
-        } else {
-          navbar.classList.remove("navbar-hidden");
-        }
+        // navbar always visible
       });
     }
 

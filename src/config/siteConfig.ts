@@ -7,10 +7,10 @@ const SITE_LANG = "zh_CN";
 
 export const siteConfig: SiteConfig = {
 	// 站点标题
-	title: "小原blog 3.2",
+	title: "Ogata Kohara Blog - 小原酱的blog（万物可爱QwQ版）",
 
 	// 站点副标题
-	subtitle: "万物可爱QwQ",
+	subtitle: "",
 
 	// 站点 URL
 	site_url: "https://blog.meowhead.cn",
@@ -83,7 +83,7 @@ export const siteConfig: SiteConfig = {
 			alt: "🏠",
 		},
 		// 导航栏标题
-		title: "小原blog 3.2 - 万物可爱QwQ",
+		title: "小原blog 3.2",
 		// 全宽导航栏，导航栏是否占满屏幕宽度，true：占满，false：不占满
 		widthFull: false,
 		// 导航栏图标和标题是否跟随主题色

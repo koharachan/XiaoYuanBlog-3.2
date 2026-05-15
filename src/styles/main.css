@@ -42,7 +42,7 @@ html {
     }
 
     ::view-transition-new(root) {
-        animation: theme-expand 1.5s cubic-bezier(0.16, 1, 0.3, 1);
+        animation: theme-expand 1.5s cubic-bezier(0.77, 0, 0.18, 1);
         z-index: 2;
     }
 
@@ -135,6 +135,27 @@ html {
         backdrop-filter: none !important;
     }
     
+    /* 波浪容器 - 仅在Banner模式下显示 */
+    #header-waves {
+        transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                    max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* 非Banner模式：隐藏波浪 */
+    body:not(.enable-banner) #header-waves {
+        opacity: 0;
+        max-height: 0 !important;
+        min-height: 0 !important;
+        overflow: hidden;
+        margin-top: 0;
+    }
+    
+    /* Banner模式：显示波浪 */
+    body.enable-banner #header-waves {
+        opacity: 1;
+    }
+
     /* 波浪容器的颜色传递 */
     .is-theme-transitioning #header-waves {
         /* 设置当前颜色为页面背景色，供SVG继承 */
