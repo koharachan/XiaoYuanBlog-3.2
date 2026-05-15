@@ -3,15 +3,6 @@ import I18nKey from "@i18n/i18nKey";
 import { i18n } from "@i18n/translation";
 import { getCategoryUrl } from "@utils/url-utils";
 
-declare global {
-	interface ImportMeta {
-		readonly env: {
-			readonly PROD: boolean;
-			readonly DEV: boolean;
-		};
-	}
-}
-
 type RawPost = CollectionEntry<"posts">;
 
 let _postsCache: RawPost[] | null = null;
