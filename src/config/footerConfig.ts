@@ -6,19 +6,19 @@ export const footerConfig: FooterConfig = {
 	// 友情链接
 	links: [
 		{
-			name: "api.rainchan.com",
+			name: "雨酱Ai",
 			url: "https://api.rainchan.com/",
-			description: "雨酱Ai"
+			description: "api.rainchan.com"
 		},
 		{
-			name: "cn.jinao.wang",
+			name: "jinao的小窝",
 			url: "https://cn.jinao.wang/",
-			description: "jinao的小窝"
+			description: "cn.jinao.wang"
 		},
 		{
-			name: "luoaowoo.cn",
+			name: "洛嗷呜の小站",
 			url: "https://luoaowoo.cn/",
-			description: "洛嗷呜の小站"
+			description: "luoaowoo.cn"
 		}
 	]
 };
