@@ -7,15 +7,15 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	switchable: true,
 	// 背景图片配置
 	src: {
-		desktop: "/upload/banner-desktop.jpg",
-		mobile: "/upload/banner-mobile.jpg",
+		desktop: "/upload/banner-bg.jpg",
+		mobile: "/upload/banner-bg.jpg",
 	},
 	// Banner模式特有配置
 	banner: {
 		// 图片位置
 		// 支持所有CSS object-position值，如: 'top', 'center', 'bottom', 'left top', 'right bottom', '25% 75%', '10px 20px'..
 		// 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
-		position: "top",
+		position: "center",
 
 		// 主页横幅文字
 		homeText: {
