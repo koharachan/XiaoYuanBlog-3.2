@@ -161,6 +161,35 @@ const transparentClass = shouldEnableTransparency
 	: "";
 
 const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
+
+const navbarTransparentMode =
+	backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
+const shouldShowTopHighlight =
+	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
+
+const bannerDisplayDesktop = backgroundWallpaper.banner?.display?.desktop;
+const bannerDisplayMobile = backgroundWallpaper.banner?.display?.mobile;
+
+const desktopImgStyle = [
+	`object-fit: ${bannerDisplayDesktop?.fitMode || "cover"}`,
+	bannerDisplayDesktop?.position ? `object-position: ${bannerDisplayDesktop.position}` : `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
+	bannerDisplayDesktop?.size ? `width: ${bannerDisplayDesktop.size.split(" ")[0]}; height: ${bannerDisplayDesktop.size.split(" ")[1] || "auto"}` : "",
+	bannerDisplayDesktop?.repeat ? `background-repeat: ${bannerDisplayDesktop.repeat}` : "",
+	bannerDisplayDesktop?.backgroundColor ? `background-color: ${bannerDisplayDesktop.backgroundColor}` : "",
+].filter(Boolean).join("; ");
+
+const mobileImgStyle = [
+	`object-fit: ${bannerDisplayMobile?.fitMode || "cover"}`,
+	bannerDisplayMobile?.position ? `object-position: ${bannerDisplayMobile.position}` : `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
+	bannerDisplayMobile?.size ? `width: ${bannerDisplayMobile.size.split(" ")[0]}; height: ${bannerDisplayMobile.size.split(" ")[1] || "auto"}` : "",
+].filter(Boolean).join("; ");
+
+const desktopImgClass = bannerDisplayDesktop?.fitMode && bannerDisplayDesktop.fitMode !== "cover"
+	? ["hidden lg:block h-full transition duration-700 opacity-100"]
+	: ["hidden lg:block object-cover h-full transition duration-700 opacity-100"];
+const mobileImgClass = bannerDisplayMobile?.fitMode && bannerDisplayMobile.fitMode !== "cover"
+	? ["block lg:hidden h-full w-full transition duration-700 opacity-100"]
+	: ["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"];
 ---
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug}>
@@ -200,27 +229,24 @@ const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
 <!-- Banner - 全屏固定背景，CSS控制显示 -->
 <div id="banner-wrapper" class={`fixed inset-0 z-0 w-full h-screen overflow-hidden transition-all duration-700 ease-in-out ${mobileNonHomeBannerClass}`}>
-    <!-- 背景图片显示 + H1 标题 -->
-    <div class="relative h-full w-full">
-        <!-- H1 标题叠加在背景图上 -->
-        <div class="absolute inset-0 z-20 flex flex-col items-center justify-center pointer-events-none">
-            <h1 class="text-white font-bold text-5xl md:text-7xl drop-shadow-[0_4px_12px_rgba(0,0,0,0.6)] tracking-wider">小原blog 3.2</h1>
-            <p class="text-white/90 text-xl md:text-3xl mt-3 ml-[6.18em] drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] tracking-wide">—— 万物可爱QwQ</p>
-        </div>
+    <!-- 页面顶部渐变高光效果 -->
+    {shouldShowTopHighlight && <div class="top-gradient-highlight" />}
+    <!-- 背景图片显示 -->
+    <div class="relative h-full w-full" style={bannerDisplayDesktop?.backgroundColor ? `background-color: ${bannerDisplayDesktop.backgroundColor}` : undefined}>
         <!-- Mobile: use mobile-specific image -->
         <ImageWrapper 
             alt="Mobile background image of the blog" 
-            class:list={["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"]}
+            class:list={mobileImgClass}
             src={typeof backgroundImages.mobile === 'string' ? backgroundImages.mobile : (typeof backgroundImages.desktop === 'string' ? backgroundImages.desktop : '')} 
-            position={backgroundWallpaper.banner?.position}
+            position={mobileImgStyle}
         />
         <!-- Desktop: use desktop-specific image -->
         <ImageWrapper 
             id="banner" 
             alt="Desktop background image of the blog" 
-            class:list={["hidden lg:block object-cover h-full transition duration-700 opacity-100"]}
+            class:list={desktopImgClass}
             src={typeof backgroundImages.desktop === 'string' ? backgroundImages.desktop : (typeof backgroundImages.mobile === 'string' ? backgroundImages.mobile : '')} 
-            position={backgroundWallpaper.banner?.position}
+            position={desktopImgStyle}
         />
     </div>
     

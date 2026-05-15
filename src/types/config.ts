@@ -505,6 +505,25 @@ export type BackgroundWallpaperConfig = {
 			| "right center"
 			| "right bottom"
 			| string; // 壁纸位置，支持CSS object-position的所有值，包括百分比和像素值
+		// 分设备背景图显示控制
+		display?: {
+			// 桌面端（≥1024px）背景图显示模式
+			desktop?: {
+				fitMode?: "cover" | "contain" | "fill" | "scale-down" | "none"; // object-fit，默认 cover 填满 → 推荐 contain 保持清晰
+				position?: string; // 覆盖全局 position，支持 CSS object-position
+				size?: string; // 显式设置图片尺寸，如 "80% auto"、"600px auto"
+				repeat?: "no-repeat" | "repeat" | "repeat-x" | "repeat-y"; // 背景重复
+				backgroundColor?: string; // 图片未覆盖区域的背景色
+			};
+			// 移动端（<1024px）背景图显示模式
+			mobile?: {
+				fitMode?: "cover" | "contain" | "fill" | "scale-down" | "none";
+				position?: string;
+				size?: string;
+				repeat?: "no-repeat" | "repeat" | "repeat-x" | "repeat-y";
+				backgroundColor?: string;
+			};
+		};
 		homeText?: {
 			enable: boolean; // 是否在首页显示自定义文字（全局开关）
 			title?: string; // 主标题

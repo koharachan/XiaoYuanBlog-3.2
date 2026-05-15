@@ -7,7 +7,7 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 	switchable: true,
 	// 背景图片配置
 	src: {
-		desktop: "/upload/banner-bg.jpg",
+		desktop: "/upload/banner-bg-desktop.png",
 		mobile: "/upload/banner-bg.jpg",
 	},
 	// Banner模式特有配置
@@ -17,14 +17,30 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 		// 如果不知道怎么配置百分百之类的配置，推荐直接使用：'center'居中，'top'顶部居中，'bottom' 底部居中，'left'左侧居中，'right'右侧居中
 		position: "center",
 
+		// 分设备背景图显示控制
+		display: {
+			// 桌面端（≥1024px）：cover 裁切填满全屏，图片居中
+			desktop: {
+				fitMode: "cover",
+				position: "center center",
+				repeat: "no-repeat",
+			},
+			// 移动端（<1024px）：cover 填满屏幕
+			mobile: {
+				fitMode: "cover",
+				position: "center",
+				repeat: "no-repeat",
+			},
+		},
+
 		// 主页横幅文字
 		homeText: {
 			// 是否启用主页横幅文字
-			enable: false,
+			enable: true,
 			// 主页横幅主标题
-			title: "小原blog 3.0",
+			title: "小原blog 3.2",
 			// 主页横幅主标题字体大小
-			titleSize: "3.8rem",
+			titleSize: "3rem",
 			// 主页横幅副标题
 			subtitle: [
 				"万物可爱QwQ",
@@ -78,7 +94,7 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 		waves: {
 			enable: {
 				// 桌面端是否启用波浪动画效果
-				desktop: true,
+				desktop: false,
 				// 移动端是否启用波浪动画效果
 				mobile: true,
 			},

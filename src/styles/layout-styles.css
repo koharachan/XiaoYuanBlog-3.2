@@ -76,15 +76,15 @@
     
     /* 标题字体优化 */
     .banner-title {
-        font-size: 3.2rem !important; /* 增大字体大小 */
+        font-size: 3.6rem !important;
         line-height: 1.1 !important;
         margin-bottom: 0.5rem !important;
-        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important; /* 增强阴影 */
+        text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
     }
     
     /* 副标题字体优化 */
     .banner-subtitle {
-        font-size: 1rem !important;
+        font-size: 1.1rem !important;
         line-height: 1.3 !important;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
     }
@@ -131,7 +131,7 @@
     
     /* 标题字体优化 */
     .banner-title {
-        font-size: 3.8rem !important; /* 增大字体大小 */
+        font-size: 4.2rem !important;
         line-height: 1.1 !important;
         margin-bottom: 0.75rem !important;
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
@@ -139,7 +139,7 @@
     
     /* 副标题字体优化 */
     .banner-subtitle {
-        font-size: 1.125rem !important;
+        font-size: 1.2rem !important;
         line-height: 1.4 !important;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
     }
@@ -186,7 +186,7 @@
     
     /* 标题字体优化 */
     .banner-title {
-        font-size: 3.9rem !important;
+        font-size: 4.4rem !important;
         line-height: 1.1 !important;
         margin-bottom: 0.85rem !important;
         text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8) !important;
@@ -194,7 +194,7 @@
     
     /* 副标题字体优化 */
     .banner-subtitle {
-        font-size: 1.25rem !important;
+        font-size: 1.35rem !important;
         line-height: 1.4 !important;
         text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7) !important;
     }
@@ -261,31 +261,80 @@
     }
 }
 
-/* 桌面端保持居中 (1024px+) - Tailwind lg 断点 */
+/* ============================================
+ * 桌面端全屏 Banner 覆盖式布局 (≥1024px)
+ * Banner 占据整个首屏，内容从视窗下方滑入覆盖背景
+ * ============================================ */
 @media (min-width: 1024px) {
-    .banner-text-overlay {
-        align-items: center !important; /* 垂直居中 */
-        justify-content: center !important; /* 水平居中 */
-        padding: 2rem !important;
-        text-align: center !important; /* 文字居中对齐 */
+    /* Banner 覆盖全屏，不位移 */
+    #banner-wrapper {
+        height: 100vh !important;
+        min-height: 100vh !important;
+        top: 0 !important;
+        transform: none !important;
     }
-    
+
+    body.enable-banner.is-home #banner-wrapper {
+        height: 100vh !important;
+        transform: none !important;
+    }
+
+    body.enable-banner #banner,
+    body.enable-banner.is-home #banner {
+        height: 100% !important;
+        transform: none !important;
+    }
+
+    /* 主内容区域从视窗底部开始，覆盖时产生滑动叠加效果 */
+    body.enable-banner .relative.w-full.z-30:not(.no-banner-layout):not(.mobile-main-no-banner) {
+        position: relative;
+        margin-top: 0 !important;
+        top: 100vh !important;
+        min-height: calc(100vh) !important;
+        transition: none !important;
+    }
+
+    /* 主网格不额外位移 */
+    body.enable-banner.is-home #main-grid {
+        transform: none !important;
+    }
+
+    /* Banner 文字垂直居中 */
+    .banner-text-overlay {
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 2rem !important;
+        text-align: center !important;
+    }
+
     .banner-text-overlay > div {
         margin-bottom: 0 !important;
         width: 75% !important;
-        text-align: center !important; /* 确保文字居中 */
+        text-align: center !important;
     }
-    
-    /* 背景图片优化 */
+
+    /* Banner 背景图专属容器 — 可承载 background-color 作为 contain 模式的衬底 */
+    #banner-wrapper > div {
+        transition: background-color 0.5s ease;
+    }
+
+    /* 桌面端图片平滑过渡 */
     #banner img {
-        transition: transform 1s ease-out !important;
+        transition: transform 1s ease-out, opacity 0.7s ease !important;
     }
-    
-    /* 波浪效果恢复默认 */
+
+    /* 波浪固定在 Banner 底部，与内容区视觉衔接 */
     .waves {
         height: 4vh !important;
         min-height: 1.5rem !important;
         max-height: 2.5rem !important;
+    }
+
+    /* 侧边栏 sticky 位置修正 — 全屏模式下贴在导航栏下方 */
+    body.enable-banner.is-home #sidebar-sticky,
+    body.enable-banner.is-home #left-sidebar-sticky,
+    body.enable-banner.is-home #right-sidebar-sticky {
+        top: 5.5rem !important;
     }
 }
 
@@ -401,35 +450,19 @@
     }
 }
 
-/* 当banner被禁用时的布局样式 */
-.no-banner-layout {
-    top: 5.5rem !important;
-    min-height: calc(100vh - 5.5rem) !important;
-}
-
-/* 移动端当banner被禁用时的布局样式 */
+/* 当banner被禁用时的布局样式 — no-banner-layout 在 body 上 */
 @media (max-width: 1023px) {
-    .relative.w-full.z-30.no-banner-layout {
-        top: 5.5rem !important;
+    body.no-banner-layout .relative.w-full.z-30 {
         min-height: calc(100vh - 5.5rem) !important;
-        transition: none !important; /* 移除过渡动画，立即应用位置 */
-    }
-}
-
-/* 小屏手机当banner被禁用时的布局样式 */
-@media (max-width: 480px) {
-    .relative.w-full.z-30.no-banner-layout {
-        top: 5.5rem !important;
-        min-height: calc(100vh - 5.5rem) !important;
+        padding-top: 1.5rem !important;
         transition: none !important;
     }
 }
 
-/* 平板设备当banner被禁用时的布局样式 */
-@media (min-width: 768px) and (max-width: 1023px) {
-    .relative.w-full.z-30.no-banner-layout {
-        top: 5.5rem !important;
+@media (min-width: 1024px) {
+    body.no-banner-layout .relative.w-full.z-30 {
         min-height: calc(100vh - 5.5rem) !important;
+        padding-top: 1.5rem !important;
         transition: none !important;
     }
 }

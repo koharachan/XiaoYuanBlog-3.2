@@ -31,7 +31,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/alipay-shop.png",
 			link: "",
 			description: "支付宝经营码",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "QQ支付",
@@ -39,7 +39,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/qqpay.png",
 			link: "",
 			description: "QQ支付个人码",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "数字人民币",
@@ -47,7 +47,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/e-CNY.png",
 			link: "",
 			description: "e-CNY个人码",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "PayPal",
@@ -55,7 +55,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/paypal.png",
 			link: "https://paypal.me/koharachan",
 			description: "全球通用，点击跳转PayPal",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "ERC20-USDT/USDC",
@@ -71,7 +71,7 @@ export const sponsorConfig: SponsorConfig = {
 			qrCode: "/assets/images/sponsor/tron.png",
 			link: "tron:TYsGR9sdko7szvt3fJtbBmB3xK9Ejn4VkB",
 			description: "TRC20网络，0 Gas费",
-			enabled: true,
+			enabled: false,
 		},
 		{
 			name: "Gate.io",

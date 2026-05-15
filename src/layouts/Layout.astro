@@ -48,13 +48,6 @@ const isHomePageCheck = isHomePage(Astro.url.pathname);
 // why doing this in Layout instead of GlobalStyles: https://github.com/withastro/astro/issues/6728#issuecomment-1502203757
 const configHue = siteConfig.themeColor.hue;
 
-// 获取导航栏透明模式配置
-const navbarTransparentMode =
-	backgroundWallpaper.banner?.navbar?.transparentMode || "semi";
-// 判断是否应该显示顶部高光效果（只在full和semifull模式下显示）
-const shouldShowTopHighlight =
-	navbarTransparentMode === "full" || navbarTransparentMode === "semifull";
-
 if (!banner || typeof banner !== "string" || banner.trim() === "") {
 	banner = getDefaultBackground();
 }
@@ -417,7 +410,7 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
   <body
     class="min-h-screen"
     class:list={[
-      { "lg:is-home": isHomePageCheck, "enable-banner": enableBanner, "enable-card-border": siteConfig.card?.border },
+      { "is-home": isHomePageCheck, "enable-banner": enableBanner, "enable-card-border": siteConfig.card?.border },
       ...(siteConfig.font.enable && siteConfig.font.selected
         ? (Array.isArray(siteConfig.font.selected)
             ? siteConfig.font.selected
@@ -427,8 +420,6 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
     ]}
   >
 
-    <!-- 页面顶部渐变高光效果 - 只在full和semifull模式下显示 -->
-    {shouldShowTopHighlight && <div class="top-gradient-highlight" />}
     <ConfigCarrier />
     <slot />
 
@@ -456,33 +447,35 @@ const bannerOffset = `${BANNER_HEIGHT_EXTEND / 2}vh`;
 >
   @tailwind components;
   @layer components {
-    .enable-banner.is-home #banner-wrapper {
-      @apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)];
-    }
-    .enable-banner #banner-wrapper {
-      @apply h-[var(--banner-height-home)];
-    }
+    @media (min-width: 1024px) {
+      .enable-banner.is-home #banner-wrapper {
+        @apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)];
+      }
+      .enable-banner #banner-wrapper {
+        @apply h-[var(--banner-height-home)];
+      }
 
-    .enable-banner.is-home #banner {
-      @apply h-[var(--banner-height-home)] translate-y-0;
-    }
-    .enable-banner #banner {
-      @apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)];
-    }
-    .enable-banner.is-home #main-grid {
-      @apply translate-y-[var(--banner-height-extend)];
-    }
-    .enable-banner #top-row {
-      @apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300;
-    }
-    .enable-banner.is-home #sidebar-sticky {
-      @apply top-[calc(1rem_-_var(--banner-height-extend))];
-    }
-    .enable-banner.is-home #left-sidebar-sticky {
-      @apply top-[calc(1rem_-_var(--banner-height-extend))];
-    }
-    .enable-banner.is-home #right-sidebar-sticky {
-      @apply top-[calc(1rem_-_var(--banner-height-extend))];
+      .enable-banner.is-home #banner {
+        @apply h-[var(--banner-height-home)] translate-y-0;
+      }
+      .enable-banner #banner {
+        @apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)];
+      }
+      .enable-banner.is-home #main-grid {
+        @apply translate-y-[var(--banner-height-extend)];
+      }
+      .enable-banner #top-row {
+        @apply transition-all duration-300;
+      }
+      .enable-banner.is-home #sidebar-sticky {
+        @apply top-[calc(1rem_-_var(--banner-height-extend))];
+      }
+      .enable-banner.is-home #left-sidebar-sticky {
+        @apply top-[calc(1rem_-_var(--banner-height-extend))];
+      }
+      .enable-banner.is-home #right-sidebar-sticky {
+        @apply top-[calc(1rem_-_var(--banner-height-extend))];
+      }
     }
   }
 </style>
@@ -696,9 +689,9 @@ function disableAnimation() {
       const isHomePage = pathsEqual(visit.to.url, url("/"));
 
       if (isHomePage) {
-        bodyElement!.classList.add("lg:is-home");
+        bodyElement!.classList.add("is-home");
       } else {
-        bodyElement!.classList.remove("lg:is-home");
+        bodyElement!.classList.remove("is-home");
       }
 
       // Control banner text visibility based on page
@@ -888,10 +881,66 @@ function disableAnimation() {
   let toc = document.getElementById("toc-wrapper");
   let navbar = document.getElementById("navbar-wrapper");
 
+  // Banner 文字滚动动画：上移 15px → 非线性渐隐
+  const bannerTextOverlay = document.querySelector(".banner-text-overlay") as HTMLElement | null;
+  const bannerTitleEl = bannerTextOverlay?.querySelector(".banner-title") as HTMLElement | null;
+  const bannerSubtitleEl = bannerTextOverlay?.querySelector(".banner-subtitle") as HTMLElement | null;
+
+  function easeOutCubic(t: number): number {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function animateBannerText() {
+    if (!bannerTextOverlay || bannerTextOverlay.classList.contains("hidden")) return;
+
+    const scrollY = document.documentElement.scrollTop;
+    const vh = window.innerHeight;
+    const rawProgress = scrollY / vh;
+    const progress = Math.min(Math.max(rawProgress, 0), 0.5);
+
+    // 上移阶段: 0 → 12% VH，translateY 0 → -15px
+    const translateProgress = Math.min(progress / 0.12, 1);
+    const translateY = translateProgress * -15;
+
+    // 渐隐阶段: 5% → 45% VH，opacity 1 → 0 (非线性)
+    const fadeStart = 0.05;
+    const fadeEnd = 0.45;
+    const fadeProgress = Math.min(Math.max((progress - fadeStart) / (fadeEnd - fadeStart), 0), 1);
+    const opacity = 1 - easeOutCubic(fadeProgress);
+
+    const style = bannerTextOverlay.style;
+    style.transform = `translateY(${translateY}px)`;
+    style.opacity = `${opacity}`;
+    style.willChange = rawProgress < 0.5 ? "transform, opacity" : "auto";
+
+    if (bannerTitleEl) {
+      bannerTitleEl.style.transform = `translateY(${translateY * 0.5}px)`;
+      bannerTitleEl.style.opacity = `${Math.max(opacity, 0)}`;
+    }
+    if (bannerSubtitleEl) {
+      bannerSubtitleEl.style.transform = `translateY(${translateY * 0.7}px)`;
+      bannerSubtitleEl.style.opacity = `${Math.max(opacity, 0)}`;
+    }
+
+    // 滚动超过 banner 后完全隐藏
+    if (rawProgress >= 0.5) {
+      if (!bannerTextOverlay.classList.contains("hidden")) {
+        bannerTextOverlay.classList.add("pointer-events-none");
+      }
+    } else {
+      bannerTextOverlay.classList.remove("pointer-events-none");
+    }
+  }
+
   // 优化的滚动处理函数
   function scrollFunction() {
     const scrollTop = document.documentElement.scrollTop;
     const bannerHeight = window.innerHeight * (BANNER_HEIGHT / 100);
+
+    // Banner 文字动画
+    if (bannerEnabled) {
+      animateBannerText();
+    }
 
     // 使用批量DOM操作优化性能
     const operations: (() => void)[] = [];
@@ -942,6 +991,13 @@ function disableAnimation() {
     },
     { passive: true }
   );
+
+  // 初始化 banner 文字初始状态
+  if (bannerTextOverlay && !bannerTextOverlay.classList.contains("hidden")) {
+    bannerTextOverlay.style.transition = "none";
+    bannerTextOverlay.style.transform = "translateY(0px)";
+    bannerTextOverlay.style.opacity = "1";
+  }
 
   window.onresize = () => {
     // calculate the --banner-height-extend, which needs to be a multiple of 4 to avoid blurry text
