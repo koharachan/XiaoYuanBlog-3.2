@@ -19,6 +19,11 @@ export const footerConfig: FooterConfig = {
 			name: "洛嗷呜の小站",
 			url: "https://luoaowoo.cn/",
 			description: "luoaowoo.cn"
+		},
+		{
+			name: "氢氧化钙生产线",
+			url: "https://www.glmce.cn/",
+			description: "www.glmce.cn"
 		}
 	]
 };
