@@ -4,3 +4,9 @@ exclude_selectors:
   - "[data-pagefind-ignore]"
   - ".search-panel"
   - "#search-panel"
+glob: "!{upload/**/*.docx,assets/images/sponsor/**/*.png,assets/images/sponsor/**/*.svg}"
+root_selector: "main"
+force_language: "zh"
+keep_index_url: false
+output_path: "dist/pagefind"
+log_level: "warn"

@@ -35,7 +35,10 @@ import rehypeFigure from "./src/plugins/rehype-figure.mjs";
 // https://astro.build/config
 export default defineConfig({
 	site: siteConfig.site_url,
-
+	build: {
+		inlineStylesheets: "auto",
+		concurrency: 8,
+	},
 	base: "/",
 	trailingSlash: "always",
 	integrations: [
@@ -205,40 +208,6 @@ export default defineConfig({
 			},
 		},
 		build: {
-			minify: "terser",
-			terserOptions: {
-				compress: {
-					drop_console: true,
-					drop_debugger: true,
-					pure_funcs: ["console.log", "console.info", "console.debug"],
-					pure_getters: "strict",
-					unsafe: true,
-					unsafe_arrows: true,
-					unsafe_comps: true,
-					unsafe_Function: true,
-					unsafe_math: true,
-					unsafe_symbols: true,
-					unsafe_methods: true,
-					unsafe_proto: true,
-					unsafe_regexp: true,
-					unsafe_undefined: true,
-				},
-				mangle: {
-					toplevel: true,
-					keep_classnames: false,
-					keep_fnames: false,
-					properties: {
-						regex: /^_/,
-					},
-				},
-				format: {
-					comments: false,
-					ascii_only: true,
-				},
-				ecma: 2022,
-				keep_classnames: false,
-				keep_fnames: false,
-			},
 			rollupOptions: {
 				onwarn(warning, warn) {
 					// temporarily suppress this warning
@@ -253,8 +222,7 @@ export default defineConfig({
 				output: {
 					manualChunks(id) {
 						if (id.includes("node_modules")) {
-							if (id.includes("react") || id.includes("react-dom")) return "vendor";
-							if (id.includes("@iconify")) return "icons";
+							if (id.includes("@iconify")) return "iconify";
 						}
 					},
 					assetFileNames: "assets/[name]-[hash][extname]",
@@ -266,13 +234,9 @@ export default defineConfig({
 			cssMinify: true,
 			assetsInlineLimit: 0,
 			sourcemap: false,
-			workers: 4,
 			treeShake: true,
 			codeSplit: true,
 			cache: true,
-			optimizeDeps: {
-				include: ["react", "react-dom"],
-			},
 		},
 		optimizeDeps: {
 			enabled: true,
