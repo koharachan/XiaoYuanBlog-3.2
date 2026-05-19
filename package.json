@@ -10,9 +10,6 @@
     "preview": "astro preview",
     "astro": "astro",
     "type-check": "tsc --noEmit --isolatedDeclarations",
-    "new-post": "node scripts/new-post.js",
-    "halo-to-firefly": "node scripts/halo-to-firefly.js",
-    "halo-backup-to-posts": "node scripts/halo-backup-to-posts.js",
     "format": "biome format --write ./src",
     "lint": "biome check --write ./src",
     "preinstall": "npx only-allow pnpm"
