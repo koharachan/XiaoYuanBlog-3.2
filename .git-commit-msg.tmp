@@ -1,1 +1,1 @@
-feat: remove weixin link, fix alipay direct url, add i18n for pay page
+fix: replace QWQ separator that triggered expressive-code warning
