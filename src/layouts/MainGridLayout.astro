@@ -361,7 +361,7 @@ const mobileImgClass = bannerDisplayMobile?.fitMode && bannerDisplayMobile.fitMo
         </svg>
     </div>
     <!-- The pointer-events-none here prevent blocking the click event of the TOC -->
-    <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto">
+    <div class="relative max-w-[var(--page-width)] mx-auto pointer-events-auto mt-4 md:mt-6">
         <div id="main-grid"
           class={`transition duration-700 w-full left-0 right-0 grid ${gridCols} grid-rows-[auto_1fr_auto] lg:grid-rows-[auto] mx-auto gap-4 p-[10px] md:p-4 rounded-2xl bg-[var(--card-bg-transparent)] backdrop-blur-sm ${!sidebarConfig.mobileShowSidebar ? 'mobile-no-sidebar' : ''}`}
           data-sidebar-position={sidebarLayoutConfig.position}
@@ -507,4 +507,3 @@ const mobileImgClass = bannerDisplayMobile?.fitMode && bannerDisplayMobile.fitMo
     text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
   }
 </style>
-

@@ -38,6 +38,7 @@ export default defineConfig({
 	build: {
 		inlineStylesheets: "auto",
 		concurrency: 8,
+		compressHTML: true,
 	},
 	base: "/",
 	trailingSlash: "always",
@@ -237,6 +238,14 @@ export default defineConfig({
 			treeShake: true,
 			codeSplit: true,
 			cache: true,
+			esbuild: {
+				drop: ["console", "debugger"],
+				legalComments: "none",
+				minifyIdentifiers: true,
+				minifySyntax: true,
+				minifyWhitespace: true,
+				charset: "ascii",
+			},
 		},
 		optimizeDeps: {
 			enabled: true,
