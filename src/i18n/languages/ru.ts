@@ -203,6 +203,17 @@ export const ru: Translation = {
 	[Key.sponsorButton]: "Поддержка и Поделиться",
 	[Key.sponsorButtonText]:
 		"Если статья помогла — поделись или задонать!",
+	[Key.payQuickEntry]: "Быстрый вход",
+	[Key.payWechatHint]: "Сделайте скриншот и отсканируйте в WeChat",
+	[Key.payAlipayHint]: "Сканировать через Alipay",
+	[Key.payWechatLaunch]: "Открыть WeChat Pay",
+	[Key.payQQHint]: "Сканировать через QQ",
+	[Key.payPaypalGo]: "Перейти в PayPal",
+	[Key.payECNYHint]: "Сканировать в приложении e-CNY",
+	[Key.payOpen]: "Открыть",
+	[Key.payScanQR]: "Отсканируйте QR-код выше",
+	[Key.payCopyAddress]: "Копировать адрес",
+	[Key.payCopied]: "Скопировано ✓",
 
 	[Key.shareOnSocial]: "Поделиться статьей",
 	[Key.shareOnSocialDescription]:

@@ -201,6 +201,17 @@ export const ja: Translation = {
 	[Key.sponsorButton]: "サポートと共有",
 	[Key.sponsorButtonText]:
 		"この記事が役に立ったなら、共有またはサポートをお願いします！",
+	[Key.payQuickEntry]: "クイックエントリー",
+	[Key.payWechatHint]: "スクリーンショットしてWeChatでスキャン",
+	[Key.payAlipayHint]: "Alipayでスキャン",
+	[Key.payWechatLaunch]: "WeChat Payを開く",
+	[Key.payQQHint]: "QQでスキャン",
+	[Key.payPaypalGo]: "PayPalへ",
+	[Key.payECNYHint]: "デジタル人民元アプリでスキャン",
+	[Key.payOpen]: "開く",
+	[Key.payScanQR]: "上のQRコードをスキャン",
+	[Key.payCopyAddress]: "アドレスをコピー",
+	[Key.payCopied]: "コピーしました ✓",
 
 	[Key.shareOnSocial]: "記事を共有",
 	[Key.shareOnSocialDescription]:

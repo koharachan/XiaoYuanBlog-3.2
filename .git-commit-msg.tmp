@@ -1,1 +1,1 @@
-refactor: remove default favicons, rename sponsor to QrCode
+feat: remove weixin link, fix alipay direct url, add i18n for pay page

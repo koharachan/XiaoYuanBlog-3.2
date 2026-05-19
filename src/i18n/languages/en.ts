@@ -202,6 +202,17 @@ export const en: Translation = {
 	[Key.sponsorButton]: "Support & Share",
 	[Key.sponsorButtonText]:
 		"If this article helped you, please share or send some money!",
+	[Key.payQuickEntry]: "Quick Entry",
+	[Key.payWechatHint]: "Screenshot and scan with WeChat on mobile",
+	[Key.payAlipayHint]: "Scan with Alipay",
+	[Key.payWechatLaunch]: "Open WeChat Pay",
+	[Key.payQQHint]: "Scan with QQ",
+	[Key.payPaypalGo]: "Go to PayPal",
+	[Key.payECNYHint]: "Scan with e-CNY App",
+	[Key.payOpen]: "Open",
+	[Key.payScanQR]: "Scan the QR code above",
+	[Key.payCopyAddress]: "Copy Address",
+	[Key.payCopied]: "Copied ✓",
 
 	[Key.shareOnSocial]: "Share Article",
 	[Key.shareOnSocialDescription]:

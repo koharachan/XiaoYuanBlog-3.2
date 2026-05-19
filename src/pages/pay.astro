@@ -33,6 +33,11 @@ const iconColorMap: Record<string, string> = {
 	"fa6-brands:paypal": "#0070BA",
 };
 
+// ⚠️ Do not refactor this into a define:vars block — the Astro compiler
+// breaks on destructured `const` inside define:vars in this project.
+const jsCopiedText = i18n(I18nKey.payCopied);
+const payCopyAddress = i18n(I18nKey.payCopyAddress);
+
 const hasQuickEntry = enabledMethods.length >= 3;
 const quickMethods = ["微信支付", "支付宝", "PayPal"];
 const quickList = hasQuickEntry
@@ -54,7 +59,7 @@ const quickList = hasQuickEntry
     <!-- 快捷入口 — 桌面端：图标组 / 移动端：大按钮 -->
     {quickList.length > 0 && (
       <div class="mb-10 onload-animation" style="animation-delay: 80ms">
-        <p class="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 mb-3">快速入口</p>
+        <p class="text-[11px] font-semibold uppercase tracking-[0.15em] text-neutral-400 dark:text-neutral-500 mb-3">{i18n(I18nKey.payQuickEntry)}</p>
         <div class="flex flex-wrap gap-2.5">
           {quickList.map((m) => (
             <a
@@ -125,7 +130,7 @@ const quickList = hasQuickEntry
                 data-copy={method.wallet}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-                <span>复制</span>
+                <span>{payCopyAddress}</span>
               </button>
             </div>
           )}
@@ -146,13 +151,13 @@ const quickList = hasQuickEntry
                 class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#1677ff] text-white hover:opacity-90 active:scale-95 transition-all shadow-sm"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.3 15.1c-.4.3-.8.5-1.3.6-.5.1-1 .1-1.5 0-.6-.1-1-.4-1.3-.9-.2-.3-.3-.7-.3-1.1 0-.4.1-.8.3-1.1.3-.5.7-.8 1.3-.9.5-.1 1-.1 1.5 0l1.3.6v2.8zm7.4 0c-.4.3-.8.5-1.3.6-.5.1-1 .1-1.5 0-.6-.1-1-.4-1.3-.9-.2-.3-.3-.7-.3-1.1 0-.4.1-.8.3-1.1.3-.5.7-.8 1.3-.9.5-.1 1-.1 1.5 0l1.3.6v2.8zM12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 15.5c-1.2 0-2.3-.4-3.2-1l-1.6 1.6-1.4-1.4 1.6-1.6c-.6-.9-1-2-1-3.2 0-3 2.4-5.4 5.4-5.4s5.4 2.4 5.4 5.4-2.4 5.4-5.4 5.4z"/></svg>
-                打开支付宝
+                {i18n(I18nKey.payOpen)} {method.name}
               </a>
             )}
             {method.name.includes("支付宝") && !method.link && (
               <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                用支付宝扫一扫
+                {i18n(I18nKey.payAlipayHint)}
               </span>
             )}
 
@@ -163,18 +168,18 @@ const quickList = hasQuickEntry
                 class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#07c160] text-white hover:opacity-90 active:scale-95 transition-all shadow-sm"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.7 14.3c-.5 0-1 .4-1 .9s.4.9 1 .9 1-.4 1-.9-.4-.9-1-.9zm6.6 0c-.5 0-1 .4-1 .9s.4.9 1 .9 1-.4 1-.9-.4-.9-1-.9zM2 12C2 6.5 6.5 2 12 2s10 4.5 10 10-4.5 10-10 10S2 17.5 2 12zm16.5-2.8c-1.8-2.3-5.3-2.7-7.8-1.4-.3.2-.5.4-.7.6-.1.1-.1.2-.1.4 0 .2.1.3.3.3l.4.1c.3.1.7.2 1 .4 1.3.7 2.3 1.7 2.8 3.1.1.2.2.4.2.6 0 .2.1.4.3.4.3.1.5.1.8.1 1.8-.1 3.4-1.5 3.6-3.3.2-1.2-.2-2.4-.8-3.3z"/></svg>
-                唤起微信支付
+                {i18n(I18nKey.payWechatLaunch)}
               </a>
             )}
             {method.name.includes("微信") && (
-              <span class="text-[10px] text-neutral-400 dark:text-neutral-500 w-full">桌面用户请截图后用微信扫一扫</span>
+              <span class="text-[10px] text-neutral-400 dark:text-neutral-500 w-full">{i18n(I18nKey.payWechatHint)}</span>
             )}
 
             <!-- QQ支付 -->
             {method.name.includes("QQ") && (
               <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 w-full justify-center">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm1.5 13c-.3.2-.7.4-1.1.4-.4 0-.8-.2-1.1-.4-.6-.4-.9-1-.9-1.7 0-.7.3-1.3.9-1.7.3-.2.7-.4 1.1-.4.4 0 .8.2 1.1.4.6.4.9 1 .9 1.7 0 .7-.3 1.3-.9 1.7z"/></svg>
-                用QQ扫一扫
+                {i18n(I18nKey.payQQHint)}
               </span>
             )}
 
@@ -187,14 +192,14 @@ const quickList = hasQuickEntry
                 class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#0070ba] text-white hover:opacity-90 active:scale-95 transition-all shadow-sm"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7.076 21.337H2.47a.641.641 0 01-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797H8.555c-.525 0-.973.382-1.057.903l-.043.272c-.032.203-.09.407-.143.607L7.076 21.336z"/></svg>
-                前往 PayPal
+                {i18n(I18nKey.payPaypalGo)}
               </a>
             )}
 
             <!-- 数字人民币 -->
             {method.name.includes("数字人民币") && (
               <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 w-full justify-center">
-                用数字人民币 App 扫一扫
+                {i18n(I18nKey.payECNYHint)}
               </span>
             )}
 
@@ -207,13 +212,13 @@ const quickList = hasQuickEntry
                 class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium bg-[var(--primary)] text-white hover:opacity-90 active:scale-95 transition-all shadow-sm shadow-[var(--primary)]/20"
               >
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                打开
+                {i18n(I18nKey.payOpen)}
               </a>
             )}
 
             <!-- Gate.io / OKX 无 link 仅扫码 -->
             {!method.link && !method.wallet && !method.name.includes("支付宝") && !method.name.includes("微信") && !method.name.includes("QQ") && !method.name.includes("数字人民币") && (
-              <span class="text-[11px] text-neutral-400">请扫描上方二维码</span>
+              <span class="text-[11px] text-neutral-400">{i18n(I18nKey.payScanQR)}</span>
             )}
           </div>
         </div>
@@ -225,7 +230,7 @@ const quickList = hasQuickEntry
   </div>
 </MainGridLayout>
 
-<script>
+<script define:vars={{ jsCopiedText }}>
     document.body.classList.remove("enable-banner");
     const bw = document.getElementById("banner-wrapper");
     if (bw) bw.classList.add("hidden");
@@ -236,8 +241,8 @@ const quickList = hasQuickEntry
       try {
         await navigator.clipboard.writeText(text);
         const span = btn.querySelector("span");
-        const orig = span?.textContent || "";
-        if (span) span.textContent = "已复制 ✓";
+        const orig = span?.textContent || jsCopiedText;
+        if (span) span.textContent = jsCopiedText;
         btn.classList.add("!text-green-600", "!border-green-400");
         setTimeout(() => {
           if (span) span.textContent = orig;

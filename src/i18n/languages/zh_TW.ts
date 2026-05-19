@@ -196,6 +196,17 @@ export const zh_TW: Translation = {
 	[Key.sponsorButton]: "支持與分享",
 	[Key.sponsorButtonText]:
 		"如果這篇文章對你有幫助，歡迎分享給更多人或者給老登打錢！",
+	[Key.payQuickEntry]: "快捷入口",
+	[Key.payWechatHint]: "桌面用戶請截圖後用微信掃一掃",
+	[Key.payAlipayHint]: "用支付寶掃一掃",
+	[Key.payWechatLaunch]: "喚起微信支付",
+	[Key.payQQHint]: "用QQ掃一掃",
+	[Key.payPaypalGo]: "前往 PayPal",
+	[Key.payECNYHint]: "用數字人民幣 App 掃一掃",
+	[Key.payOpen]: "打開",
+	[Key.payScanQR]: "請掃描上方二維碼",
+	[Key.payCopyAddress]: "複製地址",
+	[Key.payCopied]: "已複製 ✓",
 
 	[Key.shareOnSocial]: "文章分享",
 	[Key.shareOnSocialDescription]: "如果這篇文章對你有幫助，歡迎分享給更多人！",

@@ -13,7 +13,7 @@ export const sponsorConfig: SponsorConfig = {
 			name: "微信支付",
 			icon: "fa6-brands:weixin",
 			qrCode: "/assets/images/QrCode/wxpay.png",
-			link: "weixin://dl/scan",
+			link: "",
 			description: "微信扫码或点击唤起支付",
 			enabled: true,
 		},
