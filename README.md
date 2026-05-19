@@ -1,5 +1,7 @@
 # 🐝 Firefly — 小原酱的博客
 
+<a href="https://github.com/koharachan/XiaoYuanBlog-3.2/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/koharachan/XiaoYuanBlog-3.2.svg?style=flat-square" /></a>
+
 基于 Astro 6 构建的现代个人博客主题，支持 Markdown/MDX、KaTeX 数学公式、Mermaid 图表、全文搜索、多评论系统、Live2D/Spine 模型等丰富特性。
 
 - **站点**: [blog.meowhead.cn](https://blog.meowhead.cn)
@@ -79,6 +81,10 @@ draft: false
 - [KaTeX](https://katex.org) — 数学公式
 - [Mermaid](https://mermaid.js.org) — 图表
 - [Swup](https://swup.js.org) — 页面过渡动画
+
+## ⭐ Star History
+
+[![Star History Chart](https://api.star-history.com/chart?repos=koharachan/XiaoYuanBlog-3.2&type=date&legend=top-left)](https://www.star-history.com/?repos=koharachan%2FXiaoYuanBlog-3.2&type=date&logscale=&legend=top-left)
 
 ## 📄 许可
 
