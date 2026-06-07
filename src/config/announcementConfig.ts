@@ -19,6 +19,6 @@ export const announcementConfig: AnnouncementConfig = {
 		enable: false,
 		text: "查看详情",
 		url: "/",
-		external: false
-	}
+		external: false,
+	},
 };

@@ -172,24 +172,46 @@ const bannerDisplayMobile = backgroundWallpaper.banner?.display?.mobile;
 
 const desktopImgStyle = [
 	`object-fit: ${bannerDisplayDesktop?.fitMode || "cover"}`,
-	bannerDisplayDesktop?.position ? `object-position: ${bannerDisplayDesktop.position}` : `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
-	bannerDisplayDesktop?.size ? `width: ${bannerDisplayDesktop.size.split(" ")[0]}; height: ${bannerDisplayDesktop.size.split(" ")[1] || "auto"}` : "",
-	bannerDisplayDesktop?.repeat ? `background-repeat: ${bannerDisplayDesktop.repeat}` : "",
-	bannerDisplayDesktop?.backgroundColor ? `background-color: ${bannerDisplayDesktop.backgroundColor}` : "",
-].filter(Boolean).join("; ");
+	bannerDisplayDesktop?.position
+		? `object-position: ${bannerDisplayDesktop.position}`
+		: `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
+	bannerDisplayDesktop?.size
+		? `width: ${bannerDisplayDesktop.size.split(" ")[0]}; height: ${bannerDisplayDesktop.size.split(" ")[1] || "auto"}`
+		: "",
+	bannerDisplayDesktop?.repeat
+		? `background-repeat: ${bannerDisplayDesktop.repeat}`
+		: "",
+	bannerDisplayDesktop?.backgroundColor
+		? `background-color: ${bannerDisplayDesktop.backgroundColor}`
+		: "",
+]
+	.filter(Boolean)
+	.join("; ");
 
 const mobileImgStyle = [
 	`object-fit: ${bannerDisplayMobile?.fitMode || "cover"}`,
-	bannerDisplayMobile?.position ? `object-position: ${bannerDisplayMobile.position}` : `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
-	bannerDisplayMobile?.size ? `width: ${bannerDisplayMobile.size.split(" ")[0]}; height: ${bannerDisplayMobile.size.split(" ")[1] || "auto"}` : "",
-].filter(Boolean).join("; ");
+	bannerDisplayMobile?.position
+		? `object-position: ${bannerDisplayMobile.position}`
+		: `object-position: ${backgroundWallpaper.banner?.position || "center"}`,
+	bannerDisplayMobile?.size
+		? `width: ${bannerDisplayMobile.size.split(" ")[0]}; height: ${bannerDisplayMobile.size.split(" ")[1] || "auto"}`
+		: "",
+]
+	.filter(Boolean)
+	.join("; ");
 
-const desktopImgClass = bannerDisplayDesktop?.fitMode && bannerDisplayDesktop.fitMode !== "cover"
-	? ["hidden lg:block h-full transition duration-700 opacity-100"]
-	: ["hidden lg:block object-cover h-full transition duration-700 opacity-100"];
-const mobileImgClass = bannerDisplayMobile?.fitMode && bannerDisplayMobile.fitMode !== "cover"
-	? ["block lg:hidden h-full w-full transition duration-700 opacity-100"]
-	: ["block lg:hidden object-cover h-full w-full transition duration-700 opacity-100"];
+const desktopImgClass =
+	bannerDisplayDesktop?.fitMode && bannerDisplayDesktop.fitMode !== "cover"
+		? ["hidden lg:block h-full transition duration-700 opacity-100"]
+		: [
+				"hidden lg:block object-cover h-full transition duration-700 opacity-100",
+			];
+const mobileImgClass =
+	bannerDisplayMobile?.fitMode && bannerDisplayMobile.fitMode !== "cover"
+		? ["block lg:hidden h-full w-full transition duration-700 opacity-100"]
+		: [
+				"block lg:hidden object-cover h-full w-full transition duration-700 opacity-100",
+			];
 ---
 
 <Layout title={title} banner={banner} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug}>

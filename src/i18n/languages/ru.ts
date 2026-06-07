@@ -201,8 +201,7 @@ export const ru: Translation = {
 	[Key.scanToSponsor]: "Скан для доната",
 	[Key.sponsorGoTo]: "Задонатить",
 	[Key.sponsorButton]: "Поддержка и Поделиться",
-	[Key.sponsorButtonText]:
-		"Если статья помогла — поделись или задонать!",
+	[Key.sponsorButtonText]: "Если статья помогла — поделись или задонать!",
 	[Key.payQuickEntry]: "Быстрый вход",
 	[Key.payWechatHint]: "Сделайте скриншот и отсканируйте в WeChat",
 	[Key.payAlipayHint]: "Сканировать через Alipay",

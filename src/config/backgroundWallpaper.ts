@@ -42,9 +42,7 @@ export const backgroundWallpaper: BackgroundWallpaperConfig = {
 			// 主页横幅主标题字体大小
 			titleSize: "3rem",
 			// 主页横幅副标题
-			subtitle: [
-				"万物可爱QwQ",
-			],
+			subtitle: ["万物可爱QwQ"],
 			// 主页横幅副标题字体大小
 			subtitleSize: "1.5rem",
 			typewriter: {

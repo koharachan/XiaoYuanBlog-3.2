@@ -1,29 +1,30 @@
 ---
+import Icon from "@/components/common/Icon.astro";
 import { siteConfig, sponsorConfig } from "@/config";
-import { i18n } from "@/i18n/translation";
 import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import ECnyIcon from "@/icons/e-cny.svg?raw";
+import Erc20Icon from "@/icons/erc20.svg?raw";
+import GateIcon from "@/icons/gate.svg?raw";
+import OkxIcon from "@/icons/okx.svg?raw";
+import TronIcon from "@/icons/tron.svg?raw";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
 import { url } from "@/utils/url-utils";
-import Icon from "@/components/common/Icon.astro";
-import GateIcon from "@/icons/gate.svg?raw";
-import ECnyIcon from "@/icons/e-cny.svg?raw";
-import TronIcon from "@/icons/tron.svg?raw";
-import OkxIcon from "@/icons/okx.svg?raw";
-import Erc20Icon from "@/icons/erc20.svg?raw";
 
 if (!siteConfig.pages.sponsor) {
 	return Astro.redirect("/404/");
 }
 
 const title = sponsorConfig.title || i18n(I18nKey.sponsorTitle);
-const description = sponsorConfig.description || i18n(I18nKey.sponsorDescription);
+const description =
+	sponsorConfig.description || i18n(I18nKey.sponsorDescription);
 const enabledMethods = sponsorConfig.methods.filter((m) => m.enabled);
 const customSvgMap: Record<string, string> = {
 	"e-cny": ECnyIcon,
-	"gate": GateIcon,
-	"tron": TronIcon,
-	"okx": OkxIcon,
-	"erc20": Erc20Icon,
+	gate: GateIcon,
+	tron: TronIcon,
+	okx: OkxIcon,
+	erc20: Erc20Icon,
 };
 
 const iconColorMap: Record<string, string> = {
