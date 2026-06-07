@@ -1,0 +1,40 @@
+name: Issues → Posts
+
+on:
+  issues:
+    types: [opened, edited, deleted, reopened, closed]
+
+permissions:
+  contents: write
+  actions: write
+
+jobs:
+  convert:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Convert Issue to Blog Post
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_DATE: ${{ github.event.issue.updated_at }}
+          ISSUE_CREATED: ${{ github.event.issue.created_at }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_LABELS: ${{ toJson(github.event.issue.labels.*.name) }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_ACTION: ${{ github.event.action }}
+        run: node .github/scripts/issues-to-posts.mjs
+
+      - name: Commit and Push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "📝 ${{ github.event.action == 'deleted' && '删除' || (github.event.action == 'closed' && '关闭' || '更新') }}文章: ${{ github.event.issue.title }}"
+          file_pattern: src/content/posts/
+
+      - name: Trigger Deploy
+        run: |
+          gh workflow run "Deploy to EdgeOne Pages" --ref master
+        env:
+          GH_TOKEN: ${{ github.token }}
