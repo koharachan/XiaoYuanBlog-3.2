@@ -10,6 +10,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "type-check": "tsc --noEmit --isolatedDeclarations",
+    "fetch-issues": "node scripts/fetch-issues.mjs",
     "format": "biome format --write ./src",
     "lint": "biome check --write ./src",
     "preinstall": "npx only-allow pnpm"

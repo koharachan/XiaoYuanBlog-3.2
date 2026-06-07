@@ -42,7 +42,7 @@ function extractDescription(body) {
 	const lines = body.split("\n");
 	for (const line of lines) {
 		const trimmed = line.trim();
-		if (trimmed && !trimmed.startsWith("#") && !trimmed.startsWith("!") && !trimmed.startsWith(">")) {
+		if (trimmed && !trimmed.startsWith("#") && !trimmed.startsWith("!") && !trimmed.startsWith(">") && !trimmed.startsWith("---")) {
 			return trimmed.substring(0, 200);
 		}
 	}

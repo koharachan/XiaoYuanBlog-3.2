@@ -35,6 +35,6 @@ jobs:
 
       - name: Trigger Deploy
         run: |
-          gh workflow run "Deploy to EdgeOne Pages" --ref master
+          gh workflow run "Deploy to EdgeOne Pages" --ref main
         env:
           GH_TOKEN: ${{ github.token }}
