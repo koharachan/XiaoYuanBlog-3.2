@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "start": "astro dev",
     "check": "astro check",
+    "prebuild": "pnpm fetch-issues",
     "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "astro": "astro",
