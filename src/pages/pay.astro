@@ -1,4 +1,4 @@
----
+﻿---
 import Icon from "@/components/common/Icon.astro";
 import { siteConfig, sponsorConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
@@ -145,15 +145,13 @@ const quickList = hasQuickEntry
           >
             <!-- 支付宝：桌面显示打开支付宝，移动端显示唤起支付宝 -->
             {method.name.includes("支付宝") && method.link && (
-              <a
-                href={method.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#1677ff] text-white hover:opacity-90 active:scale-95 transition-all shadow-sm"
+              <button
+                data-alipay-url={method.link}
+                class="alipay-launch inline-flex items-center gap-1.5 px-4 py-2.5 rounded-lg text-sm font-semibold bg-[#1677ff] text-white hover:opacity-90 active:scale-95 transition-all shadow-sm cursor-pointer"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8.3 15.1c-.4.3-.8.5-1.3.6-.5.1-1 .1-1.5 0-.6-.1-1-.4-1.3-.9-.2-.3-.3-.7-.3-1.1 0-.4.1-.8.3-1.1.3-.5.7-.8 1.3-.9.5-.1 1-.1 1.5 0l1.3.6v2.8zm7.4 0c-.4.3-.8.5-1.3.6-.5.1-1 .1-1.5 0-.6-.1-1-.4-1.3-.9-.2-.3-.3-.7-.3-1.1 0-.4.1-.8.3-1.1.3-.5.7-.8 1.3-.9.5-.1 1-.1 1.5 0l1.3.6v2.8zM12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 15.5c-1.2 0-2.3-.4-3.2-1l-1.6 1.6-1.4-1.4 1.6-1.6c-.6-.9-1-2-1-3.2 0-3 2.4-5.4 5.4-5.4s5.4 2.4 5.4 5.4-2.4 5.4-5.4 5.4z"/></svg>
                 {i18n(I18nKey.payOpen)} {method.name}
-              </a>
+              </button>
             )}
             {method.name.includes("支付宝") && !method.link && (
               <span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400">
@@ -258,7 +256,32 @@ const quickList = hasQuickEntry
         ta.select();
         document.execCommand("copy");
         document.body.removeChild(ta);
-      }
-    });
-  });
-</script>
+     }
+   });
+ });
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest(".alipay-launch");
+    if (!btn) return;
+    e.preventDefault();
+    var qrUrl = btn.getAttribute("data-alipay-url");
+    if (!qrUrl) return;
+    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      var encodedUrl = encodeURIComponent(qrUrl);
+      var alipayUrl = "alipays://platformapi/startapp?saId=10000007&qrcode=" + encodedUrl;
+      var iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.src = alipayUrl;
+      document.body.appendChild(iframe);
+      var fallbackTimer = setTimeout(function () {
+        try { document.body.removeChild(iframe); } catch (_) {}
+        window.location.href = qrUrl;
+      }, 2000);
+      var clearFallback = function () { clearTimeout(fallbackTimer); };
+      window.addEventListener("blur", clearFallback, { once: true });
+      window.addEventListener("visibilitychange", function () {
+        if (document.hidden) clearFallback();
+      }, { once: true });
+    } else {
+      window.open(qrUrl, "_blank", "noopener,noreferrer");
+    }
+  });</script>
