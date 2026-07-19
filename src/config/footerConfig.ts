@@ -21,9 +21,9 @@ export const footerConfig: FooterConfig = {
 			description: "luoaowoo.cn",
 		},
 		{
-			name: "氢氧化钙生产线",
-			url: "https://www.glmce.cn/",
-			description: "www.glmce.cn",
+			name: "魔域",
+			url: "https://weibo.com/ttarticle/p/show?id=2309405276788133068860",
+			description: "weibo.com",
 		},
 	],
 };
