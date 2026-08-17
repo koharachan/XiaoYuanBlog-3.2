@@ -30,6 +30,16 @@ export const footerConfig: FooterConfig = {
 			url: "http://www.baiying800.cn",
 			description: "baiying800.cn",
 		},
+		{
+			name: "AXB虚拟号",
+			url: "https://axbysh.sinmeng.cn",
+			description: "axbysh.sinmeng.cn",
+		},
+		{
+			name: "和女生聊天话题",
+			url: "https://www.lee8.com/",
+			description: "www.lee8.com/",
+		},
 	],
 };
 
