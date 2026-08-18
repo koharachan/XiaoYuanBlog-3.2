@@ -6,7 +6,7 @@ draft: false
 description: "把模型答砸的 7699 条对话丢给 Kimi K3、GLM 5.3、DeepSeek V4 Pro 三家重答再选优。记录三家 agent 的真实工作方式：GLM 搭流水线、DeepSeek 硬编码直写、Kimi 一次性生成，以及我从中看到的东西"
 image: ""
 tags: ["AI", "LLM", "数据蒸馏", "agent", "实践记录"]
-category: AI
+category: 外版
 comment: true
 ---
 

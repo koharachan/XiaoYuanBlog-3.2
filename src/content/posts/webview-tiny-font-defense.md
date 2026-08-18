@@ -6,7 +6,7 @@ draft: false
 description: "打包网页应用在华为鸿蒙 6（卓易通兼容环境）与 vivo Y33s 上卡片 5px 小字被系统 WebView 强制放大、Firefox 却正常的排查实录：三次试错，最终用「放大渲染再整体缩回」收场"
 image: ""
 tags: ["WebView", "CSS", "移动端", "安卓", "踩坑"]
-category: 教程
+category: 外版
 comment: true
 ---
 

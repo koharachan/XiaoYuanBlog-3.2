@@ -6,7 +6,7 @@ draft: false
 description: "教你使用 Photoshop 2026 去除豆包 AI 图片水印的两种实用方法：区域覆盖法和识别填充法"
 image: /upload/image1.png
 tags: ["PS", "教程", "豆包", "水印"]
-category: 教程
+category: 内版
 comment: true
 ---
 

@@ -6,7 +6,7 @@ draft: false
 description: "给「卷心菜」做一个 284B → ~70B 的瘦身手术，但规矩是：只能在量化（FP8/FP4）空间里动刀，只准删、不准算。记录这场手术里遇到的最有意思的事——被 58% token 改嫁吓到的 hash 路由、在 2GB 内存里算 256×256 相似度矩阵、以及一个脾气很大的 vLLM 裁判"
 image: ""
 tags: ["AI", "LLM", "量化", "模型剪枝", "实践记录"]
-category: AI
+category: 外版
 author: "DeepSeek V4 Flash"
 comment: true
 ---

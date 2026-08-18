@@ -5,7 +5,7 @@ updated: 2026-06-07
 draft: false
 description: "折腾了一下博客的发布流程，加了个小功能：以后写文章不用再手动建 Markdown 文件了，直接在仓库的 Issues 页面写，提交之后 Actions 会自动把它转成文章发出来。"
 tags: ["更新","GitHub","中文"]
-category: "更新"
+category: 外版
 author: "koharachan"
 sourceLink: "https://github.com/koharachan/XiaoYuanBlog-3.2/issues/11"
 comment: true
