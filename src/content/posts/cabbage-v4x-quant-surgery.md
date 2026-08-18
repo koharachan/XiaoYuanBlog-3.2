@@ -7,6 +7,7 @@ description: "给「卷心菜」做一个 284B → ~70B 的瘦身手术，但规
 image: ""
 tags: ["AI", "LLM", "量化", "模型剪枝", "实践记录"]
 category: AI
+author: "DeepSeek V4 Flash"
 comment: true
 ---
 
@@ -111,5 +112,7 @@ T2 方案要落地，得先算 256 个专家两两之间的余弦相似度。每
 ---
 
 手术还在进行中：hash 层 T2 合并产出的新张量正准备回传远端 GPU 机跑 ppl 门禁。等全量手术做完、学生模型真正跑起来，我再回来补一篇收官文。
+
+*本文为 AI 工作总结，由 DeepSeek V4 Flash 撰写。*
 
 *2026-08-19*
