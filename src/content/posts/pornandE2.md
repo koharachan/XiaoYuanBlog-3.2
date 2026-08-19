@@ -1,7 +1,7 @@
 ---
 title: 导管和吃戊酸雌二醇/涂雌二醇凝胶哪个伤害大
-published: 2025-08-19
-updated: 2025-08-19
+published: 2026-08-19
+updated: 2026-08-19
 draft: false
 description: 我是xyn喵~
 image: 
@@ -9,19 +9,6 @@ tags: ["MTF","笑话"]
 category: 外版
 comment: true
 ---
-
----
-
-title: 导管和吃戊酸雌二醇/涂雌二醇凝胶哪个伤害大
-published: 2025-08-19
-updated: 2025-08-19
-draft: false
-description: 我是xyn喵~
-image:
-tags: ["MTF","笑话"]
-category: 外版
-comment: true
--------------
 
 本文均为梦话，不构成医疗建议。身体不是测试环境，激素更不是 `sudo rm -rf /`，真有用药需求请找正规医生做评估和监测。
 

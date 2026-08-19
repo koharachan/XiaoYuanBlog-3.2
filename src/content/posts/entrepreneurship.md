@@ -1,7 +1,7 @@
 ---
 title: 创业如何成功
-published: 2025-08-19
-updated: 2025-08-19
+published: 2026-08-19
+updated: 2026-08-19
 draft: false
 description: 先帝创业未半而中道崩阻，好产品在没有高成本的情况下是否真的可以广泛的出售
 image: 

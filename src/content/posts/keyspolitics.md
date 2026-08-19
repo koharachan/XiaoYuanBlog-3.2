@@ -1,7 +1,7 @@
 ---
 title: 一个关于键政的讨论
-published: 2025-08-19
-updated: 2025-08-19
+published: 2026-08-19
+updated: 2026-08-19
 draft: false
 description: 莫谈国事的当代为何还有键政
 image: 
