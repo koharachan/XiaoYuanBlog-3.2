@@ -3,7 +3,7 @@ title: 2025广东中考
 published: 2025-07-06
 updated: 2025-07-06
 draft: false
-description: 
+description: 一个关于广东省2025年中考题目的故事
 image: /upload/image-XCtB.jpg
 tags: ["中考","笑话"]
 category: 外版
