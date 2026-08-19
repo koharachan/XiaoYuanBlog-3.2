@@ -9,7 +9,6 @@ import GateIcon from "@/icons/gate.svg?raw";
 import OkxIcon from "@/icons/okx.svg?raw";
 import TronIcon from "@/icons/tron.svg?raw";
 import MainGridLayout from "@/layouts/MainGridLayout.astro";
-import { url } from "@/utils/url-utils";
 
 if (!siteConfig.pages.sponsor) {
 	return Astro.redirect("/404/");
@@ -95,7 +94,7 @@ const quickList = hasQuickEntry
               {customSvgMap[method.icon || ""] ? (
                 <span class="w-5 h-5" set:html={customSvgMap[method.icon || ""]} />
               ) : (
-                method.icon ? <Icon icon={method.icon} size="base" color={iconColorMap[method.icon] || "var(--primary)"} /> : null
+                method.icon ? <Icon icon={method.icon} size="lg" color={iconColorMap[method.icon] || "var(--primary)"} /> : null
               )}
             </div>
             <div>
