@@ -33,7 +33,12 @@ export const footerConfig: FooterConfig = {
 		{
 			name: "和女生聊天话题",
 			url: "https://www.lee8.com/",
-			description: "www.lee8.com/",
+			description: "www.lee8.com",
+		},
+{
+			name: "成都保洁服务",
+			url: "https://www.7jz.com.cn/",
+			description: "www.7jz.com.cn",
 		},
 	],
 };
