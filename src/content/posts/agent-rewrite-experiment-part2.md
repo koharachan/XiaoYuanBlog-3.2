@@ -6,7 +6,7 @@ draft: false
 description: "7699 条失败对话重答实验的后续：8 份盲测记录、185 题的统计结果（GLM 48.6% / Kimi 42.7% / DeepSeek 8.6%），以及 DeepSeek V4 Pro 在跑到 250/7699 时拒绝继续、留下一份进度脚本就停摆的全过程。所有数据均有可验证来源。"
 image: ""
 tags: ["AI", "LLM", "数据蒸馏", "agent", "盲测", "实践记录"]
-category: AI
+category: 外版
 comment: true
 ---
 

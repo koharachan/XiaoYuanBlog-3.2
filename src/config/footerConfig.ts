@@ -21,11 +21,6 @@ export const footerConfig: FooterConfig = {
 			description: "luoaowoo.cn",
 		},
 		{
-			name: "魔域",
-			url: "https://weibo.com/ttarticle/p/show?id=2309405276788133068860",
-			description: "weibo.com",
-		},
-		{
 			name: "农贸市场设计",
 			url: "http://www.baiying800.cn",
 			description: "baiying800.cn",

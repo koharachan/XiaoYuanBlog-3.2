@@ -75,12 +75,17 @@ export type Category = {
 };
 
 export async function getCategoryList(): Promise<Category[]> {
+	// 站点仅允许 内版 / 外版 两个分类
+	const allowed = ["内版", "外版"];
 	const posts = await getAllPosts();
 	const count: Record<string, number> = {};
 	const uncategorizedKey = i18n(I18nKey.uncategorized);
 
 	for (const post of posts) {
 		const category = post.data.category?.trim() || "";
+		if (category && !allowed.includes(category)) {
+			continue; // 白名单之外的分类不进入列表
+		}
 		const key = category || uncategorizedKey;
 		count[key] = (count[key] || 0) + 1;
 	}
