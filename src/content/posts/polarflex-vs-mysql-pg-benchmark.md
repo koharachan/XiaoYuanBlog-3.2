@@ -142,6 +142,20 @@ PolarDB PostgreSQL 轻量版符合“国产化 / 信创适配”的主要口径�
 
 > 性能拉不拉平其实是小事。真正重要、也最容易被忽略的是：**PolarDB / PolarFlex 这套栈对比原生 PostgreSQL，多出来了一大块 PG 根本没有的攻击面和配置风险。** 以下都是本次在实测服务器上直接观察到的事实，不是理论推演。
 
+### 红队实测：三条路径均已验证可利用（非破坏性 POC）
+
+> 这不是"理论上可能有漏洞"，而是按红队思路实际打进去验证过。全部为只读探测，未触碰、未修改任何数据。
+
+| 路径 | 入口 | 用什么口令 | 结果 |
+|---|---|---|---|
+| **X1** | `公网IP:1523`（PG 引擎直连） | 默认 `admin / postgres` | ✅ 登录成功，`current_user=admin, rolsuper=true` |
+| **X2** | `127.0.0.1:12369`（PolarProxy，公网绑 0.0.0.0） | 配置文件里写死的 `aurora / aurora` | ✅ 登录成功，`current_user=aurora, rolsuper=true` |
+| **X3** | `0.0.0.0:12371`（MaxScale 管理口） | 未设 `admin_passwd`（默认无认证） | ⚠️ 管理面公网暴露、无显式口令 |
+
+**杀伤力演示**（X1 拿到的公网超级用户）：能读取 `pg_authid` 里所有用户的密码哈希（`aurora` / `admin` 均已读到），等于可以离线脱库或撞库；而 `config.yaml` 里 `polardb_base_init_password: cG9zdGdyZXM=` 用 `base64 -d` 直接还原成明文 `postgres`，所谓 `password_encrypt: true` 只是编码不是加密。
+
+> 结论：**默认口令 + 公网绑定 + 全放行 pg_hba + 无防火墙 = 只凭出厂默认值就能远程拿到 PolarDB 超级用户**。这不是 0day，是比 0day 更现实、更该在采购前堵死的洞。
+
 原生 PostgreSQL 的形态是：**一个 `postgres` 进程 + 一个 5432 端口 + 非特权运行账号**。而 PolarDB 这台机器上多出了一整套组件，还几乎全跑成 **root**：
 
 | 组件 | 进程账号 | 监听端口 | 原生 PG 有吗 |
