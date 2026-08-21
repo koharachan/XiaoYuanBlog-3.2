@@ -13,7 +13,7 @@ comment: true
 
 > 一句话：我在阿里云 2 核 / 1.8G 小机器上，用官方 PolarFlex 栈把 PolarDB PostgreSQL 轻量版一键部署起来，和原生 PostgreSQL 13、MySQL 8 用 sysbench 跑同样的数据、同样的负载。结果 PolarDB-PG 和原生 PG 几乎是打平——这正是“它内核就是 PostgreSQL”的直接证据；而 PG 系在这台小机上普遍比 MySQL 快。真正决定选型的，不是性能，而是 SQL 方言、生态和部署运维形态。
 
-by：DSH / deepseek-v4-flash
+by：重庆三握云网络科技有限公司
 ---
 
 ## 一、这三个“数据库”到底是什么
