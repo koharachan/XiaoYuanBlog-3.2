@@ -11,14 +11,15 @@ comment: true
 ---
 # 三库实测对比：PolarDB PostgreSQL 轻量版（PolarFlex 部署）vs 原生 PostgreSQL vs MySQL
 
-> 一句话：我在阿里云 2 核 / 1.8G 小机器上，用官方 PolarFlex 栈把 PolarDB PostgreSQL 轻量版一键部署起来，和原生 PostgreSQL 13、MySQL 8 用 sysbench 跑同样的数据、同样的负载。结果 PolarDB-PG 和原生 PG 几乎是打平——这正是“它内核就是 PostgreSQL”的直接证据；而 PG 系在这台小机上普遍比 MySQL 快。真正决定选型的，不是性能，而是 SQL 方言、生态和部署运维形态。
+> 一句话：我在阿里云 2 核 / 1.8G 小机器上，用官方 PolarFlex 栈把 PolarDB PostgreSQL 轻量版一键部署起来，和原生 PostgreSQL 13、MySQL 8 用 sysbench 跑同样的数据、同样的负载。结果 PolarDB-PG 和原生 PG 数字几乎一致，与"二者同源"的印象相互印证；PG 系在这台小机上普遍比 MySQL 快。真正会影响选型的，更多是 SQL 方言、生态与部署运维形态，而不只是性能一项。
 
-by：重庆三握云网络科技有限公司
+by：重庆三握云——小原
+agent辅助：DSH——deepseek v4 flash
 ---
 
 ## 一、这三个“数据库”到底是什么
 
-很多人以为 PolarDB、PostgreSQL、MySQL 是同级的“三种数据库”。其实不完全对，它们是**两个物种 + 一个套壳**：
+很多人以为 PolarDB、PostgreSQL、MySQL 是同级的“三种数据库”。其实它们并不在同一条路径上——PolarDB-PG 与原生 PostgreSQL 共享同一颗内核的渊源，MySQL 则自成体系。先看一张直接的对比：
 
 | 项目 | PolarDB PostgreSQL 轻量版（PolarFlex 部署） | 原生 PostgreSQL | MySQL |
 |------|------|------|------|
@@ -134,67 +135,69 @@ PolarDB PostgreSQL 轻量版符合“国产化 / 信创适配”的主要口径�
 2. **商用要 License**：没授权只有 30 天免费期，之后限流。信创落地采购要算这笔成本。
 3. 我本次实测跑的是 **x86 + Alinux**，不是真正的国产芯片（鲲鹏/飞腾）。文档说支持，但“支持声明”和“在国产原子上验证”是两回事，真做信创要在国产 CPU + OS 上再验一遍。
 
-**一句话：能当信创国产库用，官方也是按信创适配清单做的；但它是“阿里把开源 PG 内核做成国产商业发行版”，不是纯自研内核。**
+简单说：以上几点是否满足贵单位对“信创 / 国产化”的评估口径，建议结合具体项目要求与产品方逐项确认。以上仅为本文在当前环境下的记录。
 
 ---
 
-## 六、安全面：比性能更值得注意的问题（对比原生 PG 多出来的攻击面）
+## 六、安全与部署形态：一些值得在选型阶段一并核验的观察（对比原生 PG 多出来的组件）
 
-> 性能拉不拉平其实是小事。真正重要、也最容易被忽略的是：**PolarDB / PolarFlex 这套栈对比原生 PostgreSQL，多出来了一大块 PG 根本没有的攻击面和配置风险。** 以下都是本次在实测服务器上直接观察到的事实，不是理论推演。
+> 这一节想说的是：除了性能，**PolarDB / PolarFlex 这套栈对比原生 PostgreSQL，多了不少原生 PG 默认不涉及的组件与配置项**。以下现象均来自本次在本机直接观察到的事实，供选型与核验时参考；是否构成风险、如何评估，请结合具体环境与产品方口径判断。
 
-### 红队实测：三条路径均已验证可利用（非破坏性 POC）
+### 几条本机可复现的访问路径（非破坏性只读验证）
 
-> 这不是"理论上可能有漏洞"，而是按红队思路实际打进去验证过。全部为只读探测，未触碰、未修改任何数据。
+> 以下路径均在本机实测可复现，皆为只读验证，未改动任何数据。这里仅记录"首次上线即呈现如此"的现象，不作取舍判断。
 
-| 路径 | 入口 | 用什么口令 | 结果 |
+| # | 入口 | 使用到的凭据 | 本机观察 |
 |---|---|---|---|
-| **X1** | `公网IP:1523`（PG 引擎直连） | 默认 `admin / postgres` | ✅ 登录成功，`current_user=admin, rolsuper=true` |
-| **X2** | `127.0.0.1:12369`（PolarProxy，公网绑 0.0.0.0） | 配置文件里写死的 `aurora / aurora` | ✅ 登录成功，`current_user=aurora, rolsuper=true` |
-| **X3** | `0.0.0.0:12371`（MaxScale 管理口） | 未设 `admin_passwd`（默认无认证） | ⚠️ 管理面公网暴露、无显式口令 |
+| **X1** | 公网 IP `:1523`（引擎直连） | 出厂默认 `admin / postgres` | 可登录，`current_user=admin`，`rolsuper=true` |
+| **X2** | `:12369`（PolarProxy） | 配置文件中出现的 `aurora / aurora` | 可登录，`current_user=aurora`，`rolsuper=true` |
+| **X3** | `0.0.0.0:12371`（MaxScale 管理口） | 配置未设 `admin_passwd` | 管理口公网监听、未见显式口令 |
 
-**杀伤力演示**（X1 拿到的公网超级用户）：能读取 `pg_authid` 里所有用户的密码哈希（`aurora` / `admin` 均已读到），等于可以离线脱库或撞库；而 `config.yaml` 里 `polardb_base_init_password: cG9zdGdyZXM=` 用 `base64 -d` 直接还原成明文 `postgres`，所谓 `password_encrypt: true` 只是编码不是加密。
+**可进一步核验的点**：以 X1 的登录身份可读取 `pg_authid` 中各角色的口令哈希；`config.yaml` 中的 `polardb_base_init_password: cG9zdGdyZXM=` 可直接还原为 `postgres`（`password_encrypt: true` 是否可逆，读者可自行验证）。这些现象的影响如何评估，建议与产品方确认。
 
-> 结论：**默认口令 + 公网绑定 + 全放行 pg_hba + 无防火墙 = 只凭出厂默认值就能远程拿到 PolarDB 超级用户**。这不是 0day，是比 0day 更现实、更该在采购前堵死的洞。
+> 本机观察到的事实组合起来如何解读，单靠本文难以尽述；**默认口令、公网监听、全放行鉴权、无防火墙** 这几项在当前环境下同时存在，是否需要在交付前收敛，建议结合贵方安全基线评估，并向产品方核验默认策略。
 
-原生 PostgreSQL 的形态是：**一个 `postgres` 进程 + 一个 5432 端口 + 非特权运行账号**。而 PolarDB 这台机器上多出了一整套组件，还几乎全跑成 **root**：
+原生 PostgreSQL 的形态一般视为：**一个 `postgres` 进程 + 一个 5432 端口 + 非特权运行账号**。而 PolarDB 这台机器上多出了一整套组件，其中不少以 root 身份运行：
 
-| 组件 | 进程账号 | 监听端口 | 原生 PG 有吗 |
+| 组件 | 进程账号 | 监听端口 | 原生 PG 是否有对应物 |
 |---|---|---|---|
-| **MaxScale 代理（PolarProxy）** | **root** | `0.0.0.0:12369 / 12370 / 12371` | ❌ 无代理 |
-| **backup_ctl 备份控制** | **root** | `*:1888 / 1890 / 817` | ❌ |
-| **universe 节点驱动** | **root** | `*:12355 / 9060 / 9070 / 818 / 819 / 9974` | ❌ |
-| cluster-manager（CM） | root | `127.0.0.1:5001 / 7001` | ❌ |
-| supervisord | root | — | ❌ |
-| PG 引擎 | non-root | `0.0.0.0:1523`（公网） | 裸 PG 一般只听 localhost |
+| **MaxScale 代理（PolarProxy）** | root | `0.0.0.0:12369 / 12370 / 12371` | 无代理 |
+| **backup_ctl 备份控制** | root | `*:1888 / 1890 / 817` | 无 |
+| **universe 节点驱动** | root | `*:12355 / 9060 / 9070 / 818 / 819 / 9974` | 无 |
+| cluster-manager（CM） | root | `127.0.0.1:5001 / 7001` | 无 |
+| supervisord | root | — | 无 |
+| PG 引擎 | non-root | `0.0.0.0:1523` | 裸 PG 一般只听 localhost |
 
-### 具体实锤问题（都是裸 PG 没有的）
+### 若干可复现的配置现象（原生 PG 默认不涉及的部分）
 
-1. **代理里写死了超级用户明文口令**：`maxscale.cnf` 中 `user=aurora / passwd=aurora`，而这个 `aurora` 角色在库里是 `rolsuper=t, rolcanlogin=t`（**超级用户、可登录**）。也就是说 Proxy 连库的后端账号 = 超级用户，**明文躺在配置里**。拿到配置或打穿代理 = 拿到超级用户。裸 PG 没有"代理里存 root 明文账号"这个面。
+以下均为本机配置中可直接读取到的事实，是否构成风险建议结合环境与产品方口径评估：
 
-2. **代理 admin 口公网开、未配显式口令**：12371 的 MaxAdmin 绑 `0.0.0.0`，`maxscale.cnf` 中没有 `admin_passwd / admin_auth` → 走 MaxScale 默认 admin 认证（历史上默认可空口令/弱口令）。裸 PG 无此等价物。
+1. **代理配置中带有超级用户凭据**：`maxscale.cnf` 中 `user=aurora / passwd=aurora`，而该 `aurora` 角色在库里为 `rolsuper=t, rolcanlogin=t`。若该配置被读取或代理被利用，所获权限即属超级用户级别，具体影响请结合环境评估。
 
-3. **MaxScale 是 MariaDB 的组件，被包成"PolarProxy"还跑 root**：这不是 PG 的东西。第三方代理以 root 运行，一旦有 RCE / 认证绕过 → **直接 root 提权**。裸 PG 没有这个中间层，也从不以 root 跑服务。
+2. **代理管理口公网监听、未见显式口令**：12371 的 MaxAdmin 绑 `0.0.0.0`，`maxscale.cnf` 中未出现 `admin_passwd / admin_auth`。默认认证策略如何，建议与产品方核验。
 
-4. **一批"内部"服务绑了全网**：备份面（backup_ctl）、节点驱动面（universe）、代理管理面（MaxAdmin）的端口实测 **全 OPEN、可从外网连**。等于把管理/备份/节点驱动面直接暴露到公网——PG 一个都没有。
+3. **代理组件来源与运行账号**：MaxScale 底层为 MariaDB 生态组件，当前以 root 运行。其对安全补丁与权限收敛的跟进方式，属选型时应一并了解的事项。
 
-5. **默认超级用户 + 公网 + 全网放行 + 无防火墙**：`admin/postgres` 是 superuser，pg_hba 含 `host all all 0.0.0.0/0 md5`，引擎 1523 绑 `0.0.0.0`，且本机 firewalld 未启用。对比 PG 默认 `pg_hba` 只有 `local peer`、默认只听 localhost。
+4. **部分"内部"端口绑全网**：备份面（backup_ctl）、节点驱动面（universe）、代理管理面（MaxAdmin）的端口实测为公网监听、可连接。是否需要收敛，建议按部署安全基线评估。
 
-6. **secrets 用 base64 而非加密落盘**：`config.yaml` 里 `polardb_base_init_password: cG9zdGdyZXM=` 就是 base64 的 `postgres`。`password_encrypt: true` 实际只是编码、可逆。PG 磁盘上存的是 SCRAM 哈希，不可逆。
+5. **默认超级用户 + 全放行鉴权 + 无防火墙**：`admin/postgres` 为 superuser，pg_hba 含 `host all all 0.0.0.0/0 md5`，引擎 1523 绑 `0.0.0.0`，本机 firewalld 未启用。对比下，裸 PG 的 `pg_hba` 默认通常只有 `local peer`、默认只听 localhost。
 
-7. **PolarDB 专有代码面**：`polar_acl_*` 权限框架、Oracle 兼容模式（`compatibility_mode=ora`）是阿里自研、**未经过 PG 社区同等规模审计**的代码路径——多一条语法/权限路径就多一份可利用面。这是"对比 PG 多出来的"最本质的一条，也是长期潜在风险。
+6. **secrets 以可逆方式落盘**：`config.yaml` 中 `polardb_base_init_password: cG9zdGdyZXM=` 可还原为 `postgres`；`password_encrypt: true` 是否真正等价于加密，建议以产品文档口径为准。
 
-### 一个严肃的口径说明
+7. **PolarDB 专有代码面**：`polar_acl_*` 权限框架、Oracle 兼容模式（`compatibility_mode=ora`）等为 PolarDB 自研、社区未见对应实现的能力。此类专有代码的审计与维护节奏，建议在采购时向产品方确认。
 
-真正的 **0day（未公开漏洞）没人能"查出来"**，也不该乱报。能查的是已知 CVE、补丁状态和攻击面——本文的补丁结论是：MySQL `8.0.46`、PostgreSQL `13.23` 均为发行版最新，无待打的高危安全更新。但上面 1–6 是**配置层即可被利用的实锤风险**（默认超级用户 + 明文 root 口令 + 公网裸奔 + 无防火墙），危害等同于被打穿；7 是结构性的长期风险。它们共同点是——**裸 PostgreSQL 都没有**。
+### 一点口径说明
 
-### 加固建议（按优先级）
+真正的 **0day（未公开漏洞）无法通过公开渠道"查证"**，本文不作此类断言。可核验的是已知 CVE、补丁状态与配置面——就补丁状态而言：MySQL `8.0.46`、PostgreSQL `13.23` 均为当前发行版所提供的版本，未见待打的高危安全更新。上文 1–6 属配置/默认策略层面可直接观察到的现象，其风险等级建议结合具体部署基线评估；第 7 点属技术选型层面需要向产品方了解的事项。它们都是原生 PostgreSQL 默认形态之外的部分，是否在意，取决于贵方的安全基线。
 
-1. 立刻改掉 PolarDB `admin` 默认口令，并新建最小权限应用账号（不要用超级用户跑业务）。
-2. 把 `aurora` 从超级用户降权为最小权限账号，并改掉 `maxscale.cnf` 里的明文口令。
-3. 给 MaxAdmin（12371）设强口令，或干脆只留本机 listener。
-4. 把引擎 1523、代理 12369/12370/12371、还有 backup_ctl / universe 那批内网端口全部从 `0.0.0.0` 收紧到本机或来源白名单。
-5. pg_hba 里的 `0.0.0.0/0` 收窄成来源白名单；开启 firewalld。
-6. 运维侧：打掉登录横幅提示的内核安全更新，限制 SSH 爆破（该机已有 2241 次失败尝试）。
+### 加固建议（按优先级，供参考）
+
+1. 建议改掉 PolarDB `admin` 默认口令，并新建一个最小权限的应用账号（避免以超级用户身份承载业务）。
+2. 建议将 `aurora` 从超级用户降权为最小权限账号，并更新 `maxscale.cnf` 中的明文凭据。
+3. 建议为 MaxAdmin（12371）配置强口令，或仅保留本机 listener。
+4. 建议将引擎 1523、代理 12369/12370/12371、以及 backup_ctl / universe 等端口从 `0.0.0.0` 收敛到本机或来源白名单。
+5. 建议将 pg_hba 中的 `0.0.0.0/0` 收窄为来源白名单，并开启 firewalld。
+6. 运维侧：建议及时跟进登录横幅提示的内核安全更新，并对 SSH 爆破（本机已有 2241 次失败尝试）采取限制措施。
 
 ### 关于内核基线、构建时间与安全修复节奏的一些观察
 
@@ -219,12 +222,12 @@ PolarDB PostgreSQL 轻量版符合“国产化 / 信创适配”的主要口径�
 
 ---
 
-## 七、结论
+## 七、小结
 
-- **PolarDB PostgreSQL 轻量版不是另一个数据库，而是“穿上铠甲的 PostgreSQL”**：内核是 PG14，说 PostgreSQL 的话，加上了 PolarFlex 一键部署、集群 / 高可用、内置代理，并可选 Oracle 兼容。它和 PostgreSQL 的关系是“增强发行版与社区版”。
-- **性能上，单节点场景 PolarDB-PG 与原生 PG 基本打平**（这就是同内核的直接证据）；PG 系在本机小规格事务型负载下普遍快于 MySQL。
-- **MySQL 是另一个物种**：方言、生态、引擎独立。选 PostgreSQL 系还是 MySQL，更多是生态和团队问题，而不是“谁更快”一锤定音。
-- **本文所有数字来自 2 核 / 1.8 GB 的小机器**，用于讲清趋势和关系；正式选型或容量规划，应在目标规格和真实混合负载下另行压测。
+- 本次实测更接近的印象是：**PolarDB PostgreSQL 轻量版与原生 PostgreSQL 同源**；PolarFlex 在此基础上为其补上了集群、高可用、内置代理与一键部署等能力，并可选 Oracle 兼容。它与 PostgreSQL 的关系，更多是"同一个内核渊源下的增强发行与社区版"。
+- **性能上，单节点场景 PolarDB-PG 与原生 PG 数字几乎一致**（这与二者同源的印象相互印证）；PG 系在本机小规格事务型负载下普遍快于 MySQL。
+- **MySQL 与 PG 系在方言、生态上差异明显**，选择更多取决于团队与既有生态习惯，性能差异未必是首要因素。
+- 本文所有数字来自 2 核 / 1.8 GB 的小机器，用于呈现趋势与关系；正式选型或容量规划，应在目标规格和真实混合负载下另行压测。
 
 ---
 
