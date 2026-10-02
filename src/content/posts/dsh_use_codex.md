@@ -7,7 +7,8 @@ description: "用dsh使用sub2api反代的codex模型"
 image: ""
 tags: ["Ai", "Codex", "DSH", "反代", "sub2api", "实践记录"]
 category: 外版
-comment: tr
+---
+
 # 修复 DSH 与 Codex 反代的“隐形战争”：真正出问题的不是模型，而是协议语义
 
 最近在折腾 DeepSeek Shell（DSH）接 OpenAI Responses / Codex 风格的反向代理时，我遇到了一组非常有迷惑性的错误：
