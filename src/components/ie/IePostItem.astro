@@ -1,0 +1,23 @@
+---
+import { categoryUrl, excerpt, fmtDate, type Post, tagUrl } from "@/lib/posts";
+
+interface Props {
+	post: Post;
+}
+const { post } = Astro.props;
+const summary = post.description || excerpt(post.entry.body || "");
+---
+<div class="box post-item clear">
+	{post.image && (
+		<a href={`/ie${post.url}`}><img class="cover" src={post.image} alt="" width={post.imageSize?.width} height={post.imageSize?.height} /></a>
+	)}
+	{post.pinned && <span class="pin-ie">置顶</span>}
+	<h2><a href={`/ie${post.url}`}>{post.title}</a></h2>
+	<p class="imeta">
+		<span>{fmtDate(post.published)}</span>
+		<span><a href={`/ie${categoryUrl(post.category)}`}>{post.category || "未分类"}</a></span>
+		<span>{post.words} 字</span>
+	</p>
+	{summary && <p>{summary}</p>}
+	<div>{post.tags.map((t) => (<a class="itag" href={`/ie${tagUrl(t)}`}>#{t}</a>))}</div>
+</div>

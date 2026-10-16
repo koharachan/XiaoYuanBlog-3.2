@@ -1,0 +1,20 @@
+---
+import { getEntry, render } from "astro:content";
+import { friends } from "@/config";
+import IeBase from "@/layouts/IeBase.astro";
+
+const entry = await getEntry("spec", "friends");
+if (!entry) throw new Error("src/content/spec/friends.md 不存在");
+const { Content } = await render(entry);
+---
+<IeBase title="友链" modernPath="/friends/">
+	<div class="box">
+		<h3 class="t">友情链接</h3>
+		<div class="ifriends clear">
+			{friends.map((f) => (
+				<a href={f.url} target="_blank"><b>{f.name}</b><small>{f.desc}</small></a>
+			))}
+		</div>
+		<div class="iprose"><Content /></div>
+	</div>
+</IeBase>

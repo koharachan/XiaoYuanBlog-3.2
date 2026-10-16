@@ -3,7 +3,7 @@ title: 导管和吃戊酸雌二醇/涂雌二醇凝胶哪个伤害大
 published: 2026-08-19
 updated: 2026-08-19
 draft: false
-description: 我是xyn喵~
+description: "拆解一个跨赛道的问题：自慰主要是局部机械负荷，雌二醇则是系统性内分泌改变；逐器官比较两者，并说明口服与经皮雌二醇在首过效应和血栓风险上的差别。"
 image: 
 tags: ["MTF","笑话"]
 category: 外版

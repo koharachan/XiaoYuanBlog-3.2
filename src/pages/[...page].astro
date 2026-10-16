@@ -1,70 +1,55 @@
 ---
 import type { GetStaticPaths } from "astro";
-import Pagination from "@/components/common/Pagination.astro";
-import PostPage from "@/components/layout/PostPage.astro";
-import { siteConfig } from "@/config";
-import MainGridLayout from "@/layouts/MainGridLayout.astro";
-import { getSortedPosts } from "@/utils/content-utils";
+import Pagination from "@/components/Pagination.astro";
+import PostCard from "@/components/PostCard.astro";
+import Sidebar from "@/components/Sidebar.astro";
+import { author, site } from "@/config";
+import Base from "@/layouts/Base.astro";
+import { getPosts, getTags } from "@/lib/posts";
+
 export const getStaticPaths = (async ({ paginate }) => {
-	const allBlogPosts = await getSortedPosts();
-	// 使用配置中的文章数量
-	const pageSize = siteConfig.pagination.postsPerPage;
-	return paginate(allBlogPosts, { pageSize });
+	const posts = await getPosts();
+	return paginate(posts, { pageSize: site.postsPerPage });
 }) satisfies GetStaticPaths;
-// https://github.com/withastro/astro/issues/6507#issuecomment-1489916992
 
 const { page } = Astro.props;
-
-const len = page.data.length;
+const [posts, tags] = await Promise.all([getPosts(), getTags()]);
+const days = Math.floor((Date.now() - new Date(site.startDate).getTime()) / 86400000);
+const isFirst = page.currentPage === 1;
 ---
-
-<MainGridLayout>
-  <PostPage page={page} />
-  {
-    page.total > page.size && (
-      <Pagination
-        class="mx-auto onload-animation"
-        page={page}
-        style={`animation-delay: calc(var(--content-delay) + ${len * 50}ms)`}
-      />
-    )
-  }
-</MainGridLayout>
-
-<script>
-  // 响应式分页处理脚本
-  document.addEventListener("DOMContentLoaded", function () {
-    // 如果启用了响应式分页，添加相应的CSS类
-    const responsiveEnabled = true; // ${siteConfig.pagination.responsive}
-    if (responsiveEnabled) {
-      const deviceType = getDeviceType();
-      document.body.classList.add(`device-${deviceType}`);
-
-      // 监听窗口大小变化
-      let resizeTimeout;
-      window.addEventListener("resize", function () {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(function () {
-          const newDeviceType = getDeviceType();
-          const currentDeviceType = document.body.className.match(
-            /device-(mobile|tablet|desktop)/
-          )?.[1];
-
-          if (currentDeviceType !== newDeviceType) {
-            document.body.classList.remove(`device-${currentDeviceType}`);
-            document.body.classList.add(`device-${newDeviceType}`);
-          }
-        }, 250);
-      });
-    }
-  });
-
-  function getDeviceType() {
-    if (typeof window === "undefined") return "desktop";
-
-    const width = window.innerWidth;
-    if (width < 768) return "mobile";
-    if (width < 1024) return "tablet";
-    return "desktop";
-  }
-</script>
+<Base title={isFirst ? undefined : `第 ${page.currentPage} 页`} iePath={isFirst ? "/ie/" : `/ie/${page.currentPage}/`}>
+	{isFirst && (
+		<section class="hero">
+			<div>
+				<div class="hero__kicker">system online · {author.name}</div>
+				<h1><span class="grad">{site.title}</span></h1>
+				<svg class="hero__line" viewBox="0 0 352 14" aria-hidden="true">
+					<path d="M2 7 H120 l6 -5 h40 l6 5 H260 l5 5 h20 l5 -5 H350" />
+				</svg>
+				<p>{site.tagline}。{site.description}</p>
+				<ul class="hero__stats">
+					<li><b>{posts.length}</b>篇文章</li>
+					<li><b>{tags.length}</b>个标签</li>
+					<li><b>{days}</b>天运行</li>
+				</ul>
+			</div>
+			<svg class="reactor" viewBox="0 0 200 200" aria-hidden="true">
+				<circle class="r1" cx="100" cy="100" r="92" />
+				<circle class="r2" cx="100" cy="100" r="74" />
+				<circle class="r3" cx="100" cy="100" r="56" />
+				<path class="hex" d="M100 60 l34.6 20 v40 l-34.6 20 l-34.6 -20 v-40z" />
+				<circle class="r4" cx="100" cy="100" r="40" />
+				<circle class="core" cx="100" cy="100" r="9" />
+			</svg>
+		</section>
+	)}
+	<div class="layout">
+		<section class="posts" aria-label="文章列表">
+			{page.data.map((post, i) => (<PostCard post={post} index={i} eager={i < 2} />))}
+			<Pagination current={page.currentPage} total={page.lastPage} href={(n) => (n === 1 ? "/" : `/${n}/`)} />
+		</section>
+		<aside class="side">
+			<Sidebar />
+		</aside>
+	</div>
+</Base>

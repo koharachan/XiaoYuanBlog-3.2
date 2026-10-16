@@ -1,229 +1,224 @@
 ---
-title: docker纯命令行部署网站
+title: "用 Docker 命令行部署 Nginx、PHP 和反向代理"
 published: 2025-04-03
 updated: 2025-04-04
 draft: false
-description: 
+description: "从一个能长期维护的 Compose 示例开始，用固定版本镜像部署 Nginx 静态站、PHP-FPM 和 Halo 反向代理；修正容器网络、挂载路径、PHP location 和配置检查。"
 image: /upload/image-nhAz.jpg
-tags: ["网站","服务器","教程"]
+tags: ["Docker", "网站", "Nginx", "PHP", "服务器"]
 category: 外版
 comment: true
 ---
 
-### 1. 拉取 Nginx 容器
+原稿是我早期用 `docker run` 部署网站时留下的笔记，里面有 `nginx:latest`、PHP 7.1、容器 IP 和几处写错的 Nginx 配置。照着旧版本直接复制，运气不好会在容器升级或重启后坏掉。
+
+这次把它整理成一份更容易维护的例子。示例分成三种：静态站、PHP-FPM、以及把 Nginx 作为 Halo 之类服务的反向代理。三种可以单独用，不需要全部一起启动。
+
+## 目录结构
+
+```text
+website/
+├── compose.yml
+├── nginx/
+│   └── default.conf
+├── php/
+│   └── default.conf
+└── site/
+    ├── index.html
+    └── index.php
+```
+
+先创建目录：
 
 ```bash
-docker pull nginx:latest
+mkdir -p website/{nginx,php,site}
+cd website
 ```
 
-### 2. 运行 Nginx 容器
+## 部署静态网站
 
-在这里面:
+如果只是 Astro、Hugo 或普通 HTML，先用最简单的 Nginx：
 
-`--name nginx` 就是容器的名称，可以自定义，但是不能包含特殊字符或空格，可以使用 `-` 或 `_` 来分隔。
-
-`-p 80:80` 是把容器的80端口映射到服务器的80端口，格式是：
-
-```
-容器端口:服务器端口
-```
-
-`-p 443:443` 是把容器的443端口映射到服务器的443端口，443端口负责https，如果你不需要，可以删除这行。
-
-```bash
-docker run -d --name nginx -p 80:80 -p 443:443 \
-  -v /var/www/html/dist:/usr/share/nginx/html:ro \
-  -v /etc/nginx/sites-available/default:/etc/nginx/nginx.conf:ro \
-  nginx:latest
-```
-
-**挂载说明：**
-
-1. **挂载静态文件**：
-   - 宿主机的 `/var/www/html/dist` 是静态文件的存放目录，挂载到容器的 `/usr/share/nginx/html`。
-   - 设置为只读（`ro`）可以防止容器修改静态文件。
-
-2. **挂载 Nginx 配置文件**：
-   - 宿主机的 `/etc/nginx/sites-available/default` 是 Nginx 的配置文件，挂载到容器的 `/etc/nginx/nginx.conf`。
-   - 设置为只读（`ro`）可以防止容器修改配置文件。
-
-## 使用 PHP
-
-和 `nginx` 一样，我们拉一下 `PHP` 的容器，我们可以直接用 docker run 来节省先 pull 后 run 的时间：
-
-```bash
-docker run -p 9000:9000 -d --name php-fpm -v /var/www:/usr/share/nginx/www php:7.1-fpm
+```yaml
+# compose.yml
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: website-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./site:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx
+      - /var/run
 ```
 
-**参数说明：**
-
-- `-p 9000:9000`：将容器的9000端口映射到主机的9000端口
-- `-d`：后台运行(守护进程)
-- `--name myphp-fpm`：将容器命名为myphp-fpm
-- `-v`：将主机中当前目录下的www挂载到容器的www目录
-
-### 查看容器启动情况
-
-```bash
-docker ps -a
-```
-
-运行后会看到这样的内容：
-
-```
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                    NAMES
-51adb2df6004        php:7.1-fpm         "docker-php-entrypoif"   45 seconds ago      Up 20 seconds       0.0.0.0:9000->9000/tcp   php-fpm
-3218b3ad4e47        nginx               "nginx -g 'daemon off"   18 minutes ago      Up 5 minutes       0.0.0.0:80->80/tcp,0.0.0.0:443->80/tcp       nginx
-```
-
-说明两个容器都正常运行了，然后我们来看看ip，然后去修改nginx相关配置：
-
-```bash
-docker inspect myphp-fpm | grep "IPAddress"
-```
-
-然后会得到 `"SecondaryIPAddresses": null, "IPAddress": "172.17.0.3", "IPAddress": "172.17.0.3",` 这样的输出，其中 `172.17.0.3` 就是容器ip，我们记下来。
-
-### 修改配置文件PHP部分
-
-我们上面已经想到了容器里面没有vim，所以把路径映射了出来，我们接下来就不需要进入容器去编辑了。
-
-我们直接进入vim去编辑（如果不会用vim看下文的vim怎么用，提示vim不存在看如何安装vim）：
-
-```bash
-vim /etc/nginx/sites-available/default/default.conf
-```
-
-把下面的内容放到 `server` 块中，这个时候也可以随便设置你的域名：
+对应的 `nginx/default.conf`：
 
 ```nginx
-location \.php$ {
-    fastcgi_pass   你的容器ip:9000;
-    fastcgi_index  index.php;
-    fastcgi_param  SCRIPT_FILENAME  /usr/share/nginx/www$fastcgi_script_name;
-    fastcgi_param  SCRIPT_NAME      $fastcgi_script_name;
-    include        fastcgi_params;
-}
-```
-
-**设置域名：**
-
-可以在 `server` 块中设置 `server_name example.com 192.168.1.8; `
-
-这个例子中设置了域名 `example.com` 和ip `192.168.1.8`。
-
-### Vim 使用教程
-
-**第一步：打开文件**
-
-```bash
-vim 文件路径
-```
-
-**第二步：进入编辑模式**
-
-输入 “`i`” 切换编辑模式，然后就可以开始编辑了。
-
-**第三步：保存并退出**
-
-编辑完成后按下 `esc` 键退出编辑模式。
-
-退出编辑模式后，确认当前输入法是英语（这个很重要），确认后按下英语的 `:` ，然后输入 `wq` ，你的文件就被保存并退出vim了。
-
-**常见问题处理：**
-
-- 如果提示你没有权限（你真的不是root用户），你需要通过 `:q!` 不保存并强制退出
-- 如果你是root用户，你可以使用 `:w!` 强制保存，然后通过 `:q` 退出
-
-### 更新 Nginx 配置文件
-
-执行这个命令：
-
-```bash
-docker exec -it mynginx service nginx reload
-```
-
-然后得到 `[ ok ] Reloading nginx: nginx.` ，说明大功告成了。
-
-这个时候我们来访问我们刚刚设置的ip/域名（你域名要已经解析到服务器上面）：
-
-![](/upload/image-nhAz.jpg)
-
-图片来自 [使用docker快速搭建nginx+php环境 - 代码汇 - 博客园](https://www.cnblogs.com/codehui/p/docker_nginx_php.html) 剪裁后得。
-
-## 非PHP动态网站
-
-这里以 halo 举例，我们跳过 halo 的部署，直接来到部署好的时候。
-
-一样的，也要修改配置文件，但是简单很多。
-
-用 vim 打开配置文件（关于vim的教程和常见问题看php部分的vim怎么用）：
-
-```bash
-vim /etc/nginx/sites-available/default/default.conf
-```
-
-在这个里面添加以下内容来配置反向代理：
-
-```nginx
-upstream halo {
-  server 127.0.0.1:8090;
-}
-
 server {
-  listen 80;
-  listen [::]:80;
-  server_name www.yourdomain.com;
-  client_max_body_size 1024m;
-  
-  location / {
-    proxy_pass http://halo;
-    proxy_set_header HOST $host;
-    proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  }
-}
-```
+    listen 80;
+    server_name example.com;
+    root /usr/share/nginx/html;
+    index index.html;
 
-**完整配置示例：**
-
-```nginx
-upstream halo {
-    server 127.0.0.1:8090; 
-}
-
-server {
-    listen 80 ;
-    listen 443 ssl http2 ;
-    listen [::]:443 ssl http2 ;
-    
-    server_name xyj.haokajia.vip 192.168.1.42 xyj.kohara123.asia;
-    client_max_body_size 1024m;
-    
-    access_log /www/sites/xyj.haokajia.vip/log/access.log main;
-    error_log /www/sites/xyj.haokajia.vip/log/error.log;
-    
-    location ^~ /.well-known/acme-challenge {
-        allow all;
-        root /usr/share/nginx/html;
+    location / {
+        try_files $uri $uri/ =404;
     }
-    
-    location ^~ / {
-        proxy_pass http://127.0.0.1:8090;
+
+    location = /healthz {
+        add_header Content-Type text/plain;
+        return 200 "ok\n";
+    }
+}
+```
+
+启动并检查：
+
+```bash
+docker compose pull
+docker compose up -d
+docker compose ps
+docker compose exec nginx nginx -t
+docker compose logs --tail=100 nginx
+```
+
+不要使用 `nginx:latest`。固定到一个明确的大版本，升级时手动改版本并先在测试机执行 `nginx -t`。
+
+## 加 PHP-FPM
+
+PHP-FPM 和 Nginx 不需要互相查 IP。把它们放在同一个 Compose 网络里，直接使用服务名 `php`：
+
+```yaml
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./site:/var/www/html:ro
+      - ./php/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+
+  php:
+    image: php:8.3-fpm-alpine
+    restart: unless-stopped
+    volumes:
+      - ./site:/var/www/html:ro
+```
+
+`php/default.conf`：
+
+```nginx
+server {
+    listen 80;
+    server_name example.com;
+    root /var/www/html;
+    index index.php index.html;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        try_files $uri =404;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param SCRIPT_NAME $fastcgi_script_name;
+        fastcgi_pass php:9000;
+    }
+
+    location ~ /\. {
+        deny all;
+    }
+}
+```
+
+这里有两个容易写错的地方：`location ~ \.php$` 需要正则匹配，不能写成 `location \.php$`；`fastcgi_pass` 写 Compose 服务名 `php:9000`，不要手工查 `172.17.0.3` 之类的临时容器 IP。
+
+启动后可以放一个最小的 `site/index.php`：
+
+```php
+<?php
+header('Content-Type: text/plain; charset=utf-8');
+echo "PHP is working\n";
+```
+
+检查：
+
+```bash
+docker compose up -d
+docker compose exec nginx nginx -t
+curl -i http://127.0.0.1/index.php
+docker compose logs --tail=100 nginx php
+```
+
+## 给 Halo 做反向代理
+
+如果 Halo 已经运行在宿主机的 `127.0.0.1:8090`，Nginx 容器里的 `127.0.0.1` 指向的是容器自己，不是宿主机。Linux 上可以把宿主机映射成 `host.docker.internal`：
+
+```yaml
+services:
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./nginx/halo.conf:/etc/nginx/conf.d/default.conf:ro
+```
+
+`nginx/halo.conf`：
+
+```nginx
+server {
+    listen 80;
+    server_name blog.example.com;
+    client_max_body_size 64m;
+
+    location / {
+        proxy_pass http://host.docker.internal:8090;
         proxy_http_version 1.1;
-        add_header X-Cache $upstream_cache_status;
-        proxy_set_header Host xyj.haokajia.vip;
-        proxy_ssl_server_name off;
-        
-        if ( $uri ~* "\.(gif|png|jpg|css|js|woff|woff2)$" ) {
-            expires 1m;
-        }
-        
-        proxy_ignore_headers Set-Cookie Cache-Control expires;
-        proxy_cache proxy_cache_panel;
-        proxy_cache_key $host$uri$is_args$args;
-        proxy_cache_valid 200 304 301 302 10m;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
     }
 }
 ```
+
+如果 Halo 也在 Compose 里，就把它加入同一个 Compose 文件，直接写 `proxy_pass http://halo:8090;`，不要暴露 Halo 的管理端口到公网。
+
+## HTTPS 和上线前检查
+
+证书可以由宿主机上的 Caddy、Certbot 或云 CDN 管理，Nginx 只负责监听 443；不要把真实证书提交进 Git。上线前至少检查：
+
+```bash
+docker compose config
+docker compose up -d
+docker compose ps
+docker compose exec nginx nginx -t
+curl -I http://example.com/
+docker compose logs --tail=200
+```
+
+还要确认：
+
+- `site` 和配置文件挂载为只读；
+- PHP、Halo 的管理端口没有额外 `ports` 映射；
+- 云防火墙只开放 80/443 和必要的 SSH 来源；
+- 上传目录有明确的大小限制和备份；
+- 镜像版本固定，升级前先备份 `compose.yml` 和数据卷；
+- 反代后的域名、HTTPS 和 WebSocket 分别测试，不要只看首页能不能开。
+
+Docker 本身不是“输入一条命令就永远稳定”。真正省事的做法是：固定镜像版本，用 Compose 网络里的服务名通信，配置文件先 `nginx -t`，再让容器重载。

@@ -35,7 +35,7 @@ jobs:
           run_install: false # Disable auto-install
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Run Astro Check
         run: pnpm astro check
@@ -61,7 +61,7 @@ jobs:
           run_install: false # Disable auto-install
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
 
       - name: Run Astro Build
         run: pnpm astro build

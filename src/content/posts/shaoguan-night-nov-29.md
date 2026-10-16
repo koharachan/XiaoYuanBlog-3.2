@@ -1,29 +1,33 @@
 ---
-title: 11月29韶关夜（附RAW）
+title: "11 月 29 日，韶关的夜"
 published: 2024-12-02
 updated: 2024-12-02
 draft: false
-description: 韶关夜景摄影作品集
+description: "2024 年 11 月 29 日在韶关拍的一组夜景，江边塔楼、灯光和路上的几个瞬间，原图按当天的时间顺序放在这里。"
 image: /upload/IMG20241129193908.jpg
-tags: ["摄影"]
+tags: ["摄影", "韶关", "生活记录"]
 category: 外版
 comment: true
 ---
 
-![](/upload/IMG20241129193908.jpg)
-![](/upload/IMG20241129193906.jpg)
-![](/upload/IMG20241129193842.jpg)
-![](/upload/IMG20241129193902.jpg)
-![](/upload/IMG20241129193900.jpg)
-![](/upload/IMG20241129193858.jpg)
-![](/upload/IMG20241129193850.jpg)
-![](/upload/IMG20241129193847.jpg)
-![](/upload/IMG20241129193552.jpg)
-![](/upload/IMG20241129193528.jpg)
-![](/upload/IMG20241129193521.jpg)
-![](/upload/IMG20241129193510.jpg)
-![](/upload/IMG20241129193503.jpg)
-![](/upload/IMG20241129191513.jpg)
-![](/upload/IMG20241129191415.jpg)
-![](/upload/IMG20241129191409.jpg)
-![](/upload/IMG20241129191351.jpg)
+11 月 29 日晚上在韶关随手拍的一组图。那天没有专门带设备，基本就是看到什么拍什么：江边的灯、对岸的塔、路上的光，还有一些没来得及认真构图的瞬间。
+
+原来标题写了“附 RAW”，但仓库里并没有对应的 RAW 文件，所以这里不再这样承诺，保留现有 JPEG 记录。
+
+![韶关夜景 01](/upload/IMG20241129193908.jpg)
+![韶关夜景 02](/upload/IMG20241129193906.jpg)
+![韶关夜景 03](/upload/IMG20241129193842.jpg)
+![韶关夜景 04](/upload/IMG20241129193902.jpg)
+![韶关夜景 05](/upload/IMG20241129193900.jpg)
+![韶关夜景 06](/upload/IMG20241129193858.jpg)
+![韶关夜景 07](/upload/IMG20241129193850.jpg)
+![韶关夜景 08](/upload/IMG20241129193847.jpg)
+![韶关夜景 09](/upload/IMG20241129193552.jpg)
+![韶关夜景 10](/upload/IMG20241129193528.jpg)
+![韶关夜景 11](/upload/IMG20241129193521.jpg)
+![韶关夜景 12](/upload/IMG20241129193510.jpg)
+![韶关夜景 13](/upload/IMG20241129193503.jpg)
+![韶关夜景 14](/upload/IMG20241129191513.jpg)
+![韶关夜景 15](/upload/IMG20241129191415.jpg)
+![韶关夜景 16](/upload/IMG20241129191409.jpg)
+![韶关夜景 17](/upload/IMG20241129191351.jpg)

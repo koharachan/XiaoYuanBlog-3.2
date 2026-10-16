@@ -1,0 +1,20 @@
+---
+import { getEntry, render } from "astro:content";
+import { giscus } from "@/config";
+import IeBase from "@/layouts/IeBase.astro";
+
+const entry = await getEntry("spec", "guestbook");
+if (!entry) throw new Error("src/content/spec/guestbook.md 不存在");
+const { Content } = await render(entry);
+---
+<IeBase title="留言板" modernPath="/guestbook/">
+	<div class="box">
+		<h3 class="t">留言板</h3>
+		<div class="iprose"><Content /></div>
+		<p>
+			留言基于 GitHub Discussions，经典版无法内嵌。
+			<a class="btn-ie" href={giscus.discussionsUrl} target="_blank">前往 GitHub 讨论区</a>
+			或 <a href="/guestbook/?modern=1">切换到完整版</a>。
+		</p>
+	</div>
+</IeBase>

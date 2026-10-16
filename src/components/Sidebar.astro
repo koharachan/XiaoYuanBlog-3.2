@@ -1,0 +1,56 @@
+---
+import { author } from "@/config";
+import { getCategories, getPosts, getTags } from "@/lib/posts";
+import Icon from "./Icon.astro";
+
+interface Props {
+	/** 当前高亮的分类/标签名 */
+	active?: string;
+	/** 是否显示分类与标签（文章页用目录替代） */
+	terms?: boolean;
+}
+const { active, terms = true } = Astro.props;
+const [posts, categories, tags] = await Promise.all([getPosts(), getCategories(), getTags()]);
+type IconName = "github" | "bilibili" | "qq" | "mail" | "rss";
+---
+<section class="card profile reveal" style="--i:1">
+	<img class="profile__avatar" src={author.avatar} alt={author.name} width="88" height="88" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+	<h3>{author.name}</h3>
+	<p>{author.bio}</p>
+	<div class="social">
+		{author.links.map((l) => (
+			<a href={l.url} aria-label={l.name} title={l.name} target={l.url.startsWith("http") ? "_blank" : undefined} rel={l.url.startsWith("http") ? "noopener" : undefined}>
+				<Icon name={l.icon as IconName} />
+			</a>
+		))}
+	</div>
+</section>
+<section class="card reveal" style="--i:2">
+	<h3 class="card__title">站点</h3>
+	<ul class="termlist">
+		<li><a href="/archive/">文章 <small>{posts.length}</small></a></li>
+		<li><a href="/archive/">标签 <small>{tags.length}</small></a></li>
+		<li><a href="/archive/">分类 <small>{categories.length}</small></a></li>
+	</ul>
+</section>
+{terms && (
+	<>
+		<section class="card reveal" style="--i:3">
+			<h3 class="card__title">分类</h3>
+			<ul class="termlist">
+				{categories.map((c) => (
+					<li><a href={c.url} aria-current={active === c.name ? "page" : undefined}>{c.name} <small>{c.count}</small></a></li>
+				))}
+			</ul>
+		</section>
+		<section class="card reveal" style="--i:4">
+			<h3 class="card__title">标签</h3>
+			<div class="chips">
+				{tags.map((t) => (
+					<a class="chip" href={t.url} aria-current={active === t.name ? "page" : undefined}>{t.name} <small>{t.count}</small></a>
+				))}
+			</div>
+		</section>
+	</>
+)}
+<slot />

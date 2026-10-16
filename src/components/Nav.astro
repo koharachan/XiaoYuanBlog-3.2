@@ -1,0 +1,41 @@
+---
+import { nav, site } from "@/config";
+import Icon from "./Icon.astro";
+
+const path = Astro.url.pathname;
+const isCurrent = (url: string) => (url === "/" ? path === "/" || /^\/\d+\/$/.test(path) : path.startsWith(url));
+const iePath = `/ie${path}`;
+---
+<header class="nav">
+	<div class="wrap nav__in">
+		<a class="brand" href="/" aria-label={`${site.title} 首页`}>
+			<svg viewBox="0 0 32 32" aria-hidden="true">
+				<circle class="orbit" cx="16" cy="16" r="13" />
+				<circle class="orbit" cx="16" cy="16" r="8" style="animation-direction:reverse;animation-duration:9s" />
+				<circle class="core" cx="16" cy="16" r="3.2" />
+				<circle class="sat" cx="16" cy="3" r="1.8" />
+			</svg>
+			<span>{site.title}</span>
+		</a>
+		<ul class="nav__links">
+			{nav.map((l) => (
+				<li><a href={l.url} aria-current={isCurrent(l.url) ? "page" : undefined}>{l.name}</a></li>
+			))}
+		</ul>
+		<button class="ibtn" type="button" data-open-search aria-label="搜索（快捷键 /）" title="搜索  /"><Icon name="search" /></button>
+		<div class="menu" data-menu data-open="false">
+			<button class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="切换主题" title="主题"><Icon name="palette" /></button>
+			<div class="menu__panel" role="menu">
+				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="neon"><span class="menu__sw menu__sw--neon"></span>霓虹 · 科技</button>
+				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="cloud"><span class="menu__sw menu__sw--cloud"></span>云 · 浅色</button>
+				<a class="menu__item" role="menuitem" href={iePath}><span class="menu__sw menu__sw--ie"></span>经典 · IE 兼容</a>
+			</div>
+		</div>
+		<button id="burger" class="ibtn burger" type="button" aria-label="菜单" aria-expanded="false" aria-controls="drawer"><Icon name="menu" /></button>
+	</div>
+</header>
+<nav id="drawer" class="drawer" data-open="false" aria-label="移动端导航">
+	{nav.map((l) => (
+		<a href={l.url} aria-current={isCurrent(l.url) ? "page" : undefined}>{l.name}</a>
+	))}
+</nav>

@@ -1,0 +1,84 @@
+---
+import { analytics, author, site } from "@/config";
+import Background from "@/components/Background.astro";
+import Footer from "@/components/Footer.astro";
+import Nav from "@/components/Nav.astro";
+import SearchDialog from "@/components/SearchDialog.astro";
+import Icon from "@/components/Icon.astro";
+import "@/styles/base.css";
+import "@/styles/prose.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: string;
+	type?: "website" | "article";
+	/** 当前路径对应的 IE 版本地址，默认按路径推导 */
+	iePath?: string;
+	noindex?: boolean;
+}
+const { title, description = site.description, image, type = "website", noindex } = Astro.props;
+const fullTitle = title ? `${title} - ${site.title}` : `${site.title} - ${site.tagline}`;
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const ogImage = image ? new URL(image, site.url).href : undefined;
+const iePath = Astro.props.iePath ?? `/ie${Astro.url.pathname}`;
+const defaultTheme = site.defaultTheme;
+---
+<!doctype html>
+<html lang={site.lang} data-theme={defaultTheme}>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<script is:inline define:vars={{ iePath, defaultTheme }}>
+// 1) IE / Edge IE 模式：立刻跳到经典版（纯 ES5，必须放在最前面）。
+if (document.documentMode && !/[?&]modern=1/.test(location.search)) {
+	location.replace(iePath + location.search + location.hash);
+}
+// 2) 渲染前应用已保存的主题，避免闪烁。?theme=neon|cloud 可强制指定并记住。
+(function () {
+	var t = null;
+	var m = /[?&]theme=(neon|cloud)/.exec(location.search);
+	if (m) { t = m[1]; try { localStorage.setItem("theme", t); } catch (e) {} }
+	else { try { t = localStorage.getItem("theme"); } catch (e) {} }
+	if (t !== "neon" && t !== "cloud") t = defaultTheme;
+	document.documentElement.setAttribute("data-theme", t);
+})();
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<meta name="author" content={author.name} />
+<meta name="keywords" content={site.keywords.join(", ")} />
+<meta name="theme-color" content={defaultTheme === "cloud" ? "#eaf3ff" : "#070b14"} />
+<meta name="generator" content={Astro.generator} />
+{noindex && <meta name="robots" content="noindex" />}
+<link rel="canonical" href={canonical} />
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="alternate" type="application/rss+xml" title={site.title} href="/rss.xml" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<meta property="og:site_name" content={site.title} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+{ogImage && <meta property="og:image" content={ogImage} />}
+<meta name="twitter:card" content={ogImage ? "summary_large_image" : "summary"} />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+{ogImage && <meta name="twitter:image" content={ogImage} />}
+<slot name="head" />
+<script is:inline define:vars={{ cfg: { ga: analytics.googleAnalyticsId, clarity: analytics.microsoftClarityId, adsense: analytics.adsenseClient } }}>window.__xy = cfg;</script>
+</head>
+<body>
+<Background />
+<a class="sr-only" href="#main">跳到正文</a>
+<Nav />
+<main id="main" class="wrap">
+	<slot />
+</main>
+<Footer />
+<SearchDialog />
+<button id="totop" class="totop" type="button" aria-label="回到顶部"><Icon name="up" /></button>
+<script src="../scripts/main.ts"></script>
+</body>
+</html>

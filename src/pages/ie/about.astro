@@ -1,0 +1,13 @@
+---
+import { getEntry, render } from "astro:content";
+import IeSidebar from "@/components/ie/IeSidebar.astro";
+import IeBase from "@/layouts/IeBase.astro";
+
+const entry = await getEntry("spec", "about");
+if (!entry) throw new Error("src/content/spec/about.md 不存在");
+const { Content } = await render(entry);
+---
+<IeBase title="关于" modernPath="/about/">
+	<div class="ie-col"><div class="box iprose"><Content /></div></div>
+	<aside class="ie-side"><IeSidebar terms={false} /></aside>
+</IeBase>

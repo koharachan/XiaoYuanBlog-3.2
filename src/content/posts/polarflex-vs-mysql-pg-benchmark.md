@@ -3,18 +3,19 @@ title: "三库实测对比：PolarDB PostgreSQL 轻量版（PolarFlex 部署）v
 published: 2026-08-21
 updated: 2026-08-21
 draft: false
-description: "在阿里云 2核/1.8G 小机器上，用官方 PolarFlex 栈一键部署 PolarDB PostgreSQL 轻量版，并与原生 PostgreSQL 13、MySQL 8 用 sysbench 同数据同负载对比。结果：PolarDB-PG 与原生 PG 几乎打平（同内核的直接证据），PG 系明显快于 MySQL；真正区别在方言、生态与部署运维形态。但比性能更重要的，是 PolarDB 栈相比原生 PG 多出来的一大块攻击面：MaxScale/backup_ctl/universe 全以 root 运行、代理里写死超级用户明文口令、多个端口公网裸奔、secrets 用 base64 落盘——这些裸 PostgreSQL 都没有，附带加固清单"
+description: "在 2 核 1.8G 阿里云小机上用 sysbench 同负载对比 PolarDB-PG、原生 PostgreSQL 13 与 MySQL 8，并梳理 PolarFlex 栈比裸 PG 多出的默认口令、公网端口和 root 组件，附加固清单。"
 image: ""
 tags: ["PolarDB", "PolarFlex", "PostgreSQL", "MySQL", "数据库", "性能测试", "sysbench", "信创", "安全", "攻击面"]
 category: 外版
 comment: true
 ---
+
+*本文由重庆三握云——小原整理，DSH（DeepSeek V4 Flash）辅助完成；测试结果和安全观察来自本次实际部署。*
+
 # 三库实测对比：PolarDB PostgreSQL 轻量版（PolarFlex 部署）vs 原生 PostgreSQL vs MySQL
 
 > 一句话：我在阿里云 2 核 / 1.8G 小机器上，用官方 PolarFlex 栈把 PolarDB PostgreSQL 轻量版一键部署起来，和原生 PostgreSQL 13、MySQL 8 用 sysbench 跑同样的数据、同样的负载。结果 PolarDB-PG 和原生 PG 数字几乎一致，与"二者同源"的印象相互印证；PG 系在这台小机上普遍比 MySQL 快。真正会影响选型的，更多是 SQL 方言、生态与部署运维形态，而不只是性能一项。
 
-by：重庆三握云——小原
-agent辅助：DSH——deepseek v4 flash
 ---
 
 ## 一、这三个“数据库”到底是什么

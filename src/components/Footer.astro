@@ -1,0 +1,21 @@
+---
+import { author, footerLinks, site } from "@/config";
+const year = new Date().getFullYear();
+const days = Math.floor((Date.now() - new Date(site.startDate).getTime()) / 86400000);
+---
+<footer class="footer">
+	<div class="wrap footer__in">
+		{footerLinks.length > 0 && (
+			<div class="footer__links">
+				{footerLinks.map((l) => (
+					<a href={l.url} target="_blank" rel="noopener">{l.name}</a>
+				))}
+			</div>
+		)}
+		<div>
+			© {year} {author.name}<span class="footer__sep">·</span>已运行 {days} 天<span class="footer__sep">·</span>
+			<a href="/rss.xml">RSS</a><span class="footer__sep">·</span><a href="/sitemap-index.xml">Sitemap</a><span class="footer__sep">·</span>
+			<a href={`/ie${Astro.url.pathname}`} rel="nofollow">经典版</a>
+		</div>
+	</div>
+</footer>

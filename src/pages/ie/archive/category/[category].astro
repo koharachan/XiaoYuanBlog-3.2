@@ -1,0 +1,20 @@
+---
+import IeSidebar from "@/components/ie/IeSidebar.astro";
+import IeTimeline from "@/components/ie/IeTimeline.astro";
+import IeBase from "@/layouts/IeBase.astro";
+import { categoryUrl, type Post, termPaths } from "@/lib/posts";
+
+export async function getStaticPaths() {
+	return termPaths("category");
+}
+const { term, posts } = Astro.props as { term: string; posts: Post[] };
+---
+<IeBase title={`分类：${term}`} modernPath={categoryUrl(term)}>
+	<div class="ie-col">
+		<div class="box">
+			<h3 class="t">分类 {term} · {posts.length} 篇 · <a href="/ie/archive/">全部</a></h3>
+			<IeTimeline posts={posts} />
+		</div>
+	</div>
+	<aside class="ie-side"><IeSidebar active={term} /></aside>
+</IeBase>

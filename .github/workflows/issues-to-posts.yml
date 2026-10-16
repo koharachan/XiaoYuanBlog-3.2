@@ -10,6 +10,9 @@ permissions:
 
 jobs:
   convert:
+    # Only the repository owner may turn an Issue into published content.
+    # Without this guard, any public Issue could become a deployed blog post.
+    if: github.event.issue.user.login == github.repository_owner
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

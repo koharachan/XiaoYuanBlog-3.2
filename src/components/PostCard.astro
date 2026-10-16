@@ -1,0 +1,40 @@
+---
+import { excerpt, type Post, tagUrl } from "@/lib/posts";
+import Icon from "./Icon.astro";
+import Meta from "./Meta.astro";
+
+interface Props {
+	post: Post;
+	index?: number;
+	/** 首屏卡片的封面不懒加载，避免 LCP 变慢 */
+	eager?: boolean;
+}
+const { post, index = 0, eager = false } = Astro.props;
+const summary = post.description || excerpt(post.entry.body || "");
+---
+<article class:list={["card card--glow post-card reveal", { "post-card--cover": !!post.image }]} style={`--i:${index}`}>
+	<div>
+		{post.pinned && <span class="pin"><Icon name="pin" size={12} />置顶</span>}
+		<h2><a href={post.url}>{post.title}</a></h2>
+		<Meta post={post} />
+		{summary && <p>{summary}</p>}
+		{post.tags.length > 0 && (
+			<div class="chips">
+				{post.tags.map((t) => (<a class="chip" href={tagUrl(t)}>#{t}</a>))}
+			</div>
+		)}
+	</div>
+	{post.image && (
+		<a class="post-card__cover" href={post.url} tabindex="-1" aria-hidden="true">
+			<img
+				src={post.image}
+				alt=""
+				width={post.imageSize?.width}
+				height={post.imageSize?.height}
+				loading={eager ? "eager" : "lazy"}
+				decoding="async"
+				fetchpriority={eager ? "high" : undefined}
+			/>
+		</a>
+	)}
+</article>

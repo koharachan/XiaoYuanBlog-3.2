@@ -1,91 +1,75 @@
-# 🐝 Firefly — 小原酱的博客
+# 小原blog
 
-<a href="https://github.com/koharachan/XiaoYuanBlog-3.2/commits"><img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/koharachan/XiaoYuanBlog-3.2.svg?style=flat-square" /></a>
-
-基于 Astro 6 构建的现代个人博客主题，支持 Markdown/MDX、KaTeX 数学公式、Mermaid 图表、全文搜索、多评论系统、Live2D/Spine 模型等丰富特性。
+一个以 Astro 构建的轻量个人博客，内容包括博客与服务器折腾、AI 实验、手机刷机、网络与日常记录。
 
 - **站点**: [blog.meowhead.cn](https://blog.meowhead.cn)
-- **版本**: 6.5.3
-- **协议**: [MIT](LICENSE)
+- **构建**: Astro 6 + TypeScript
+- **部署**: 静态输出，可部署到 EdgeOne Pages、GitHub Pages、Nginx 等
+- **许可**: [MIT](LICENSE)
 
-## ✨ 特性
+## 现在的界面
 
-- **内容**: Markdown / MDX 写作，代码高亮（Expressive Code），KaTeX 数学公式，Mermaid 图表
-- **搜索**: Pagefind 离线全文搜索，支持中文分词
-- **评论**: 可选 Twikoo / Waline / Giscus / Artalk / Disqus
-- **主题**: 亮色 / 暗色 / 跟随系统，可调色相
-- **壁纸**: Banner / Overlay / 纯色三种模式，支持毛玻璃
-- **布局**: 列表 / 网格双模式，响应式侧边栏
-- **特效**: 樱花飘落、Live2D / Spine 模型、打字机效果
-- **分析**: Google Analytics、Microsoft Clarity
-- **其它**: RSS、Sitemap、OG 图片、分享海报、友链
-
-## 🚀 快速开始
+- **霓虹主题**：深色科技感背景、SVG 网格、粒子连线、节点碰撞和点击冲击波；
+- **Cloud 主题**：浅色云层、低对比度粒子背景，适合长时间阅读；
+- **经典主题**：`/ie/` 为 IE / 老旧浏览器准备的纯 CSS、无客户端 JavaScript 版本；
+- **响应式**：手机、平板和桌面使用同一套清晰的列表布局，不依赖全屏 Banner 推动正文；
+- **文章体验**：图片尺寸预留、懒加载、图片灯箱、代码复制、目录高亮、上一篇/下一篇；
+- **性能**：不加载图标库、字体包或客户端路由；统计和广告在页面空闲或首次交互后加载；
+- **内容**：文章保存在 `src/content/posts/`，支持 Markdown；图片保存在 `public/upload/`，构建时只把当前页面实际引用的图片复制到部署产物，未引用的原图仍保留在仓库素材库中。
+## 本地运行
 
 ```bash
-# 安装依赖
 pnpm install
-
-# 开发
 pnpm dev
+```
 
-# 构建
+打开 <http://localhost:4321/>。
+
+## 构建与检查
+
+```bash
+pnpm astro check
 pnpm build
-
-# 预览构建产物
 pnpm preview
 ```
 
-## 📁 文章管理
+构建输出位于 `dist/`。搜索数据由构建阶段生成的 `search.json` 提供，不需要运行时数据库。
 
-文章存放在 `src/content/posts/` 目录，支持 `.md` 和 `.mdx` 格式。
+## 写文章
+
+文章放在 `src/content/posts/`，最小 frontmatter：
 
 ```markdown
 ---
 title: 文章标题
-published: 2026-05-19
-description: 文章简介
-tags: [标签1, 标签2]
-category: 分类
-draft: false
+published: 2026-10-16
+description: 用一句具体的话说明读者能从文章中得到什么。
+tags: [标签]
+category: 外版
+comment: true
 ---
 
-正文内容...
+正文。
 ```
 
-## ⚙️ 配置
+`image` 可以填写 `/upload/...` 的本地封面。建议给本地图片保留真实尺寸，构建时会自动为文章和卡片补充 `width` / `height`，避免图片加载时页面跳动。
 
-所有配置集中在 `src/config/` 目录：
+## 目录说明
 
-| 文件 | 说明 |
-|------|------|
-| `siteConfig.ts` | 站点标题、URL、导航栏、分析等 |
-| `navBarConfig.ts` | 导航栏链接 |
-| `sidebarConfig.ts` | 侧边栏组件 |
-| `profileConfig.ts` | 个人信息卡片 |
-| `commentConfig.ts` | 评论系统 |
-| `fontConfig.ts` | 字体配置 |
-| `backgroundWallpaper.ts` | 壁纸模式 |
-| `sakuraConfig.ts` | 樱花特效 |
-| `coverImageConfig.ts` | 封面图片 |
-| `sponsorConfig.ts` | 赞助信息 |
-| `adConfig.ts` | 广告配置 |
+| 路径 | 作用 |
+| --- | --- |
+| `src/config.ts` | 站点、作者、导航、友链、评论和赞助配置 |
+| `src/layouts/Base.astro` | 现代主题全局布局与元数据 |
+| `src/layouts/IeBase.astro` | 经典 / IE 兼容布局 |
+| `src/styles/base.css` | 霓虹与 Cloud 主题、响应式布局和 SVG 背景样式 |
+| `src/styles/prose.css` | Markdown 文章排版 |
+| `src/styles/ie.css` | 经典主题的老浏览器 CSS |
+| `src/scripts/main.ts` | 主题、搜索、灯箱、代码复制、懒加载和性能增强 |
+| `src/scripts/net.ts` | 粒子网络与碰撞动画 |
+| `src/lib/posts.ts` | 文章排序、标签、分类、摘要和阅读时间 |
+| `src/content/spec/` | 关于、友链、留言板页面内容 |
+| `src/pages/ie/` | IE 兼容版页面路由 |
 
-## 🛠 技术栈
+## Issues 自动写文章
 
-- [Astro 6](https://astro.build) — 静态站点生成
-- [Tailwind CSS 3](https://tailwindcss.com) — 样式
-- [Svelte 5](https://svelte.dev) — 交互组件
-- [Pagefind](https://pagefind.app) — 离线搜索
-- [Expressive Code](https://expressive-code.com) — 代码高亮
-- [KaTeX](https://katex.org) — 数学公式
-- [Mermaid](https://mermaid.js.org) — 图表
-- [Swup](https://swup.js.org) — 页面过渡动画
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/chart?repos=koharachan/XiaoYuanBlog-3.2&type=date&legend=top-left)](https://www.star-history.com/?repos=koharachan%2FXiaoYuanBlog-3.2&type=date&logscale=&legend=top-left)
-
-## 📄 许可
-
-MIT © koharachan
+仓库保留 Issues → Markdown 的工作流，但只有仓库所有者创建的 Issue 才会触发转换。公开 Issue 不会自动变成已部署文章。生成内容仍应在发布前人工检查标题、简介、图片和来源。

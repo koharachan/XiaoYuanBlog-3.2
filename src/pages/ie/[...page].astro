@@ -1,0 +1,38 @@
+---
+import type { GetStaticPaths } from "astro";
+import IePostItem from "@/components/ie/IePostItem.astro";
+import IeSidebar from "@/components/ie/IeSidebar.astro";
+import { site } from "@/config";
+import IeBase from "@/layouts/IeBase.astro";
+import { getPosts } from "@/lib/posts";
+
+export const getStaticPaths = (async ({ paginate }) => {
+	const posts = await getPosts();
+	return paginate(posts, { pageSize: site.postsPerPage });
+}) satisfies GetStaticPaths;
+
+const { page } = Astro.props;
+const cur = page.currentPage;
+const total = page.lastPage;
+const href = (n: number) => (n === 1 ? "/ie/" : `/ie/${n}/`);
+const pages: (number | "…")[] = [];
+for (let i = 1; i <= total; i++) {
+	if (i === 1 || i === total || Math.abs(i - cur) <= 1) pages.push(i);
+	else if (pages[pages.length - 1] !== "…") pages.push("…");
+}
+---
+<IeBase title={cur === 1 ? undefined : `第 ${cur} 页`} modernPath={cur === 1 ? "/" : `/${cur}/`}>
+	<div class="ie-col">
+		{page.data.map((post) => <IePostItem post={post} />)}
+		{total > 1 && (
+			<div class="ipager">
+				{cur > 1 ? <a href={href(cur - 1)}>&lsaquo;</a> : <span class="dis">&lsaquo;</span>}
+				{pages.map((p) =>
+					p === "…" ? <span class="dis">…</span> : p === cur ? <span class="cur">{p}</span> : <a href={href(p)}>{p}</a>,
+				)}
+				{cur < total ? <a href={href(cur + 1)}>&rsaquo;</a> : <span class="dis">&rsaquo;</span>}
+			</div>
+		)}
+	</div>
+	<aside class="ie-side"><IeSidebar /></aside>
+</IeBase>

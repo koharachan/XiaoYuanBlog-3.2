@@ -1,0 +1,33 @@
+---
+import IeSidebar from "@/components/ie/IeSidebar.astro";
+import IeTimeline from "@/components/ie/IeTimeline.astro";
+import IeBase from "@/layouts/IeBase.astro";
+import { getPosts } from "@/lib/posts";
+
+const posts = await getPosts();
+---
+<IeBase title="归档" modernPath="/archive/">
+	<div class="ie-col">
+		<div class="box">
+			<h3 class="t">归档 · 共 {posts.length} 篇</h3>
+			<input class="ifilter" id="f" type="text" placeholder="输入关键词筛选标题…" />
+			<div id="arc"><IeTimeline posts={posts} /></div>
+		</div>
+	</div>
+	<aside class="ie-side"><IeSidebar /></aside>
+	<script is:inline>
+	(function () {
+		var f = document.getElementById("f");
+		var arc = document.getElementById("arc");
+		if (!f || !arc) return;
+		var items = arc.getElementsByTagName("li");
+		f.onkeyup = f.onchange = function () {
+			var q = f.value.toLowerCase();
+			for (var i = 0; i < items.length; i++) {
+				var t = (items[i].getAttribute("data-t") || "").toLowerCase();
+				items[i].style.display = !q || t.indexOf(q) > -1 ? "" : "none";
+			}
+		};
+	})();
+	</script>
+</IeBase>

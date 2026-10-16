@@ -1,0 +1,23 @@
+---
+import Sidebar from "@/components/Sidebar.astro";
+import Timeline from "@/components/Timeline.astro";
+import Base from "@/layouts/Base.astro";
+import { type Post, termPaths } from "@/lib/posts";
+
+export async function getStaticPaths() {
+	return termPaths("category");
+}
+const { term, posts } = Astro.props as { term: string; posts: Post[] };
+---
+<Base title={`分类：${term}`} description={`分类「${term}」下的 ${posts.length} 篇文章。`}>
+	<div class="layout">
+		<section class="card reveal">
+			<div class="page-head">
+				<h1>{term}</h1>
+				<p>{posts.length} 篇文章 · <a href="/archive/">查看全部</a></p>
+			</div>
+			<Timeline posts={posts} />
+		</section>
+		<aside class="side"><Sidebar active={term} /></aside>
+	</div>
+</Base>

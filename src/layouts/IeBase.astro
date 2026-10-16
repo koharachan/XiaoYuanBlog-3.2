@@ -1,0 +1,51 @@
+---
+import { author, footerLinks, nav, site } from "@/config";
+import "@/styles/ie.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+	/** 对应的现代版地址（默认去掉 /ie 前缀） */
+	modernPath?: string;
+}
+const { title, description = site.description } = Astro.props;
+const fullTitle = title ? `${title} - ${site.title}` : `${site.title} - ${site.tagline}`;
+const modernPath = Astro.props.modernPath ?? Astro.url.pathname.replace(/^\/ie/, "") ?? "/";
+const path = Astro.url.pathname;
+const isCurrent = (url: string) => (url === "/" ? path === "/ie/" || /^\/ie\/\d+\/$/.test(path) : path.startsWith(`/ie${url}`));
+const year = new Date().getFullYear();
+---
+<!doctype html>
+<html lang={site.lang}>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+<meta name="robots" content="noindex, follow" />
+<link rel="canonical" href={new URL(modernPath, site.url).href} />
+<link rel="icon" href="/favicon.ico" />
+<link rel="alternate" type="application/rss+xml" title={site.title} href="/rss.xml" />
+</head>
+<body>
+<div class="ie-notice"><div class="wrap">经典版（兼容 IE / 老旧浏览器）。<a href={`${modernPath}?modern=1`}>切换到完整版 &raquo;</a></div></div>
+<header class="ie-header">
+	<div class="wrap">
+		<a class="ie-brand" href="/ie/">{site.title}<small>{site.tagline}</small></a>
+		<ul class="ie-nav">
+			{nav.map((l) => (<li><a class={isCurrent(l.url) ? "cur" : undefined} href={`/ie${l.url}`}>{l.name}</a></li>))}
+		</ul>
+	</div>
+</header>
+<main class="ie-main"><div class="wrap row"><slot /></div></main>
+<footer class="ie-footer">
+	<div class="wrap">
+		{footerLinks.length > 0 && (
+			<div class="flinks">{footerLinks.map((l) => (<a href={l.url} target="_blank" rel="noopener">{l.name}</a>))}</div>
+		)}
+		<div>&copy; {year} {author.name} · <a href="/rss.xml">RSS</a> · <a href={`${modernPath}?modern=1`}>完整版</a></div>
+	</div>
+</footer>
+</body>
+</html>

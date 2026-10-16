@@ -1,0 +1,31 @@
+---
+import { sponsor } from "@/config";
+import IeBase from "@/layouts/IeBase.astro";
+---
+<IeBase title={sponsor.title} modernPath="/pay/">
+	<div class="box">
+		<h3 class="t">{sponsor.title}</h3>
+		<p>{sponsor.description}</p>
+		<div class="clear">
+			{sponsor.methods.map((m) => (
+				<div class="ipay">
+					{m.qr && <img src={m.qr} alt={m.name} width="300" height="300" />}
+					<b>{m.name}</b>
+					{m.wallet && <code>{m.wallet}</code>}
+					<small>{m.note}</small>
+					{m.link && <div><a href={m.link} target="_blank">打开 &raquo;</a></div>}
+				</div>
+			))}
+		</div>
+		{sponsor.sponsors.length > 0 && (
+			<>
+				<h3 class="t" style="margin-top:16px">感谢名单</h3>
+				<ul class="ilist">
+					{sponsor.sponsors.map((s) => (
+						<li><a>{s.name}{s.message ? ` · ${s.message}` : ""}<small>{s.amount} {s.date}</small></a></li>
+					))}
+				</ul>
+			</>
+		)}
+	</div>
+</IeBase>

@@ -1,0 +1,42 @@
+---
+import { author } from "@/config";
+import { getCategories, getPosts, getTags } from "@/lib/posts";
+
+interface Props {
+	active?: string;
+	terms?: boolean;
+}
+const { active, terms = true } = Astro.props;
+const [posts, categories, tags] = await Promise.all([getPosts(), getCategories(), getTags()]);
+const ie = (u: string) => `/ie${u}`;
+---
+<div class="box iprofile">
+	<img src={author.avatar} alt={author.name} width="84" height="84" />
+	<h3>{author.name}</h3>
+	<p>{author.bio}</p>
+	<div class="links">
+		{author.links.map((l) => (<a href={l.url} target={l.url.indexOf("http") === 0 ? "_blank" : undefined}>{l.name}</a>))}
+	</div>
+</div>
+<div class="box">
+	<h3 class="t">站点</h3>
+	<ul class="ilist">
+		<li><a href="/ie/archive/">文章 <small>{posts.length}</small></a></li>
+		<li><a href="/ie/archive/">标签 <small>{tags.length}</small></a></li>
+	</ul>
+</div>
+{terms && (
+	<>
+		<div class="box">
+			<h3 class="t">分类</h3>
+			<ul class="ilist">
+				{categories.map((c) => (<li><a href={ie(c.url)} style={active === c.name ? "color:#2b6cb0;font-weight:bold" : undefined}>{c.name} <small>{c.count}</small></a></li>))}
+			</ul>
+		</div>
+		<div class="box">
+			<h3 class="t">标签</h3>
+			{tags.map((t) => (<a class="itag" href={ie(t.url)}>{t.name} ({t.count})</a>))}
+		</div>
+	</>
+)}
+<slot />

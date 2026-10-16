@@ -1,0 +1,27 @@
+---
+import { fmtDate, type Post } from "@/lib/posts";
+
+interface Props {
+	posts: Post[];
+}
+const { posts } = Astro.props;
+const byYear = new Map<number, Post[]>();
+for (const p of posts) {
+	const y = p.published.getFullYear();
+	byYear.set(y, [...(byYear.get(y) || []), p]);
+}
+const years = [...byYear.keys()].sort((a, b) => b - a);
+---
+<div class="timeline">
+	{years.map((y) => (
+		<>
+			<h2>{y} <small style="opacity:.6;font-size:.8em">· {byYear.get(y)!.length} 篇</small></h2>
+			<ul>
+				{byYear.get(y)!.map((p) => (
+					<li><a href={p.url}><time datetime={p.published.toISOString()}>{fmtDate(p.published).slice(5)}</time><span>{p.title}</span></a></li>
+				))}
+			</ul>
+		</>
+	))}
+	{posts.length === 0 && <p style="color:var(--muted)">这里还没有文章。</p>}
+</div>

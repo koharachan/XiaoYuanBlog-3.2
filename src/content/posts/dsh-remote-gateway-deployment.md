@@ -3,7 +3,7 @@ title: "给 DSH 加一个访问网关：一次远程部署的踩坑流水账"
 published: 2026-09-06
 updated: 2026-09-06
 draft: false
-description: "把 DeepSeek Harness 的 Web 界面（dsh web）从 loopback 搬到公网域名 dsh.chf.org.cn，套一层 Flask 登录网关 + 高防 CDN。记录这一路的坑：登录页乱码、API 403、WS 连不上、模型不回复，以及每个问题真正的原因和最终解法。"
+description: "把 DeepSeek Harness 的 Web 界面（dsh web）从 loopback 搬到公网域名 dsh.example.invalid，套一层 Flask 登录网关 + 高防 CDN。记录这一路的坑：登录页乱码、API 403、WS 连不上、模型不回复，以及每个问题真正的原因和最终解法。"
 tags: ["DSH", "DeepSeek", "部署", "反向代理", "WebSocket", "实践记录"]
 category: 外版
 author: "koharachan"
@@ -24,7 +24,7 @@ comment: true
 
 也就是说，DSH 认为「能跑到这个 Web 的用户」=「这台机器的主人」。一旦你把 `dsh web` 反向代理到公网域名，就**打破了它的安全假设**，等于在跟 DSH 内置的一整套「浏览器信任围栏 / 会话绑定」对着干。
 
-我这次想做的事很简单：**让 DSH 在 `dsh.chf.org.cn` 上可用，多用户、浏览器直接访问，前面有一层登录页 + 高防 CDN**。目的是让 Team 里的同学不用 SSH、不装东西，浏览器打开就能用模型。
+我这次想做的事很简单：**让 DSH 在 `dsh.example.invalid` 上可用，多用户、浏览器直接访问，前面有一层登录页 + 高防 CDN**。目的是让 Team 里的同学不用 SSH、不装东西，浏览器打开就能用模型。
 
 于是就有了这趟踩坑之旅。
 
@@ -56,9 +56,9 @@ comment: true
 new URL(origin).host === hostUrl.host
 ```
 
-浏览器对 XHR POST 必定带 `Origin: https://dsh.chf.org.cn`。而 Flask 网关**原样把 `Origin` 转发给了 DSH**，DSH 一看 Origin 是 `dsh.chf.org.cn`，但它自己的 authority 是 `127.0.0.1:3082`，**对不上 → 403**。
+浏览器对 XHR POST 必定带 `Origin: https://dsh.example.invalid`。而 Flask 网关**原样把 `Origin` 转发给了 DSH**，DSH 一看 Origin 是 `dsh.example.invalid`，但它自己的 authority 是 `127.0.0.1:3082`，**对不上 → 403**。
 
-**修**：网关在转发给 DSH 时**剥掉 `Origin`（还有 `Referer`）**。DSH 收到无 `Origin` 的请求，就当同源处理，接受了。顺手把 `Host` 也转发成 `dsh.chf.org.cn`，配合 DSH 的 `--trusted-host`。
+**修**：网关在转发给 DSH 时**剥掉 `Origin`（还有 `Referer`）**。DSH 收到无 `Origin` 的请求，就当同源处理，接受了。顺手把 `Host` 也转发成 `dsh.example.invalid`，配合 DSH 的 `--trusted-host`。
 
 > 教训：`forbidden` 这个纯文本 403 不是 CDN/WAF 的（它会返回 HTML 拦截页），而是 **DSH 后端**的。所以关 CDN 的 WAF/防盗链完全没用——得从 DSH 的角度想。
 
@@ -79,7 +79,7 @@ isLoopback = transport.ownsHost === true || isLoopbackHostname(location.hostname
 ```
 
 - 页面在 `127.0.0.1`（loopback）→ `isLoopback = true` → 数据层、WS 会话、host 设置全部走完整；
-- 页面在 `dsh.chf.org.cn`（非 loopback）→ **`isLoopback = false`** → host 设置降级为 memory（于是出现「settings are unavailable in this browser」）、实时事件流/模型回复投递被砍。
+- 页面在 `dsh.example.invalid`（非 loopback）→ **`isLoopback = false`** → host 设置降级为 memory（于是出现「settings are unavailable in this browser」）、实时事件流/模型回复投递被砍。
 
 `--trusted-host` 能让 DSH 的 `/api` 信任围栏**接受非 loopback 域名**（这个必要且已经做了），但**改不了「页面非 loopback → isLoopback=false」**这一事实。
 
@@ -101,27 +101,27 @@ isLoopback = transport.ownsHost === true || isLoopbackHostname(location.hostname
 浏览器 ──> scdn 高防 CDN ──> Flask 网关(3081) ──> DSH web(127.0.0.1:3082)
                 │  TLS/防护        │ 登录页 /auth          └─ 注入 ownsHost
                 │                  │ 剥 Origin/Referer
-                │                  │ 转发 Host=dsh.chf.org.cn
+                │                  │ 转发 Host=dsh.example.invalid
                 │                  └─ WS → DSH(101)
 ```
 
-- **登录**：`/koharachan` 黑白极简登录页；未登录 `/` 返回 503、`/*` 返回 404；登录后下发 HMAC cookie。
+- **登录**：`/login` 登录页；未登录 `/` 返回 503、`/*` 返回 404；登录后下发 HMAC cookie。
 - **API**：网关剥 Origin 转发，DSH 接受。
 - **WS/模型**：注入 `ownsHost`，`isLoopback=true`，会话、模型回复都通。
-- **认证**：DSH 以 `--trusted-host dsh.chf.org.cn` 启动，`/api` 围栏放行。
+- **认证**：DSH 以 `--trusted-host dsh.example.invalid` 启动，`/api` 围栏放行。
 
 ---
 
 ## 六、小结
 
-这套东西能落地，靠的是**读懂 DSH 的安全假设，而不是硬配**：
+这套东西能落地，靠的是**读懂 DSH 的安全假设，并明确知道自己正在扩大攻击面**：
 
 1. DSH 只信 loopback，`--host 0.0.0.0` 被禁；
 2. 非 loopback 下，`isLoopback=false`，host 设置降级 + 实时流被砍；
-3. 信任围栏用字面 `Origin === Host`，反代必须剥 Origin；
-4. 网关注入 `ownsHost=true`，把非 loopback 场景「伪装」回 DSH 能完整处理的形态。
+3. 信任围栏用字面 `Origin === Host`，反代剥掉 Origin 后会改变这条安全边界；
+4. 网关注入 `ownsHost=true`，本质上是在兼容 DSH 的前端会话绑定，而不是恢复 loopback 的真实安全性。
 
-每一层都在**顺着 DSH 的安全模型做**，而不是绕过它。落地后：`dsh.chf.org.cn` 登录 → 选模型 → 发消息 → **有回复**，多用户浏览器直连无障碍。
+因此，Flask 登录网关不是“额外的便利层”，而是新的唯一信任边界：登录成功基本等同于获得 DSH 所在机器的高权限操作能力。公网部署前必须把认证、会话失效、审计日志、来源限制和更新策略当成核心功能来维护。
 
 ---
 

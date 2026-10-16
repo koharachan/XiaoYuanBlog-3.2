@@ -1,0 +1,67 @@
+---
+import { render } from "astro:content";
+import IeSidebar from "@/components/ie/IeSidebar.astro";
+import { author, giscus, license, site } from "@/config";
+import IeBase from "@/layouts/IeBase.astro";
+import { categoryUrl, daysSince, fmtDate, getPosts, type Post, tagUrl } from "@/lib/posts";
+
+export async function getStaticPaths() {
+	const posts = await getPosts();
+	return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content, headings } = await render(post.entry);
+const toc = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+const lastDate = post.updated ?? post.published;
+const stale = daysSince(lastDate) >= site.outdatedDays;
+const isRepost = !!post.entry.data.sourceLink;
+---
+<IeBase title={post.title} description={post.description || post.title} modernPath={post.url}>
+	<div class="ie-col">
+		<article class="box ipost">
+			{post.pinned && <span class="pin-ie">置顶</span>}
+			<h1>{post.title}</h1>
+			<p class="imeta">
+				<span>发布 {fmtDate(post.published)}</span>
+				{post.updated && fmtDate(post.updated) !== fmtDate(post.published) && <span>更新 {fmtDate(post.updated)}</span>}
+				<span><a href={`/ie${categoryUrl(post.category)}`}>{post.category || "未分类"}</a></span>
+				<span>{post.words} 字 · 约 {post.minutes} 分钟</span>
+			</p>
+			<div>{post.tags.map((t) => (<a class="itag" href={`/ie${tagUrl(t)}`}>#{t}</a>))}</div>
+			{post.image && <img class="cover-big" src={post.image} alt="" width={post.imageSize?.width} height={post.imageSize?.height} />}
+			{stale && <div class="iwarn">本文最后更新于 {fmtDate(lastDate)}，距今已 {daysSince(lastDate)} 天，部分内容可能已经过时。</div>}
+			{toc.length > 0 && (
+				<div class="itoc box" style="background:#f8fafc">
+					<b>目录</b>
+					<ol>
+						{toc.map((h) => (
+							<li style={h.depth === 3 ? "margin-left:1em" : undefined}><a href={`#${h.slug}`}>{h.text}</a></li>
+						))}
+					</ol>
+				</div>
+			)}
+			<div class="iprose"><Content /></div>
+			<div class="ilicense">
+				<b>{post.title}</b><br />
+				{isRepost ? `来源：${post.entry.data.author || "原作者"}` : `作者：${author.name}`}
+				{isRepost && post.entry.data.sourceLink && (<> · <a href={post.entry.data.sourceLink} target="_blank">原文链接</a></>)}
+				· 发布于 {fmtDate(post.published)} · 许可协议：<a href={post.entry.data.licenseUrl || license.url} target="_blank">{post.entry.data.licenseName || license.name}</a>
+			</div>
+		</article>
+		<div class="iadj">
+			{post.prev && <a href={`/ie/posts/${post.prev.slug}/`}>&larr; 上一篇：{post.prev.title}</a>}
+			{post.next && <a href={`/ie/posts/${post.next.slug}/`}>下一篇：{post.next.title} &rarr;</a>}
+		</div>
+		{post.entry.data.comment && (
+			<div class="box">
+				<h3 class="t">评论</h3>
+				<p>
+					评论基于 GitHub Discussions，经典版无法内嵌。
+					<a href={giscus.discussionsUrl} target="_blank">前往 GitHub 讨论区 &raquo;</a>，或<a href={`${post.url}?modern=1`}>切换到完整版</a>。
+				</p>
+			</div>
+		)}
+	</div>
+	<aside class="ie-side"><IeSidebar terms={false} /></aside>
+</IeBase>

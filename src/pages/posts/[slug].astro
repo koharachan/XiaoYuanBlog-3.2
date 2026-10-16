@@ -1,0 +1,122 @@
+---
+import { render } from "astro:content";
+import Icon from "@/components/Icon.astro";
+import Meta from "@/components/Meta.astro";
+import Toc from "@/components/Toc.astro";
+import { author, giscus, license, site } from "@/config";
+import Base from "@/layouts/Base.astro";
+import { daysSince, fmtDate, getPosts, type Post } from "@/lib/posts";
+
+export async function getStaticPaths() {
+	const posts = await getPosts();
+	return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const { Content, headings } = await render(post.entry);
+const lastDate = post.updated ?? post.published;
+const stale = daysSince(lastDate) >= site.outdatedDays;
+const hasToc = headings.some((h) => h.depth >= 2 && h.depth <= 4);
+const srcAuthor = post.entry.data.author?.trim();
+const isRepost = !!post.entry.data.sourceLink;
+
+const jsonLd = {
+	"@context": "https://schema.org",
+	"@type": "BlogPosting",
+	headline: post.title,
+	description: post.description,
+	keywords: post.tags.join(","),
+	datePublished: post.published.toISOString(),
+	dateModified: lastDate.toISOString(),
+	author: { "@type": "Person", name: author.name, url: site.url },
+	image: post.image ? new URL(post.image, site.url).href : undefined,
+	mainEntityOfPage: new URL(post.url, site.url).href,
+};
+---
+<Base title={post.title} description={post.description || post.title} image={post.image || undefined} type="article">
+	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+	<div class:list={["layout", { "layout--wide": !hasToc }]}>
+		<article>
+			<header class="card article__head reveal">
+				{post.pinned && <span class="pin"><Icon name="pin" size={12} />置顶</span>}
+				<h1>{post.title}</h1>
+				<Meta post={post} full />
+				{post.image && (
+					<figure class="article__cover">
+						<img src={post.image} alt="" width={post.imageSize?.width} height={post.imageSize?.height} fetchpriority="high" decoding="async" />
+					</figure>
+				)}
+			</header>
+
+			<div class="card article__body reveal" style="--i:1">
+				{stale && (
+					<div class="notice">
+						<Icon name="warn" />
+						<span>本文最后更新于 {fmtDate(lastDate)}，距今已 {daysSince(lastDate)} 天，部分内容可能已经过时。</span>
+					</div>
+				)}
+				{hasToc && (
+					<details class="toc-m">
+						<summary>目录</summary>
+						<Toc headings={headings} />
+					</details>
+				)}
+				<div class="prose">
+					<Content />
+				</div>
+
+				<div class="license">
+					<b>{post.title}</b>
+					<span>
+						{isRepost ? `来源：${srcAuthor || "原作者"}` : `作者：${author.name}`}
+						{isRepost && post.entry.data.sourceLink && (<> · <a href={post.entry.data.sourceLink} target="_blank" rel="noopener">原文链接</a></>)}
+						· 发布于 {fmtDate(post.published)}
+					</span>
+					<span>
+						许可协议：<a href={post.entry.data.licenseUrl || license.url} target="_blank" rel="noopener license">{post.entry.data.licenseName || license.name}</a>
+						，转载请注明出处。
+					</span>
+				</div>
+
+				<div class="actions">
+					<button id="share" class="btn" type="button"><Icon name="share" />分享本文</button>
+					<a class="btn" href="/pay/"><Icon name="heart" />请我喝杯咖啡</a>
+				</div>
+			</div>
+
+			<nav class="adjacent" aria-label="上一篇 / 下一篇">
+				{post.prev ? (
+					<a class="card card--glow prev" href={`/posts/${post.prev.slug}/`} rel="prev"><small>← 上一篇</small><span>{post.prev.title}</span></a>
+				) : <span />}
+				{post.next && (
+					<a class="card card--glow next" href={`/posts/${post.next.slug}/`} rel="next"><small>下一篇 →</small><span>{post.next.title}</span></a>
+				)}
+			</nav>
+
+			{post.entry.data.comment && (
+				<section
+					id="comments"
+					class="card comments"
+					data-repo={giscus.repo}
+					data-repo-id={giscus.repoId}
+					data-category={giscus.category}
+					data-category-id={giscus.categoryId}
+					data-mapping={giscus.mapping}
+					data-lang={giscus.lang}
+				>
+					<h3 class="card__title">评论</h3>
+					<p class="comments__ph">评论区滚动到这里时加载（基于 GitHub Discussions）</p>
+				</section>
+			)}
+		</article>
+
+		{hasToc && (
+			<aside class="side side--sticky">
+				<section class="card">
+					<h3 class="card__title">目录</h3>
+					<Toc headings={headings} />
+				</section>
+			</aside>
+		)}
+	</div>
+</Base>

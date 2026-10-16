@@ -1,0 +1,271 @@
+/* ==========================================================================
+   文章正文排版（Markdown 渲染结果）
+   ========================================================================== */
+.prose {
+	font-size: 1.02rem;
+	line-height: 1.85;
+	color: var(--text);
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+}
+.prose > :first-child {
+	margin-top: 0;
+}
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+	position: relative;
+	margin: 2em 0 0.8em;
+	line-height: 1.3;
+	font-weight: 800;
+	letter-spacing: -0.01em;
+	scroll-margin-top: calc(var(--nav-h) + 1rem);
+}
+.prose h1 {
+	font-size: 1.75rem;
+}
+.prose h2 {
+	font-size: 1.45rem;
+	padding-bottom: 0.4rem;
+	border-bottom: 1px solid var(--line);
+}
+.prose h2::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	bottom: -1px;
+	width: 3rem;
+	height: 2px;
+	background: linear-gradient(90deg, var(--primary), transparent);
+}
+.prose h3 {
+	font-size: 1.2rem;
+}
+.prose h4 {
+	font-size: 1.05rem;
+}
+.prose h2 a,
+.prose h3 a,
+.prose h4 a {
+	color: inherit;
+}
+.prose p {
+	margin: 0 0 1.1em;
+}
+.prose a {
+	color: var(--primary);
+	text-decoration: underline;
+	text-decoration-color: rgba(var(--primary-rgb), 0.35);
+	text-underline-offset: 0.2em;
+	text-decoration-thickness: 1px;
+}
+.prose a:hover {
+	text-decoration-color: currentColor;
+}
+.prose strong {
+	font-weight: 700;
+}
+.prose ul,
+.prose ol {
+	padding-left: 1.6em;
+	margin: 0 0 1.1em;
+}
+.prose li {
+	margin: 0.25em 0;
+}
+.prose li > ul,
+.prose li > ol {
+	margin: 0.25em 0;
+}
+.prose li::marker {
+	color: var(--primary);
+}
+.prose hr {
+	border: 0;
+	height: 1px;
+	margin: 2.5em 0;
+	background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+}
+.prose blockquote {
+	margin: 1.25em 0;
+	padding: 0.75em 1.1em;
+	border-left: 3px solid var(--primary);
+	border-radius: 0 var(--radius-s) var(--radius-s) 0;
+	background: rgba(var(--primary-rgb), 0.06);
+	color: var(--text-2);
+}
+.prose blockquote p:last-child {
+	margin-bottom: 0;
+}
+.prose img {
+	border-radius: var(--radius-s);
+	border: 1px solid var(--line);
+	cursor: zoom-in;
+	margin: 0 auto;
+	background: var(--bg-2);
+}
+.prose figure.post-figure {
+	margin: 1.5em 0;
+	text-align: center;
+}
+.prose figcaption {
+	margin-top: 0.5em;
+	font-size: 0.85rem;
+	color: var(--muted);
+}
+.prose code {
+	font-family: var(--mono);
+	font-size: 0.88em;
+}
+.prose :not(pre) > code {
+	padding: 0.15em 0.4em;
+	border-radius: 5px;
+	background: var(--inline-code-bg);
+	color: var(--primary);
+	border: 1px solid var(--line);
+	word-break: break-word;
+}
+.prose pre {
+	position: relative;
+	margin: 1.4em 0;
+	padding: 1rem 1.1rem;
+	border-radius: var(--radius-s);
+	border: 1px solid var(--line);
+	overflow: auto;
+	line-height: 1.6;
+	font-size: 0.86rem;
+	tab-size: 4;
+	scrollbar-width: thin;
+}
+.prose pre code {
+	display: block;
+	min-width: 100%;
+	background: none;
+	padding: 0;
+	border: 0;
+	font-size: inherit;
+}
+/* Shiki dual theme: neon uses the dark palette emitted as CSS custom properties */
+[data-theme="neon"] .prose pre.astro-code {
+	background-color: var(--shiki-dark-bg, var(--code-bg)) !important;
+	color: var(--shiki-dark, inherit) !important;
+}
+[data-theme="neon"] .prose pre.astro-code span {
+	color: var(--shiki-dark, inherit) !important;
+	font-style: var(--shiki-dark-font-style, inherit) !important;
+	font-weight: var(--shiki-dark-font-weight, inherit) !important;
+}
+[data-theme="cloud"] .prose pre.astro-code {
+	background-color: var(--code-bg) !important;
+}
+.prose pre[data-lang]::before {
+	content: attr(data-lang);
+	position: absolute;
+	top: 0.35rem;
+	right: 3rem;
+	font-family: var(--mono);
+	font-size: 0.68rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--muted);
+	pointer-events: none;
+}
+.copy-btn {
+	position: absolute;
+	top: 0.45rem;
+	right: 0.5rem;
+	width: 1.9rem;
+	height: 1.9rem;
+	display: grid;
+	place-items: center;
+	border-radius: 6px;
+	border: 1px solid var(--line);
+	background: var(--panel-solid);
+	color: var(--muted);
+	opacity: 0;
+	transition: opacity 0.2s, color 0.2s;
+}
+.prose pre:hover .copy-btn,
+.copy-btn:focus-visible,
+.copy-btn.ok {
+	opacity: 1;
+}
+.copy-btn:hover {
+	color: var(--primary);
+}
+.copy-btn.ok {
+	color: var(--ok);
+}
+.copy-btn svg {
+	width: 0.95rem;
+	height: 0.95rem;
+}
+.table-wrap {
+	margin: 1.4em 0;
+	overflow-x: auto;
+	border: 1px solid var(--line);
+	border-radius: var(--radius-s);
+	scrollbar-width: thin;
+}
+.prose table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.92rem;
+	min-width: 32rem;
+}
+.prose th,
+.prose td {
+	padding: 0.55em 0.8em;
+	border-bottom: 1px solid var(--line);
+	text-align: left;
+	vertical-align: top;
+}
+.prose th {
+	background: rgba(var(--primary-rgb), 0.08);
+	font-weight: 700;
+	white-space: nowrap;
+}
+.prose tr:last-child td {
+	border-bottom: 0;
+}
+.prose tbody tr:hover {
+	background: rgba(var(--primary-rgb), 0.04);
+}
+.prose kbd {
+	font-family: var(--mono);
+	font-size: 0.8em;
+	padding: 0.1em 0.4em;
+	border: 1px solid var(--line-strong);
+	border-bottom-width: 2px;
+	border-radius: 4px;
+}
+.prose details {
+	margin: 1em 0;
+	padding: 0.75em 1em;
+	border: 1px solid var(--line);
+	border-radius: var(--radius-s);
+}
+.prose summary {
+	cursor: pointer;
+	font-weight: 600;
+}
+.prose iframe,
+.prose video {
+	max-width: 100%;
+	border-radius: var(--radius-s);
+}
+.prose .anchor {
+	opacity: 0;
+	margin-left: 0.35em;
+	font-weight: 400;
+	color: var(--muted);
+	text-decoration: none;
+}
+.prose h2:hover .anchor,
+.prose h3:hover .anchor,
+.prose h4:hover .anchor {
+	opacity: 1;
+}

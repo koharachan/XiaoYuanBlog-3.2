@@ -1,0 +1,23 @@
+---
+import { categoryUrl, fmtDate, type Post, tagUrl } from "@/lib/posts";
+import Icon from "./Icon.astro";
+
+interface Props {
+	post: Post;
+	/** 文章页显示更多信息（更新时间、阅读时长） */
+	full?: boolean;
+}
+const { post, full = false } = Astro.props;
+---
+<ul class="meta">
+	<li><Icon name="calendar" /><time datetime={post.published.toISOString()}>{fmtDate(post.published)}</time></li>
+	{full && post.updated && fmtDate(post.updated) !== fmtDate(post.published) && (
+		<li><Icon name="edit" /><time datetime={post.updated.toISOString()}>更新于 {fmtDate(post.updated)}</time></li>
+	)}
+	<li><Icon name="folder" /><a href={categoryUrl(post.category)}>{post.category || "未分类"}</a></li>
+	<li><Icon name="text" />{post.words} 字</li>
+	{full && <li><Icon name="clock" />约 {post.minutes} 分钟</li>}
+	{full && post.tags.length > 0 && (
+		<li><Icon name="tag" />{post.tags.map((t, i) => (<>{i > 0 && <span aria-hidden="true">/</span>}<a href={tagUrl(t)}>{t}</a></>))}</li>
+	)}
+</ul>

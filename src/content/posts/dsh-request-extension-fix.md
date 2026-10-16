@@ -3,7 +3,7 @@ title: "DSH 跑个官方模型每回合都报 REQUEST_EXTENSION：最后发现�
 published: 2026-09-04
 updated: 2026-09-04
 draft: false
-description: "DeepSeek Harness（@deepseek-ai/dsh 0.1.2-rc.1）web profile 下，官方 deepseek 模型每回合都稳定报「DeepSeek request extension preparation failed / REQUEST_EXTENSION」。顺着源码一路剥到根因：不是密钥、不是网络，而是 profile 的 package.json 只有 name 没有 version，被 plugin-package-inventory-deepseek 这个按请求收集插件清单的扩展插件当场抛错，再被外层包成一句看不出原因的通用错误。补上 version 字段后原地恢复。记录这次「错误吞错误」的排查过程与最小复现思路"
+description: "DSH 0.1.2-rc.1 下官方模型每回合报 REQUEST_EXTENSION，顺着被吞掉的 cause 查到是插件清单扩展把 profile 自己缺少 version 的 package.json 当成非法插件包，补一行字段即恢复。"
 image: ""
 tags: ["DeepSeek", "DSH", "踩坑记录", "Debug", "实践记录"]
 category: 外版
