@@ -44,17 +44,14 @@ export const nav = [
 
 /** 页脚友情链接（互换链接） */
 export const footerLinks = [
-	{ name: "雨酱Ai", url: "https://api.rainchan.com/" },
 	{ name: "jinao的小窝", url: "https://cn.jinao.wang/" },
 	{ name: "洛嗷呜の小站", url: "https://luoaowoo.cn/" },
-	{ name: "农贸市场设计", url: "http://www.baiying800.cn" },
 	{ name: "和女生聊天话题", url: "https://www.lee8.com/" },
-	{ name: "成都保洁服务", url: "https://www.7jz.com.cn/" },
+	{ name: "魔域游戏", url: "https://weibo.com/ttarticle/p/show?id=2309405333861231099934" },
 ];
 
 /** 友链页展示的朋友们 */
 export const friends = [
-	{ name: "雨酱Ai", url: "https://api.rainchan.com/", desc: "api.rainchan.com" },
 	{ name: "jinao的小窝", url: "https://cn.jinao.wang/", desc: "cn.jinao.wang" },
 	{ name: "洛嗷呜の小站", url: "https://luoaowoo.cn/", desc: "luoaowoo.cn" },
 ];
