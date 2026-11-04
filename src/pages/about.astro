@@ -7,7 +7,7 @@ const entry = await getEntry("spec", "about");
 if (!entry) throw new Error("src/content/spec/about.md 不存在");
 const { Content } = await render(entry);
 ---
-<Base title="关于" description="关于小原酱和这个博客。">
+<Base title="关于" description="关于我是一个普通的人，">
 	<div class="layout">
 		<article class="card article__body reveal">
 			<div class="prose"><Content /></div>

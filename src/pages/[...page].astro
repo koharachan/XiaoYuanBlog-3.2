@@ -3,7 +3,7 @@ import type { GetStaticPaths } from "astro";
 import Pagination from "@/components/Pagination.astro";
 import PostCard from "@/components/PostCard.astro";
 import Sidebar from "@/components/Sidebar.astro";
-import { author, site } from "@/config";
+import { site } from "@/config";
 import Base from "@/layouts/Base.astro";
 import { getPosts, getTags } from "@/lib/posts";
 
@@ -19,28 +19,15 @@ const isFirst = page.currentPage === 1;
 ---
 <Base title={isFirst ? undefined : `第 ${page.currentPage} 页`} iePath={isFirst ? "/ie/" : `/ie/${page.currentPage}/`}>
 	{isFirst && (
-		<section class="hero">
-			<div>
-				<div class="hero__kicker">system online · {author.name}</div>
-				<h1><span class="grad">{site.title}</span></h1>
-				<svg class="hero__line" viewBox="0 0 352 14" aria-hidden="true">
-					<path d="M2 7 H120 l6 -5 h40 l6 5 H260 l5 5 h20 l5 -5 H350" />
-				</svg>
-				<p>{site.tagline}。{site.description}</p>
-				<ul class="hero__stats">
-					<li><b>{posts.length}</b>篇文章</li>
-					<li><b>{tags.length}</b>个标签</li>
-					<li><b>{days}</b>天运行</li>
-				</ul>
-			</div>
-			<svg class="reactor" viewBox="0 0 200 200" aria-hidden="true">
-				<circle class="r1" cx="100" cy="100" r="92" />
-				<circle class="r2" cx="100" cy="100" r="74" />
-				<circle class="r3" cx="100" cy="100" r="56" />
-				<path class="hex" d="M100 60 l34.6 20 v40 l-34.6 20 l-34.6 -20 v-40z" />
-				<circle class="r4" cx="100" cy="100" r="40" />
-				<circle class="core" cx="100" cy="100" r="9" />
-			</svg>
+		<section class="card intro">
+			<h1>{site.title}</h1>
+			<p class="intro__tag">{site.tagline}</p>
+			<p>{site.description}</p>
+			<ul class="intro__stats">
+				<li><b>{posts.length}</b>篇文章</li>
+				<li><b>{tags.length}</b>个标签</li>
+				<li>开站 <b>{days}</b> 天</li>
+			</ul>
 		</section>
 	)}
 	<div class="layout">

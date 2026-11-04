@@ -9,13 +9,8 @@ const iePath = `/ie${path}`;
 <header class="nav">
 	<div class="wrap nav__in">
 		<a class="brand" href="/" aria-label={`${site.title} 首页`}>
-			<svg viewBox="0 0 32 32" aria-hidden="true">
-				<circle class="orbit" cx="16" cy="16" r="13" />
-				<circle class="orbit" cx="16" cy="16" r="8" style="animation-direction:reverse;animation-duration:9s" />
-				<circle class="core" cx="16" cy="16" r="3.2" />
-				<circle class="sat" cx="16" cy="3" r="1.8" />
-			</svg>
 			<span>{site.title}</span>
+			<small>{site.tagline}</small>
 		</a>
 		<ul class="nav__links">
 			{nav.map((l) => (
@@ -26,8 +21,8 @@ const iePath = `/ie${path}`;
 		<div class="menu" data-menu data-open="false">
 			<button class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="切换主题" title="主题"><Icon name="palette" /></button>
 			<div class="menu__panel" role="menu">
-				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="neon"><span class="menu__sw menu__sw--neon"></span>霓虹 · 科技</button>
-				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="cloud"><span class="menu__sw menu__sw--cloud"></span>云 · 浅色</button>
+				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="neon"><span class="menu__sw menu__sw--neon"></span>夜间</button>
+				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="cloud"><span class="menu__sw menu__sw--cloud"></span>日间</button>
 				<a class="menu__item" role="menuitem" href={iePath}><span class="menu__sw menu__sw--ie"></span>经典 · IE 兼容</a>
 			</div>
 		</div>

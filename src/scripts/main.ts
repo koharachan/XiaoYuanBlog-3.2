@@ -2,8 +2,6 @@
  * 全站唯一的客户端脚本：主题切换、导航抽屉、搜索、代码复制、图片灯箱、
  * 目录高亮、回到顶部、懒加载评论与统计。所有功能都是渐进增强，没有 JS 页面也完整可读。
  */
-import { startNetwork } from "./net";
-
 type Theme = "neon" | "cloud";
 const html = document.documentElement;
 const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel);
@@ -19,7 +17,7 @@ function setTheme(t: Theme) {
 		localStorage.setItem("theme", t);
 	} catch {}
 	$$("[data-set-theme]").forEach((b) => b.setAttribute("aria-checked", String(b.getAttribute("data-set-theme") === t)));
-	$("meta[name=theme-color]")?.setAttribute("content", t === "cloud" ? "#eaf3ff" : "#070b14");
+	$("meta[name=theme-color]")?.setAttribute("content", t === "cloud" ? "#f3ece3" : "#121820");
 	syncGiscusTheme();
 }
 $$("[data-set-theme]").forEach((b) =>
@@ -341,19 +339,12 @@ if (comments) {
 	} else loadGiscus();
 }
 
-/* ---------- background network (starts once the page is idle) ---------- */
-const net = $<SVGSVGElement>("#bg-net");
+/* ---------- analytics / ads: after load, when idle ---------- */
 const idle = (cb: () => void, timeout = 4000) =>
 	"requestIdleCallback" in window
 		? (window as Window & { requestIdleCallback: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback(cb, { timeout })
 		: setTimeout(cb, Math.min(timeout, 1500));
-if (net) {
-	const start = () => idle(() => startNetwork(net), 1500);
-	if (document.readyState === "complete") start();
-	else addEventListener("load", start, { once: true });
-}
 
-/* ---------- analytics / ads: after load, when idle ---------- */
 function thirdParty() {
 	const cfg = (window as unknown as { __xy?: { ga?: string; clarity?: string; adsense?: string } }).__xy || {};
 	if (cfg.ga) {

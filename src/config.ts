@@ -14,7 +14,7 @@ export const site = {
 	startDate: "2023-01-01",
 	/** 每页文章数 */
 	postsPerPage: 10,
-	/** 默认主题：neon（科技感暗色）或 cloud（云·浅色） */
+	/** 默认主题：neon（夜间玻璃）或 cloud（日间玻璃），背景都是原来的雨夜壁纸 */
 	defaultTheme: "neon" as "neon" | "cloud",
 	/** 文章超过多少天未更新时显示“可能过时”提示 */
 	outdatedDays: 180,

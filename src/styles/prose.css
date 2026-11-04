@@ -20,7 +20,7 @@
 	position: relative;
 	margin: 2em 0 0.8em;
 	line-height: 1.3;
-	font-weight: 800;
+	font-weight: 700;
 	letter-spacing: -0.01em;
 	scroll-margin-top: calc(var(--nav-h) + 1rem);
 }
@@ -39,7 +39,7 @@
 	bottom: -1px;
 	width: 3rem;
 	height: 2px;
-	background: linear-gradient(90deg, var(--primary), transparent);
+	background: var(--primary);
 }
 .prose h3 {
 	font-size: 1.2rem;
@@ -87,7 +87,7 @@
 	border: 0;
 	height: 1px;
 	margin: 2.5em 0;
-	background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+	background: var(--line);
 }
 .prose blockquote {
 	margin: 1.25em 0;
