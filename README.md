@@ -9,8 +9,7 @@
 
 ## 现在的界面
 
-- **霓虹主题**：深色科技感背景、SVG 网格、粒子连线、节点碰撞和点击冲击波；
-- **Cloud 主题**：浅色云层、低对比度粒子背景，适合长时间阅读；
+- **夜间 / 日间**：同一张原来的雨夜壁纸上铺磨砂玻璃面板。夜间面板更透，日间面板偏暖白，方便长时间读文章。主题值仍是 `neon` / `cloud`，已经保存过的选择不会丢；
 - **经典主题**：`/ie/` 为 IE / 老旧浏览器准备的纯 CSS、无客户端 JavaScript 版本；
 - **响应式**：手机、平板和桌面使用同一套清晰的列表布局，不依赖全屏 Banner 推动正文；
 - **文章体验**：图片尺寸预留、懒加载、图片灯箱、代码复制、目录高亮、上一篇/下一篇；
@@ -61,11 +60,11 @@ comment: true
 | `src/config.ts` | 站点、作者、导航、友链、评论和赞助配置 |
 | `src/layouts/Base.astro` | 现代主题全局布局与元数据 |
 | `src/layouts/IeBase.astro` | 经典 / IE 兼容布局 |
-| `src/styles/base.css` | 霓虹与 Cloud 主题、响应式布局和 SVG 背景样式 |
+| `src/styles/base.css` | 夜间 / 日间玻璃主题、响应式布局和壁纸背景 |
 | `src/styles/prose.css` | Markdown 文章排版 |
 | `src/styles/ie.css` | 经典主题的老浏览器 CSS |
 | `src/scripts/main.ts` | 主题、搜索、灯箱、代码复制、懒加载和性能增强 |
-| `src/scripts/net.ts` | 粒子网络与碰撞动画 |
+| `public/assets/bg/` | 由 `public/upload/banner-bg-*.png/jpg` 压出来的壁纸，只给页面背景用 |
 | `src/lib/posts.ts` | 文章排序、标签、分类、摘要和阅读时间 |
 | `src/content/spec/` | 关于、友链、留言板页面内容 |
 | `src/pages/ie/` | IE 兼容版页面路由 |
