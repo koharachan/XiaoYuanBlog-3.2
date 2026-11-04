@@ -1,7 +1,8 @@
 ---
 import { getEntry, render } from "astro:content";
-import Base from "@/layouts/Base.astro";
+import Glass from "@/components/Glass.astro";
 import { friends } from "@/config";
+import Base from "@/layouts/Base.astro";
 
 const entry = await getEntry("spec", "friends");
 if (!entry) throw new Error("src/content/spec/friends.md 不存在");
@@ -9,20 +10,22 @@ const { Content } = await render(entry);
 ---
 <Base title="友链" description="朋友们的站点，以及友链申请方式。">
 	<div class="layout layout--wide">
-		<article class="card article__body reveal">
+		<Glass class="card article__body reveal" variant="reading">
 			<div class="page-head">
 				<h1>友情链接</h1>
 				<p>排名不分先后。欢迎互换。</p>
 			</div>
 			<div class="friends">
 				{friends.map((f) => (
-					<a class="card card--glow" href={f.url} target="_blank" rel="noopener">
-						<b>{f.name}</b>
-						<small>{f.desc}</small>
+					<a href={f.url} target="_blank" rel="noopener">
+						<Glass class="card card--glow">
+							<b>{f.name}</b>
+							<small>{f.desc}</small>
+						</Glass>
 					</a>
 				))}
 			</div>
 			<div class="prose"><Content /></div>
-		</article>
+		</Glass>
 	</div>
 </Base>

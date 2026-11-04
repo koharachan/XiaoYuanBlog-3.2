@@ -1,5 +1,6 @@
 ---
 import { excerpt, type Post, tagUrl } from "@/lib/posts";
+import Glass from "./Glass.astro";
 import Icon from "./Icon.astro";
 import Meta from "./Meta.astro";
 
@@ -12,7 +13,7 @@ interface Props {
 const { post, index = 0, eager = false } = Astro.props;
 const summary = post.description || excerpt(post.entry.body || "");
 ---
-<article class:list={["card card--glow post-card reveal", { "post-card--cover": !!post.image }]} style={`--i:${index}`}>
+<Glass class:list={["card card--glow post-card reveal", { "post-card--cover": !!post.image }]} style={`--i:${index}`} role="article">
 	<div>
 		{post.pinned && <span class="pin"><Icon name="pin" size={12} />置顶</span>}
 		<h2><a href={post.url}>{post.title}</a></h2>
@@ -37,4 +38,4 @@ const summary = post.description || excerpt(post.entry.body || "");
 			/>
 		</a>
 	)}
-</article>
+</Glass>

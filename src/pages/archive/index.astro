@@ -1,4 +1,5 @@
 ---
+import Glass from "@/components/Glass.astro";
 import Sidebar from "@/components/Sidebar.astro";
 import Timeline from "@/components/Timeline.astro";
 import Base from "@/layouts/Base.astro";
@@ -8,13 +9,13 @@ const posts = await getPosts();
 ---
 <Base title="归档" description={`全部 ${posts.length} 篇文章，按年份排列。`}>
 	<div class="layout">
-		<section class="card reveal">
+		<Glass class="card reveal" variant="reading">
 			<div class="page-head">
 				<h1>归档</h1>
 				<p>共 {posts.length} 篇文章。按分类或标签筛选请点右侧，或按 <kbd>/</kbd> 搜索。</p>
 			</div>
 			<Timeline posts={posts} />
-		</section>
+		</Glass>
 		<aside class="side"><Sidebar /></aside>
 	</div>
 </Base>

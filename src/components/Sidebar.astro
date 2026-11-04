@@ -1,6 +1,7 @@
 ---
 import { author } from "@/config";
 import { getCategories, getPosts, getTags } from "@/lib/posts";
+import Glass from "./Glass.astro";
 import Icon from "./Icon.astro";
 
 interface Props {
@@ -10,10 +11,14 @@ interface Props {
 	terms?: boolean;
 }
 const { active, terms = true } = Astro.props;
-const [posts, categories, tags] = await Promise.all([getPosts(), getCategories(), getTags()]);
+const [posts, categories, tags] = await Promise.all([
+	getPosts(),
+	getCategories(),
+	getTags(),
+]);
 type IconName = "github" | "bilibili" | "qq" | "mail" | "rss";
 ---
-<section class="card profile reveal" style="--i:1">
+<Glass class="card profile reveal" style="--i:1">
 	<img class="profile__avatar" src={author.avatar} alt={author.name} width="88" height="88" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
 	<h3>{author.name}</h3>
 	<p>{author.bio}</p>
@@ -24,33 +29,33 @@ type IconName = "github" | "bilibili" | "qq" | "mail" | "rss";
 			</a>
 		))}
 	</div>
-</section>
-<section class="card reveal" style="--i:2">
+</Glass>
+<Glass class="card reveal" style="--i:2">
 	<h3 class="card__title">站点</h3>
 	<ul class="termlist">
 		<li><a href="/archive/">文章 <small>{posts.length}</small></a></li>
 		<li><a href="/archive/">标签 <small>{tags.length}</small></a></li>
 		<li><a href="/archive/">分类 <small>{categories.length}</small></a></li>
 	</ul>
-</section>
+</Glass>
 {terms && (
 	<>
-		<section class="card reveal" style="--i:3">
+		<Glass class="card reveal" style="--i:3">
 			<h3 class="card__title">分类</h3>
 			<ul class="termlist">
 				{categories.map((c) => (
 					<li><a href={c.url} aria-current={active === c.name ? "page" : undefined}>{c.name} <small>{c.count}</small></a></li>
 				))}
 			</ul>
-		</section>
-		<section class="card reveal" style="--i:4">
+		</Glass>
+		<Glass class="card reveal" style="--i:4">
 			<h3 class="card__title">标签</h3>
 			<div class="chips">
 				{tags.map((t) => (
 					<a class="chip" href={t.url} aria-current={active === t.name ? "page" : undefined}>{t.name} <small>{t.count}</small></a>
 				))}
 			</div>
-		</section>
+		</Glass>
 	</>
 )}
 <slot />
