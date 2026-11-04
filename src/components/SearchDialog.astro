@@ -1,14 +1,13 @@
 ---
-import Glass from "./Glass.astro";
 import Icon from "./Icon.astro";
 ---
-<dialog id="search" class="dialog" aria-label="搜索文章">
-	<Glass class="dialog__box" variant="sheet">
-		<form class="dialog__in" role="search" onsubmit="return false">
+<dialog id="search" class="search" aria-label="搜索文章">
+	<div class="search__panel">
+		<form class="search__bar" role="search" onsubmit="return false">
 			<Icon name="search" />
-			<input id="search-input" type="search" placeholder="搜索标题、标签、正文…" autocomplete="off" aria-label="搜索关键词" />
-			<kbd>Esc</kbd>
+			<input id="search-input" type="search" placeholder="搜索标题、标签、正文…" autocomplete="off" enterkeyhint="search" aria-label="搜索关键词" />
+			<button class="search__close" type="button" data-search-close>关闭</button>
 		</form>
-		<div id="search-results" class="dialog__res" role="listbox"></div>
-	</Glass>
+		<div id="search-results" class="search__results" role="listbox"></div>
+	</div>
 </dialog>

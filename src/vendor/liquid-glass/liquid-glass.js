@@ -365,6 +365,13 @@ export function createGlass(target, options = {}) {
   const fallback = options.fallback ?? 'blur(12px) saturate(1.6)';
   const p = { ...DEFAULTS, ...pick(options) };
   const flags = { fit: !!options.fit, clip: !!options.clip, sync: !!options.sync, hidden: !!options.hidden };
+  const onReady = typeof options.onReady === 'function' ? options.onReady : null;
+  let readySent = false;
+  function markReady() {
+    if (readySent || !onReady) return;
+    readySent = true;
+    onReady();
+  }
   const useBackdropURL = mode === 'backdrop' && engine === 'blink';
   const active = mode !== 'backdrop' || useBackdropURL;
 
@@ -491,8 +498,11 @@ export function createGlass(target, options = {}) {
     // a fresh id on every update forces it to re-read.
     filter.id = `${base}-v${++version}`;
     const ref = `url(#${filter.id})`;
-    if (useBackdropURL) target.style.backdropFilter = ref;
-    else target.style.filter = ref;
+    if (useBackdropURL) {
+      target.style.backdropFilter = ref;
+      target.style.webkitBackdropFilter = ref;
+    } else target.style.filter = ref;
+    markReady();
   }
 
   function schedule() {

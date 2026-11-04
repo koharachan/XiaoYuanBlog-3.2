@@ -9,7 +9,7 @@ const posts = await getPosts();
 ---
 <Base title="归档" description={`全部 ${posts.length} 篇文章，按年份排列。`}>
 	<div class="layout">
-		<Glass class="card reveal" variant="reading">
+		<Glass quiet class="card reveal" variant="reading">
 			<div class="page-head">
 				<h1>归档</h1>
 				<p>共 {posts.length} 篇文章。按分类或标签筛选请点右侧，或按 <kbd>/</kbd> 搜索。</p>

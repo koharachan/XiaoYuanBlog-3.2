@@ -31,8 +31,10 @@ const iePath = `/ie${path}`;
 		<button id="burger" class="ibtn burger" type="button" aria-label="菜单" aria-expanded="false" aria-controls="drawer"><Icon name="menu" /></button>
 	</Glass>
 </header>
-<Glass id="drawer" class="drawer" variant="sheet" role="navigation" aria-label="移动端导航" data-open="false">
-	{nav.map((l) => (
-		<a href={l.url} aria-current={isCurrent(l.url) ? "page" : undefined}>{l.name}</a>
-	))}
-</Glass>
+<div id="drawer" class="drawer" data-open="false">
+	<Glass class="drawer__sheet" variant="sheet" role="navigation" aria-label="移动端导航">
+		{nav.map((l) => (
+			<a href={l.url} aria-current={isCurrent(l.url) ? "page" : undefined}>{l.name}</a>
+		))}
+	</Glass>
+</div>

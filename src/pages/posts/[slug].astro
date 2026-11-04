@@ -41,7 +41,7 @@ const jsonLd = {
 	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	<div class:list={["layout", { "layout--wide": !hasToc }]}>
 		<article>
-			<Glass class="card article__head reveal" variant="reading">
+			<Glass quiet class="card article__head reveal" variant="reading">
 				{post.pinned && <span class="pin"><Icon name="pin" size={12} />置顶</span>}
 				<h1>{post.title}</h1>
 				<Meta post={post} full />
@@ -52,7 +52,7 @@ const jsonLd = {
 				)}
 			</Glass>
 
-			<Glass class="card article__body reveal" variant="reading" style="--i:1">
+			<Glass quiet class="card article__body reveal" variant="reading" style="--i:1">
 				{stale && (
 					<div class="notice">
 						<Icon name="warn" />
@@ -99,6 +99,7 @@ const jsonLd = {
 
 			{post.entry.data.comment && (
 				<Glass
+					quiet
 					id="comments"
 					class="card comments"
 					data-repo={giscus.repo}
@@ -116,7 +117,7 @@ const jsonLd = {
 
 		{hasToc && (
 			<aside class="side side--sticky">
-				<Glass class="card">
+				<Glass quiet class="card">
 					<h3 class="card__title">目录</h3>
 					<Toc headings={headings} />
 				</Glass>

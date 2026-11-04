@@ -18,7 +18,7 @@ const [posts, categories, tags] = await Promise.all([
 ]);
 type IconName = "github" | "bilibili" | "qq" | "mail" | "rss";
 ---
-<Glass class="card profile reveal" style="--i:1">
+<Glass quiet class="card profile reveal" style="--i:1">
 	<img class="profile__avatar" src={author.avatar} alt={author.name} width="88" height="88" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
 	<h3>{author.name}</h3>
 	<p>{author.bio}</p>
@@ -30,7 +30,7 @@ type IconName = "github" | "bilibili" | "qq" | "mail" | "rss";
 		))}
 	</div>
 </Glass>
-<Glass class="card reveal" style="--i:2">
+<Glass quiet class="card reveal" style="--i:2">
 	<h3 class="card__title">站点</h3>
 	<ul class="termlist">
 		<li><a href="/archive/">文章 <small>{posts.length}</small></a></li>
@@ -40,7 +40,7 @@ type IconName = "github" | "bilibili" | "qq" | "mail" | "rss";
 </Glass>
 {terms && (
 	<>
-		<Glass class="card reveal" style="--i:3">
+		<Glass quiet class="card reveal" style="--i:3">
 			<h3 class="card__title">分类</h3>
 			<ul class="termlist">
 				{categories.map((c) => (
@@ -48,7 +48,7 @@ type IconName = "github" | "bilibili" | "qq" | "mail" | "rss";
 				))}
 			</ul>
 		</Glass>
-		<Glass class="card reveal" style="--i:4">
+		<Glass quiet class="card reveal" style="--i:4">
 			<h3 class="card__title">标签</h3>
 			<div class="chips">
 				{tags.map((t) => (

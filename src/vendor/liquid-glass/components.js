@@ -6,9 +6,7 @@
  *
  * Elements render into light DOM (no shadow root) so SVG filter references resolve against the
  * document and the page's fonts and tokens apply. Styles are injected once; theme them with the
- * --lg-* custom properties. Glass that floats over an image refracts an aligned copy of that image
- * (set `backdrop="<selector>"` or put `data-lg-backdrop` on an ancestor); with no known backdrop it
- * uses backdrop-filter: real refraction in Chromium, frosted blur elsewhere.
+ * --lg-* custom properties. Panels sample the live backdrop. They do not clone the wallpaper.
  *
  * Toast icons are from Lucide (ISC license).
  */
@@ -252,60 +250,18 @@ function icon(name) {
 /* Surface: glass body that refracts what is behind it                                                */
 /* ------------------------------------------------------------------------------------------------ */
 
-function resolveBackdrop(host) {
-  const selector = host.getAttribute('backdrop');
-  if (selector === 'none') return null;
-  if (selector) return document.querySelector(selector);
-  const scope = host.parentElement?.closest('[data-lg-backdrop]');
-  if (!scope) return null;
-  const inner = scope.getAttribute('data-lg-backdrop');
-  return inner ? scope.querySelector(inner) : scope;
-}
-
-// A decorative copy of the backdrop: an <img> is cloned, anything else contributes its CSS background.
-function cloneBackdrop(source) {
-  let copy;
-  if (source instanceof HTMLImageElement) {
-    copy = source.cloneNode(false);
-    copy.removeAttribute('id');
-    copy.removeAttribute('class');
-    copy.removeAttribute('data-lg-backdrop');
-    copy.alt = '';
-    copy.loading = 'eager';
-    const cs = getComputedStyle(source);
-    copy.style.objectFit = cs.objectFit;
-    copy.style.objectPosition = cs.objectPosition;
-  } else {
-    copy = document.createElement('span');
-    const cs = getComputedStyle(source);
-    for (const k of ['backgroundColor', 'backgroundImage', 'backgroundSize', 'backgroundPosition', 'backgroundRepeat', 'backgroundOrigin', 'backgroundClip']) {
-      copy.style[k] = cs[k];
-    }
-  }
-  copy.classList.add('lg-surface__copy');
-  copy.setAttribute('aria-hidden', 'true');
-  return copy;
-}
-
-const surfaces = new Set();
-let syncFrame = 0;
-function requestSync() {
-  if (syncFrame) return;
-  syncFrame = requestAnimationFrame(() => {
-    syncFrame = 0;
-    for (const s of surfaces) s.update();
-  });
-}
-if (typeof window !== 'undefined') {
-  addEventListener('scroll', requestSync, { capture: true, passive: true });
-  addEventListener('resize', requestSync);
-}
+// Wallpaper alignment used to clone the photo into every panel and, on each
+// scroll, read getBoundingClientRect and write width/height/transform. That
+// forced layout during a fling (the page yanked) and the clone lagged the
+// real background on iOS. A clone also cannot be position:fixed inside a
+// filtered element, because filter becomes its containing block. Glass now
+// samples the live backdrop and does not listen to scroll.
 
 /**
- * Glass body for `host` (which must be position: relative). Modes:
- *   copy     — an aligned copy of the backdrop image, refracted with filter: url(). Every engine.
- *   backdrop — backdrop-filter: url(). Chromium only.
- *   fallback — backdrop-filter blur, for WebKit/Gecko with no known backdrop.
+ * Glass body for `host` (which must be position: relative).
+ *   backdrop — backdrop-filter: url(). Chromium only; stays aligned while the compositor scrolls.
+ *   material — CSS blur + specular rim. WebKit and Gecko ignore backdrop-filter: url().
+ *   solid    — prefers-reduced-transparency.
  */
 class Surface {
   constructor(host, { radius = 16, bleed = 16, optics: o = {}, owner = host } = {}) {
@@ -325,32 +281,51 @@ class Surface {
   }
 
   attach() {
-    this.source = resolveBackdrop(this.owner);
-    if (this.source) {
-      this.mode = 'copy';
-      this.copy = cloneBackdrop(this.source);
-      this.layer.replaceChildren(this.copy);
-      this.glass = createGlass(this.layer, { ...this.optics, clip: true });
-      if (this.source instanceof HTMLImageElement && !this.source.complete) this.source.addEventListener('load', requestSync, { once: true });
-    } else if (engine === 'blink') {
-      this.mode = 'backdrop';
-      this.glass = createGlass(this.layer, { ...this.optics, chroma: 0, mode: 'backdrop', clip: true });
-    } else {
-      this.mode = 'fallback';
-      this.layer.classList.add('lg-surface__glass--fallback');
+    // A cloned photo inside a filtered element cannot stay viewport-fixed:
+    // `filter` makes that element the containing block for position:fixed,
+    // and iOS will not update getBoundingClientRect during a fling.
+    // Blink can refract the live backdrop with backdrop-filter: url().
+    // WebKit and Gecko cannot (url() filters are ignored on the backdrop),
+    // so they get an iOS 26 material: blur, saturation, and a specular rim,
+    // which the compositor keeps pixel-aligned with the page.
+    const reduce = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-transparency: reduce)').matches;
+    const mark = () => {
+      // Drop the solid shield only after it has painted. Fading it away early
+      // shows bare text on the wallpaper for a frame.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => this.host.classList.add('is-ready'));
+      });
+    };
+    if (reduce) {
+      this.mode = 'solid';
+      mark();
+      return;
     }
-    this.observer = new ResizeObserver(() => this.update());
-    this.observer.observe(this.host);
-    surfaces.add(this);
-    this.update();
+    if (engine === 'blink') {
+      this.mode = 'backdrop';
+      this.glass = createGlass(this.layer, {
+        ...this.optics,
+        chroma: 0,
+        mode: 'backdrop',
+        clip: false,
+        fit: true,
+        onReady: mark,
+      });
+      // If the displacement map never decodes, still reveal the panel.
+      this.readyTimer = setTimeout(mark, 600);
+    } else {
+      this.mode = 'material';
+      this.layer.classList.add('lg-surface__glass--material');
+      mark();
+    }
   }
 
   detach() {
+    clearTimeout(this.readyTimer);
     this.glass?.destroy();
     this.glass = null;
     this.observer?.disconnect();
-    surfaces.delete(this);
-    this.layer.classList.remove('lg-surface__glass--fallback');
+    this.layer.classList.remove('lg-surface__glass--material', 'lg-surface__glass--fallback');
     this.layer.removeAttribute('style');
     this.layer.replaceChildren();
     this.copy = null;
@@ -382,20 +357,6 @@ class Surface {
       if (this.mode === 'fallback') place(this.layer, x, y, w, h, r);
       else this.glass?.update({ x, y, width: w, height: h, radius: r });
     }
-    if (this.mode === 'copy') this.align();
-  }
-
-  // Keep the backdrop copy registered with the real backdrop. Scrolling usually moves both together,
-  // so most calls change nothing and write nothing.
-  align() {
-    const lr = this.layer.getBoundingClientRect();
-    const sr = this.source.getBoundingClientRect();
-    const key = `${sr.width}|${sr.height}|${sr.left - lr.left}|${sr.top - lr.top}`;
-    if (key === this.alignKey) return;
-    this.alignKey = key;
-    this.copy.style.width = `${sr.width}px`;
-    this.copy.style.height = `${sr.height}px`;
-    this.copy.style.transform = `translate(${sr.left - lr.left}px, ${sr.top - lr.top}px)`;
   }
 }
 
@@ -762,7 +723,9 @@ class LgPanel extends LgElement {
     const body = el('div', 'lg-panel__body');
     body.append(...this.childNodes);
     this.append(body);
-    this.surface = new Surface(this, { radius: radiusOf(this, 24), bleed: 4, optics: optics(this, { refraction: 24, bezel: 0.3, curvature: 4, chroma: 0.1, blur: 2, specular: 0.5, specularWidth: 2 }) });
+    // bleed 0: the lens box is the panel box. A positive bleed plus a JS clip
+    // measured before layout left the glass covering only the top of the card.
+    this.surface = new Surface(this, { radius: radiusOf(this, 24), bleed: 0, optics: optics(this, { refraction: 18, bezel: 0.35, curvature: 4, chroma: 0, blur: 0, specular: 0.45, specularWidth: 1.5 }) });
   }
   attach() {
     this.surface.attach();

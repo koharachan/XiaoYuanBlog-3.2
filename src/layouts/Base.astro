@@ -53,6 +53,11 @@ if (document.documentMode && !/[?&]modern=1/.test(location.search)) {
 	document.documentElement.setAttribute("data-theme", t);
 })();
 </script>
+<style is:inline>
+	/* Paint a solid card before the bundle loads, so text never sits on the photo. */
+	lg-panel { background: #121820; color: #f6f1e8; }
+	html[data-theme="cloud"] lg-panel { background: #fffaf4; color: #2a2118; }
+</style>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>{fullTitle}</title>
 <meta name="description" content={description} />

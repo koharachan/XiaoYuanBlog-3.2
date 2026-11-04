@@ -20,6 +20,8 @@ interface Props {
 	"data-category-id"?: string;
 	"data-mapping"?: string;
 	"data-lang"?: string;
+	/** Info surfaces: flatter glass, no hover sheen, not a click target. */
+	quiet?: boolean;
 }
 
 const OPTICS = {
@@ -73,10 +75,15 @@ const OPTICS = {
 	},
 } as const;
 
-const { class: className, variant = "panel", ...rest } = Astro.props;
+const {
+	class: className,
+	variant = "panel",
+	quiet = false,
+	...rest
+} = Astro.props;
 const optics = OPTICS[variant];
 ---
 
-<lg-panel class={className} {...optics} {...rest}>
+<lg-panel class:list={[className, { "is-quiet": quiet }]} {...optics} {...rest}>
 	<slot />
 </lg-panel>
