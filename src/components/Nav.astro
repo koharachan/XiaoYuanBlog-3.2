@@ -1,13 +1,15 @@
 ---
 import { nav, site } from "@/config";
+import Glass from "./Glass.astro";
 import Icon from "./Icon.astro";
 
 const path = Astro.url.pathname;
-const isCurrent = (url: string) => (url === "/" ? path === "/" || /^\/\d+\/$/.test(path) : path.startsWith(url));
+const isCurrent = (url: string) =>
+	url === "/" ? path === "/" || /^\/\d+\/$/.test(path) : path.startsWith(url);
 const iePath = `/ie${path}`;
 ---
 <header class="nav">
-	<div class="nav__in glass">
+	<Glass class="nav__in" variant="bar">
 		<a class="brand" href="/" aria-label={`${site.title} 首页`}>
 			<span>{site.title}</span>
 			<small>{site.tagline}</small>
@@ -20,17 +22,17 @@ const iePath = `/ie${path}`;
 		<button class="ibtn" type="button" data-open-search aria-label="搜索（快捷键 /）" title="搜索  /"><Icon name="search" /></button>
 		<div class="menu" data-menu data-open="false">
 			<button class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="切换主题" title="主题"><Icon name="palette" /></button>
-			<div class="menu__panel glass" role="menu">
+			<Glass class="menu__panel" variant="sheet" role="menu">
 				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="neon">夜间</button>
 				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="cloud">日间</button>
 				<a class="menu__item" role="menuitem" href={iePath}>经典版</a>
-			</div>
+			</Glass>
 		</div>
 		<button id="burger" class="ibtn burger" type="button" aria-label="菜单" aria-expanded="false" aria-controls="drawer"><Icon name="menu" /></button>
-	</div>
+	</Glass>
 </header>
-<nav id="drawer" class="drawer glass" data-open="false" aria-label="移动端导航">
+<Glass id="drawer" class="drawer" variant="sheet" role="navigation" aria-label="移动端导航" data-open="false">
 	{nav.map((l) => (
 		<a href={l.url} aria-current={isCurrent(l.url) ? "page" : undefined}>{l.name}</a>
 	))}
-</nav>
+</Glass>

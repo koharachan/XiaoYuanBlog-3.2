@@ -1,4 +1,5 @@
 ---
+import Glass from "@/components/Glass.astro";
 import Sidebar from "@/components/Sidebar.astro";
 import Timeline from "@/components/Timeline.astro";
 import Base from "@/layouts/Base.astro";
@@ -11,13 +12,13 @@ const { term, posts } = Astro.props as { term: string; posts: Post[] };
 ---
 <Base title={`标签：${term}`} description={`标签「${term}」下的 ${posts.length} 篇文章。`}>
 	<div class="layout">
-		<section class="card reveal">
+		<Glass class="card reveal" variant="reading">
 			<div class="page-head">
 				<h1>#{term}</h1>
 				<p>{posts.length} 篇文章 · <a href="/archive/">查看全部</a></p>
 			</div>
 			<Timeline posts={posts} />
-		</section>
+		</Glass>
 		<aside class="side"><Sidebar active={term} /></aside>
 	</div>
 </Base>

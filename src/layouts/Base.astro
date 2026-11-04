@@ -1,10 +1,11 @@
 ---
-import { analytics, author, site } from "@/config";
 import Background from "@/components/Background.astro";
 import Footer from "@/components/Footer.astro";
+import Glass from "@/components/Glass.astro";
+import Icon from "@/components/Icon.astro";
 import Nav from "@/components/Nav.astro";
 import SearchDialog from "@/components/SearchDialog.astro";
-import Icon from "@/components/Icon.astro";
+import { analytics, author, site } from "@/config";
 import "@/styles/base.css";
 import "@/styles/prose.css";
 
@@ -17,8 +18,16 @@ interface Props {
 	iePath?: string;
 	noindex?: boolean;
 }
-const { title, description = site.description, image, type = "website", noindex } = Astro.props;
-const fullTitle = title ? `${title} - ${site.title}` : `${site.title} - ${site.tagline}`;
+const {
+	title,
+	description = site.description,
+	image,
+	type = "website",
+	noindex,
+} = Astro.props;
+const fullTitle = title
+	? `${title} - ${site.title}`
+	: `${site.title} - ${site.tagline}`;
 const canonical = new URL(Astro.url.pathname, site.url).href;
 const ogImage = image ? new URL(image, site.url).href : undefined;
 const iePath = Astro.props.iePath ?? `/ie${Astro.url.pathname}`;
@@ -69,7 +78,7 @@ if (document.documentMode && !/[?&]modern=1/.test(location.search)) {
 <slot name="head" />
 <script is:inline define:vars={{ cfg: { ga: analytics.googleAnalyticsId, clarity: analytics.microsoftClarityId, adsense: analytics.adsenseClient } }}>window.__xy = cfg;</script>
 </head>
-<body>
+<body data-lg-backdrop=".bg__photo">
 <Background />
 <a class="sr-only" href="#main">跳到正文</a>
 <Nav />
@@ -78,7 +87,7 @@ if (document.documentMode && !/[?&]modern=1/.test(location.search)) {
 </main>
 <Footer />
 <SearchDialog />
-<button id="totop" class="totop" type="button" aria-label="回到顶部"><Icon name="up" /></button>
+<Glass id="totop" class="totop" variant="bar" role="button" tabindex="0" aria-label="回到顶部"><Icon name="up" /></Glass>
 <script src="../scripts/main.ts"></script>
 </body>
 </html>

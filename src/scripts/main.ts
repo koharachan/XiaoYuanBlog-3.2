@@ -1,7 +1,10 @@
 /**
  * 全站唯一的客户端脚本：主题切换、导航抽屉、搜索、代码复制、图片灯箱、
  * 目录高亮、回到顶部、懒加载评论与统计。所有功能都是渐进增强，没有 JS 页面也完整可读。
+ * 液态玻璃透镜来自 liquidglass.dev（src/vendor/liquid-glass），在自定义元素升级时挂上。
  */
+import "../vendor/liquid-glass/components.js";
+
 type Theme = "neon" | "cloud";
 const html = document.documentElement;
 const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel);
@@ -70,9 +73,10 @@ document.addEventListener("keydown", (e) => {
 	}
 });
 
-/* ---------- liquid glass: pointer light + press ---------- */
-const GLARE = ".glass, .card, .dialog__box, .totop, .ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a, .dialog__res a";
-const SQUISH = ".post-card, .intro, .ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a, .totop, .friends a, .adjacent a, .pay-grid .card, .dialog__res a";
+/* ---------- liquid glass: pointer light on the lens, press on small controls ---------- */
+const GLARE = "lg-panel";
+const SQUISH = ".ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a";
+const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let lit: HTMLElement[] = [];
 let down: HTMLElement[] = [];
 let squish: HTMLElement | null = null;
@@ -124,38 +128,54 @@ function releaseGlare(e: PointerEvent) {
 	if (e.pointerType !== "mouse") clearLit([]);
 	down = [];
 }
-document.addEventListener(
-	"pointermove",
-	(e) => {
-		// composedPath() is empty once the event finishes, so capture targets now.
-		const stack = e.pointerType === "touch" ? down : glareUnder(e);
-		pendingTouch = e.pointerType === "touch";
-		pendingSpots = spotsFor(stack, e);
-		if (glareFrame) return;
-		glareFrame = requestAnimationFrame(() => {
-			glareFrame = 0;
-			applyPending();
-		});
-	},
-	{ passive: true },
-);
-document.addEventListener("pointerdown", (e) => {
-	const stack = glareUnder(e);
-	for (const s of spotsFor(stack, e)) {
-		s.el.classList.add("is-lit", "is-down");
-		place(s.el, s.x, s.y);
+if (!reduceMotion) {
+	document.addEventListener(
+		"pointermove",
+		(e) => {
+			// composedPath() is empty once the event finishes, so capture targets now.
+			const stack = e.pointerType === "touch" ? down : glareUnder(e);
+			pendingTouch = e.pointerType === "touch";
+			pendingSpots = spotsFor(stack, e);
+			if (glareFrame) return;
+			glareFrame = requestAnimationFrame(() => {
+				glareFrame = 0;
+				applyPending();
+			});
+		},
+		{ passive: true },
+	);
+	document.addEventListener("pointerdown", (e) => {
+		const stack = glareUnder(e);
+		for (const s of spotsFor(stack, e)) {
+			s.el.classList.add("is-lit", "is-down");
+			place(s.el, s.x, s.y);
+		}
+		if (e.pointerType !== "mouse") lit = stack;
+		down = stack;
+		const target = e.target;
+		const hit = target instanceof Element ? target.closest<HTMLElement>(SQUISH) : null;
+		if (hit) {
+			hit.classList.add("is-pressed");
+			squish = hit;
+		}
+	});
+	document.addEventListener("pointerup", releaseGlare);
+	document.addEventListener("pointercancel", releaseGlare);
+}
+
+/* The cloned wallpaper follows a viewport resize that swaps the responsive background. */
+const wallpaper = document.querySelector<HTMLElement>(".bg__photo");
+function syncGlassWallpaper() {
+	if (!wallpaper) return;
+	const cs = getComputedStyle(wallpaper);
+	for (const copy of document.querySelectorAll<HTMLElement>(".lg-surface__copy")) {
+		copy.style.backgroundImage = cs.backgroundImage;
+		copy.style.backgroundSize = cs.backgroundSize;
+		copy.style.backgroundPosition = cs.backgroundPosition;
+		copy.style.backgroundRepeat = cs.backgroundRepeat;
 	}
-	if (e.pointerType !== "mouse") lit = stack;
-	down = stack;
-	const target = e.target;
-	const hit = target instanceof Element ? target.closest<HTMLElement>(SQUISH) : null;
-	if (hit) {
-		hit.classList.add("is-pressed");
-		squish = hit;
-	}
-});
-document.addEventListener("pointerup", releaseGlare);
-document.addEventListener("pointercancel", releaseGlare);
+}
+addEventListener("resize", syncGlassWallpaper, { passive: true });
 
 /* ---------- search ---------- */
 interface Doc {
@@ -357,7 +377,14 @@ if (totop) {
 	const onScroll = () => totop.classList.toggle("on", scrollY > 600);
 	addEventListener("scroll", onScroll, { passive: true });
 	onScroll();
-	totop.addEventListener("click", () => scrollTo({ top: 0, behavior: "smooth" }));
+	const goTop = () => scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+	totop.addEventListener("click", goTop);
+	totop.addEventListener("keydown", (e) => {
+		if (e.key === "Enter" || e.key === " ") {
+			e.preventDefault();
+			goTop();
+		}
+	});
 }
 
 /* ---------- share ---------- */

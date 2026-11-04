@@ -1,0 +1,10 @@
+Liquid Glass for the Web — https://liquidglass.dev
+Modules: liquid-glass.js and components.js, version 1.0.0
+Unmodified copies of:
+  https://liquidglass.dev/lib/liquid-glass.js
+  https://liquidglass.dev/lib/components.js
+
+The upstream project documents these files as MIT licensed:
+  https://liquidglass.dev/docs/
+
+Toast icons inside components.js are from Lucide (ISC).

@@ -1,5 +1,6 @@
 ---
 import { render } from "astro:content";
+import Glass from "@/components/Glass.astro";
 import Icon from "@/components/Icon.astro";
 import Meta from "@/components/Meta.astro";
 import Toc from "@/components/Toc.astro";
@@ -9,7 +10,10 @@ import { daysSince, fmtDate, getPosts, type Post } from "@/lib/posts";
 
 export async function getStaticPaths() {
 	const posts = await getPosts();
-	return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+	return posts.map((post) => ({
+		params: { slug: post.slug },
+		props: { post },
+	}));
 }
 
 const { post } = Astro.props as { post: Post };
@@ -37,7 +41,7 @@ const jsonLd = {
 	<script is:inline slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
 	<div class:list={["layout", { "layout--wide": !hasToc }]}>
 		<article>
-			<header class="card article__head reveal">
+			<Glass class="card article__head reveal" variant="reading">
 				{post.pinned && <span class="pin"><Icon name="pin" size={12} />置顶</span>}
 				<h1>{post.title}</h1>
 				<Meta post={post} full />
@@ -46,9 +50,9 @@ const jsonLd = {
 						<img src={post.image} alt="" width={post.imageSize?.width} height={post.imageSize?.height} fetchpriority="high" decoding="async" />
 					</figure>
 				)}
-			</header>
+			</Glass>
 
-			<div class="card article__body reveal" style="--i:1">
+			<Glass class="card article__body reveal" variant="reading" style="--i:1">
 				{stale && (
 					<div class="notice">
 						<Icon name="warn" />
@@ -82,19 +86,19 @@ const jsonLd = {
 					<button id="share" class="btn" type="button"><Icon name="share" />分享本文</button>
 					<a class="btn" href="/pay/"><Icon name="heart" />请我喝杯咖啡</a>
 				</div>
-			</div>
+			</Glass>
 
 			<nav class="adjacent" aria-label="上一篇 / 下一篇">
 				{post.prev ? (
-					<a class="card card--glow prev" href={`/posts/${post.prev.slug}/`} rel="prev"><small>← 上一篇</small><span>{post.prev.title}</span></a>
+					<a class="prev" href={`/posts/${post.prev.slug}/`} rel="prev"><Glass class="card card--glow"><small>← 上一篇</small><span>{post.prev.title}</span></Glass></a>
 				) : <span />}
 				{post.next && (
-					<a class="card card--glow next" href={`/posts/${post.next.slug}/`} rel="next"><small>下一篇 →</small><span>{post.next.title}</span></a>
+					<a class="next" href={`/posts/${post.next.slug}/`} rel="next"><Glass class="card card--glow"><small>下一篇 →</small><span>{post.next.title}</span></Glass></a>
 				)}
 			</nav>
 
 			{post.entry.data.comment && (
-				<section
+				<Glass
 					id="comments"
 					class="card comments"
 					data-repo={giscus.repo}
@@ -106,16 +110,16 @@ const jsonLd = {
 				>
 					<h3 class="card__title">评论</h3>
 					<p class="comments__ph">评论区滚动到这里时加载（基于 GitHub Discussions）</p>
-				</section>
+				</Glass>
 			)}
 		</article>
 
 		{hasToc && (
 			<aside class="side side--sticky">
-				<section class="card">
+				<Glass class="card">
 					<h3 class="card__title">目录</h3>
 					<Toc headings={headings} />
-				</section>
+				</Glass>
 			</aside>
 		)}
 	</div>

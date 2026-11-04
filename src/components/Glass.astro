@@ -1,0 +1,82 @@
+---
+/**
+ * Thick liquid-glass surface from liquidglass.dev (vendored in src/vendor/liquid-glass).
+ * <lg-panel> builds an SVG feDisplacementMap lens: rim refraction, chromatic fringe,
+ * specular highlight, and frost, sampled from an aligned copy of the wallpaper.
+ * Text stays in light DOM above the lens, so it remains selectable and readable.
+ */
+interface Props {
+	class?: string;
+	variant?: "panel" | "bar" | "sheet" | "reading";
+	role?: string;
+	id?: string;
+	style?: string;
+	tabindex?: string | number;
+	"aria-label"?: string;
+	"data-open"?: string;
+	"data-repo"?: string;
+	"data-repo-id"?: string;
+	"data-category"?: string;
+	"data-category-id"?: string;
+	"data-mapping"?: string;
+	"data-lang"?: string;
+}
+
+const OPTICS = {
+	panel: {
+		radius: "26",
+		refraction: "22",
+		bezel: "0.46",
+		curvature: "3.2",
+		ior: "1.5",
+		chroma: "0.14",
+		blur: "2.2",
+		specular: "0.78",
+		"specular-width": "2.4",
+		"light-angle": "-115",
+	},
+	bar: {
+		radius: "capsule",
+		refraction: "20",
+		bezel: "1",
+		curvature: "2.4",
+		ior: "1.52",
+		chroma: "0.18",
+		blur: "1",
+		specular: "0.92",
+		"specular-width": "2.6",
+		"light-angle": "-90",
+	},
+	sheet: {
+		radius: "28",
+		refraction: "20",
+		bezel: "0.55",
+		curvature: "3",
+		ior: "1.5",
+		chroma: "0.14",
+		blur: "1.8",
+		specular: "0.8",
+		"specular-width": "2.2",
+		"light-angle": "-108",
+	},
+	reading: {
+		radius: "26",
+		refraction: "18",
+		bezel: "0.28",
+		curvature: "3.8",
+		ior: "1.46",
+		chroma: "0.1",
+		blur: "3.4",
+		specular: "0.62",
+		"specular-width": "2.6",
+		"light-angle": "-120",
+	},
+} as const;
+
+const { class: className, variant = "panel", ...rest } = Astro.props;
+const optics = OPTICS[variant];
+---
+
+<lg-panel class={className} {...optics} {...rest}>
+	<slot />
+</lg-panel>

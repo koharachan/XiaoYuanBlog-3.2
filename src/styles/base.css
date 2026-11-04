@@ -38,7 +38,18 @@
 	--side: 18rem;
 	--ease: cubic-bezier(0.2, 0.7, 0.2, 1);
 	--spring: cubic-bezier(0.34, 1.45, 0.64, 1);
-	--grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+	/* liquidglass.dev lens tokens. :where(:root) in the library loses to these. */
+	--lg-tint: rgb(8 12 22 / 0.46);
+	--lg-tint-strong: rgb(255 250 244 / 0.78);
+	--lg-on-glass: var(--text);
+	--lg-text: var(--text);
+	--lg-text-muted: var(--muted);
+	--lg-fallback: blur(22px) saturate(1.8) brightness(1.05);
+	--lg-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.16);
+	--lg-shadow-2: 0 18px 42px rgba(4, 8, 16, 0.32);
+	--lg-focus: var(--primary);
+	--lg-accent: var(--primary);
+	--lg-indicator: rgb(255 255 255 / 0.22);
 	color-scheme: dark;
 }
 
@@ -65,6 +76,9 @@
 	--code-bg: #fffdf9;
 	--inline-code-bg: rgba(138, 75, 22, 0.08);
 	--selection: rgba(138, 75, 22, 0.18);
+	--lg-tint: rgb(255 248 240 / 0.58);
+	--lg-shadow-2: 0 14px 32px rgba(70, 46, 24, 0.14);
+	--lg-indicator: rgb(255 255 255 / 0.62);
 	color-scheme: light;
 }
 
@@ -225,217 +239,92 @@ input {
 	}
 }
 
-/* ---------- liquid glass ---------- */
-.glass,
-.card,
-.nav__in,
-.menu__panel,
-.drawer,
-.dialog__box,
-.totop,
-.pager a,
-.pager span {
-	--rim: 7px;
-	--spot: 180px;
-	position: relative;
-	isolation: isolate;
-	background-color: var(--panel);
-	background-image: var(--grain);
-	background-size: 160px 160px;
-	background-blend-mode: soft-light;
-	border: 1px solid rgba(255, 255, 255, 0.22);
+/* ---------- liquid glass (liquidglass.dev lens, not a stroke) ---------- */
+lg-panel {
+	--x: -140px;
+	--y: -140px;
+	--spot: 220px;
+	color: var(--text);
+	background-color: var(--panel-solid);
+	border: 0;
 	border-radius: var(--radius);
-	corner-shape: squircle;
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.62),
-		inset 0 -1px 0 rgba(255, 255, 255, 0.16),
-		inset 1px 0 0 rgba(255, 255, 255, 0.22),
-		inset -1px 0 0 rgba(255, 255, 255, 0.14),
-		0 16px 42px rgba(6, 10, 20, 0.2),
-		0 2px 8px rgba(6, 10, 20, 0.08);
+	box-shadow: none;
 }
-.card {
+lg-panel > *:not(.lg-surface) {
+	position: relative;
+	z-index: 1;
+}
+/* Lens layers are absolutely placed by the library. A later element selector
+   such as `.pager span` must not pull them back into flow (that grows the page). */
+lg-panel .lg-surface,
+lg-panel .lg-surface__glass,
+lg-panel .lg-surface__shadow,
+lg-panel .lg-surface__tint,
+lg-panel .lg-surface__copy {
+	position: absolute;
+	display: block;
+	min-width: 0;
+	padding: 0;
+}
+lg-panel.card {
 	padding: 1.25rem;
+	min-width: 0;
+	max-width: 100%;
 }
-@supports ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-	.glass,
-	.card,
-	.nav__in,
-	.menu__panel,
-	.drawer,
-	.dialog__box,
-	.totop,
-	.pager a,
-	.pager span {
-		-webkit-backdrop-filter: blur(18px) saturate(1.65);
-		backdrop-filter: blur(18px) saturate(1.65);
-	}
+.posts > lg-panel,
+.side > lg-panel,
+.layout > lg-panel {
+	min-width: 0;
 }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-	.glass,
-	.card,
-	.nav__in,
-	.menu__panel,
-	.drawer,
-	.dialog__box,
-	.totop,
-	.pager a,
-	.pager span {
-		background-color: var(--panel-solid);
-		background-image: none;
-	}
+lg-panel.card > .lg-panel__body,
+lg-panel.nav__in > .lg-panel__body,
+lg-panel.drawer > .lg-panel__body,
+lg-panel.menu__panel > .lg-panel__body,
+lg-panel.pager > .lg-panel__body,
+lg-panel.dialog__box > .lg-panel__body,
+lg-panel.totop > .lg-panel__body {
+	padding: 0;
+	border-radius: inherit;
+	min-width: 0;
 }
-@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
-	.glass::before,
-	.card::before,
-	.nav__in::before,
-	.menu__panel::before,
-	.drawer::before,
-	.dialog__box::before,
-	.totop::before,
-	.pager a::before,
-	.pager span::before {
-		content: "";
-		position: absolute;
-		inset: 0;
-		border-radius: inherit;
-		padding: var(--rim);
-		pointer-events: none;
-		z-index: 2;
-		background: linear-gradient(
-			152deg,
-			rgba(255, 255, 255, 0.86) 0%,
-			rgba(255, 255, 255, 0.14) 22%,
-			rgba(255, 255, 255, 0.02) 48%,
-			rgba(255, 255, 255, 0.16) 74%,
-			rgba(255, 255, 255, 0.62) 100%
-		);
-		-webkit-backdrop-filter: blur(1.5px) saturate(1.85) brightness(1.22);
-		backdrop-filter: blur(1.5px) saturate(1.85) brightness(1.22);
-		-webkit-mask:
-			linear-gradient(#fff 0 0) content-box,
-			linear-gradient(#fff 0 0);
-		-webkit-mask-composite: xor;
-		mask:
-			linear-gradient(#fff 0 0) content-box,
-			linear-gradient(#fff 0 0);
-		mask-composite: exclude;
-	}
+/* Reading surfaces keep a deeper tint so body copy stays legible on the photo.
+   The lens still bends the wallpaper inside the bezel. */
+lg-panel.article__head .lg-surface__tint,
+lg-panel.article__body .lg-surface__tint,
+lg-panel.intro .lg-surface__tint,
+lg-panel.e404 .lg-surface__tint {
+	background: rgb(8 12 20 / 0.72);
 }
-.ibtn,
-.btn,
-.chip,
-.nav__links a,
-.menu__item,
-.drawer a,
-.termlist a,
-.pager a,
-.dialog__res a {
-	--x: -80px;
-	--y: -80px;
-	--spot: 140px;
+[data-theme="cloud"] lg-panel.article__head .lg-surface__tint,
+[data-theme="cloud"] lg-panel.article__body .lg-surface__tint,
+[data-theme="cloud"] lg-panel.intro .lg-surface__tint,
+[data-theme="cloud"] lg-panel.e404 .lg-surface__tint {
+	background: rgb(255 250 244 / 0.78);
 }
-.glass,
-.card,
-.nav__in,
-.menu__panel,
-.drawer,
-.dialog__box,
-.totop {
-	--x: -120px;
-	--y: -120px;
-}
-.glass::after,
-.card::after,
-.nav__in::after,
-.menu__panel::after,
-.drawer::after,
-.dialog__box::after,
-.totop::after,
-.ibtn::after,
-.btn::after,
-.chip::after,
-.nav__links a::after,
-.menu__item::after,
-.drawer a::after,
-.termlist a::after,
-.pager a::after {
+lg-panel::after {
 	content: "";
 	position: absolute;
 	inset: 0;
 	border-radius: inherit;
 	pointer-events: none;
-	z-index: 3;
+	z-index: 2;
 	opacity: 0;
-	background: radial-gradient(
-		var(--spot) circle at var(--x) var(--y),
-		rgba(255, 255, 255, 0.55),
-		rgba(255, 255, 255, 0.16) 32%,
-		transparent 64%
-	);
-	mix-blend-mode: plus-lighter;
-	transition:
-		opacity 0.4s ease,
-		background 0.45s ease;
+	background: radial-gradient(var(--spot) circle at var(--x) var(--y), rgba(255, 255, 255, 0.34), transparent 64%);
+	mix-blend-mode: soft-light;
+	transition: opacity 0.35s ease;
 }
-.glass.is-lit::after,
-.card.is-lit::after,
-.nav__in.is-lit::after,
-.menu__panel.is-lit::after,
-.drawer.is-lit::after,
-.dialog__box.is-lit::after,
-.totop.is-lit::after,
-.ibtn.is-lit::after,
-.btn.is-lit::after,
-.chip.is-lit::after,
-.nav__links a.is-lit::after,
-.menu__item.is-lit::after,
-.drawer a.is-lit::after,
-.termlist a.is-lit::after,
-.pager a.is-lit::after {
+lg-panel.is-lit::after,
+lg-panel.is-down::after {
 	opacity: 1;
 }
-.glass.is-down::after,
-.card.is-down::after,
-.nav__in.is-down::after,
-.menu__panel.is-down::after,
-.drawer.is-down::after,
-.dialog__box.is-down::after,
-.totop.is-down::after,
-.ibtn.is-down::after,
-.btn.is-down::after,
-.chip.is-down::after,
-.nav__links a.is-down::after,
-.menu__item.is-down::after,
-.drawer a.is-down::after,
-.termlist a.is-down::after,
-.pager a.is-down::after {
-	opacity: 1;
-	background: radial-gradient(
-		calc(var(--spot) * 0.7) circle at var(--x) var(--y),
-		rgba(255, 255, 255, 0.95),
-		rgba(255, 255, 255, 0.4) 30%,
-		transparent 66%
-	);
-	transition-duration: 0.08s;
-}
-.post-card,
-.intro,
-.profile,
 .ibtn,
 .btn,
 .chip,
 .nav__links a,
 .menu__item,
 .drawer a,
-.termlist a,
-.pager a,
-.totop.on,
-.friends a,
-.adjacent a,
-.pay-grid .card,
-.dialog__res a {
-	transition: transform 0.52s var(--spring), background-color 0.25s, border-color 0.25s, box-shadow 0.25s;
+.termlist a {
+	transition: transform 0.52s var(--spring), background-color 0.25s, color 0.2s;
 }
 .is-pressed {
 	transform: scale(0.96);
@@ -446,17 +335,24 @@ input {
 	.is-pressed {
 		transform: none;
 	}
+	lg-panel::after {
+		transition: none;
+	}
 }
-.card--glow:hover {
-	border-color: rgba(255, 255, 255, 0.38);
-}
-.article__head,
-.article__body {
-	background-color: rgba(12, 16, 26, 0.68);
-}
-[data-theme="cloud"] .article__head,
-[data-theme="cloud"] .article__body {
-	background-color: rgba(255, 250, 244, 0.78);
+@media (prefers-reduced-transparency: reduce) {
+	lg-panel .lg-surface {
+		display: none;
+	}
+	lg-panel {
+		background-color: rgb(14 18 26 / 0.96);
+		color: var(--text);
+	}
+	[data-theme="cloud"] lg-panel {
+		background-color: rgb(255 252 248 / 0.97);
+	}
+	lg-panel::after {
+		display: none;
+	}
 }
 .card__title {
 	margin: 0 0 0.75rem;
@@ -489,7 +385,6 @@ input {
 	box-shadow: none;
 }
 .nav__in {
-	--rim: 8px;
 	--spot: 280px;
 	display: flex;
 	align-items: center;
@@ -497,7 +392,14 @@ input {
 	min-height: 3.25rem;
 	padding: 0.28rem 0.38rem 0.28rem 1.05rem;
 	border-radius: 999px;
-	corner-shape: round;
+}
+.nav__in > .lg-panel__body {
+	display: flex;
+	align-items: center;
+	gap: 0.2rem;
+	flex: 1;
+	min-width: 0;
+	min-height: 2.6rem;
 }
 .brand {
 	display: inline-flex;
@@ -552,10 +454,11 @@ input {
 .nav__links a:hover,
 .nav__links a[aria-current="page"] {
 	color: var(--text);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.75),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.55),
-		inset 0 0 14px rgba(255, 255, 255, 0.22);
+	background: rgba(255, 255, 255, 0.16);
+}
+[data-theme="cloud"] .nav__links a:hover,
+[data-theme="cloud"] .nav__links a[aria-current="page"] {
+	background: rgba(255, 255, 255, 0.5);
 }
 .ibtn {
 	position: relative;
@@ -589,11 +492,11 @@ input {
 	position: absolute;
 	right: 0;
 	top: calc(100% + 0.55rem);
-	min-width: 9.5rem;
-	padding: 0.4rem;
 	display: grid;
 	gap: 0.28rem;
-	border-radius: 22px;
+	min-width: 9.5rem;
+	padding: 0.4rem;
+	border-radius: 28px;
 	opacity: 0;
 	transform: translateY(-6px);
 	pointer-events: none;
@@ -601,6 +504,10 @@ input {
 		opacity 0.18s,
 		transform 0.45s var(--spring);
 	z-index: 60;
+}
+.menu__panel > .lg-panel__body {
+	display: grid;
+	gap: 0.28rem;
 }
 .menu[data-open="true"] .menu__panel {
 	opacity: 1;
@@ -622,11 +529,7 @@ input {
 .menu__item:hover,
 .menu__item[aria-checked="true"] {
 	color: var(--text);
-	background: rgba(255, 255, 255, 0.14);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.8),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.62),
-		inset 0 0 16px rgba(255, 255, 255, 0.28);
+	background: rgba(255, 255, 255, 0.16);
 }
 .menu__item[aria-checked="true"]::before {
 	content: "✓";
@@ -639,10 +542,10 @@ input {
 	top: 4.55rem;
 	left: 50%;
 	z-index: 45;
-	width: min(20rem, calc(100% - 1.25rem));
-	padding: 0.45rem;
 	display: grid;
+	width: min(20rem, calc(100% - 1.25rem));
 	gap: 0.28rem;
+	padding: 0.45rem;
 	border-radius: 28px;
 	transform: translate(-50%, -10px);
 	opacity: 0;
@@ -652,6 +555,10 @@ input {
 		opacity 0.2s ease,
 		transform 0.45s var(--spring),
 		visibility 0.2s;
+}
+.drawer > .lg-panel__body {
+	display: grid;
+	gap: 0.28rem;
 }
 .drawer[data-open="true"] {
 	transform: translate(-50%, 0);
@@ -669,16 +576,14 @@ input {
 .drawer a:hover,
 .drawer a[aria-current="page"] {
 	color: var(--text);
-	background: rgba(255, 255, 255, 0.14);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.8),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.62),
-		inset 0 0 16px rgba(255, 255, 255, 0.28);
+	background: rgba(255, 255, 255, 0.16);
 }
 
 /* ---------- home intro ---------- */
 .intro {
 	margin-top: 1.25rem;
+}
+lg-panel.intro {
 	padding: 1.35rem 1.4rem 1.15rem;
 }
 .intro h1 {
@@ -718,18 +623,13 @@ input {
 	display: grid;
 	gap: 1rem;
 }
-.post-card {
+lg-panel.post-card > .lg-panel__body {
 	display: grid;
 	grid-template-columns: minmax(0, 1fr);
 	gap: 1rem;
-	padding: 1.25rem;
-	overflow: hidden;
-}
-.post-card--cover {
-	grid-template-columns: minmax(0, 1fr);
 }
 @media (min-width: 40rem) {
-	.post-card--cover {
+	lg-panel.post-card--cover > .lg-panel__body {
 		grid-template-columns: minmax(0, 1fr) 11.5rem;
 	}
 }
@@ -842,9 +742,8 @@ input {
 	border-radius: 999px;
 	font-size: 0.78rem;
 	color: var(--text-2);
-	background: rgba(255, 255, 255, 0.08);
-	border: 1px solid rgba(255, 255, 255, 0.28);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+	background: rgba(255, 255, 255, 0.12);
+	border: 0;
 }
 .chip:hover,
 .chip[aria-current="page"] {
@@ -858,16 +757,22 @@ input {
 /* ---------- pagination ---------- */
 .pager {
 	display: flex;
+	width: fit-content;
+	margin: 1.5rem auto 0;
+	padding: 0.3rem;
+	border-radius: 999px;
+}
+.pager > .lg-panel__body {
+	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 0.4rem;
-	margin-top: 1.5rem;
+	gap: 0.35rem;
 }
-.pager a,
-.pager span {
-	--rim: 1.5px;
-	--spot: 90px;
+.pager > .lg-panel__body > a,
+.pager > .lg-panel__body > span,
+.pager > a,
+.pager > span:not(.lg-surface) {
 	position: relative;
 	min-width: 2.4rem;
 	height: 2.4rem;
@@ -875,7 +780,6 @@ input {
 	display: inline-grid;
 	place-items: center;
 	border-radius: 999px;
-	corner-shape: round;
 	color: var(--text-2);
 	font-family: var(--mono);
 	font-size: 0.9rem;
@@ -904,8 +808,7 @@ input {
 	border-radius: 50%;
 	margin: 0 auto 0.75rem;
 	object-fit: cover;
-	border: 2px solid rgba(255, 255, 255, 0.72);
-	box-shadow: 0 8px 18px rgba(8, 12, 20, 0.22);
+	box-shadow: 0 8px 18px rgba(8, 12, 20, 0.28);
 	background: var(--bg-2);
 }
 .profile h3 {
@@ -960,10 +863,6 @@ input {
 .termlist a[aria-current="page"] {
 	color: var(--text);
 	background: rgba(255, 255, 255, 0.14);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.85),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.66),
-		inset 0 0 16px rgba(255, 255, 255, 0.3);
 }
 .termlist small {
 	font-family: var(--mono);
@@ -1037,12 +936,16 @@ details.toc-m .toc {
 }
 
 /* ---------- article ---------- */
-.article__head {
+lg-panel.article__head {
 	padding: 1.5rem 1.25rem 1.25rem;
 }
+lg-panel.article__body {
+	margin-top: 1rem;
+	padding: 1.5rem 1.25rem;
+}
 @media (min-width: 48rem) {
-	.article__head,
-	.article__body {
+	lg-panel.article__head,
+	lg-panel.article__body {
 		padding: 2rem 2.25rem;
 	}
 }
@@ -1065,10 +968,6 @@ details.toc-m .toc {
 	height: 100%;
 	max-height: 26rem;
 	object-fit: cover;
-}
-.article__body {
-	padding: 1.5rem 1.25rem;
-	margin-top: 1rem;
 }
 .notice {
 	display: flex;
@@ -1116,16 +1015,15 @@ details.toc-m .toc {
 	gap: 0.45rem;
 	padding: 0.55rem 1.05rem;
 	border-radius: 999px;
-	border: 1px solid rgba(255, 255, 255, 0.38);
+	border: 0;
 	color: var(--text);
 	font-weight: 600;
 	font-size: 0.9rem;
-	background: rgba(255, 255, 255, 0.1);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+	background: rgba(255, 255, 255, 0.14);
 }
 .btn:hover {
 	color: var(--primary);
-	border-color: var(--line-strong);
+	background: rgba(255, 255, 255, 0.22);
 }
 .btn--primary {
 	background: var(--primary);
@@ -1151,12 +1049,17 @@ details.toc-m .toc {
 	}
 }
 .adjacent a {
-	display: grid;
-	gap: 0.2rem;
-	padding: 0.9rem 1.1rem;
+	display: block;
+	min-width: 0;
 	color: var(--text);
 	font-weight: 600;
-	min-width: 0;
+}
+.adjacent lg-panel.card {
+	padding: 0.9rem 1.1rem;
+}
+.adjacent lg-panel.card > .lg-panel__body {
+	display: grid;
+	gap: 0.2rem;
 }
 .adjacent a small {
 	color: var(--muted);
@@ -1165,7 +1068,8 @@ details.toc-m .toc {
 	font-size: 0.75rem;
 	letter-spacing: 0.08em;
 }
-.adjacent a span {
+.adjacent lg-panel > span:not(.lg-surface),
+.adjacent .lg-panel__body > span {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -1256,10 +1160,6 @@ details.toc-m .toc {
 .timeline li a:hover {
 	color: var(--text);
 	background: rgba(255, 255, 255, 0.12);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.75),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.5),
-		inset 0 0 14px rgba(255, 255, 255, 0.22);
 }
 .timeline li a::before {
 	content: "";
@@ -1297,11 +1197,9 @@ details.toc-m .toc {
 	backdrop-filter: blur(4px);
 }
 .dialog__box {
-	--rim: 12px;
 	width: min(40rem, calc(100vw - 1.5rem));
 	margin: 12vh auto 0;
-	border-radius: 30px;
-	overflow: hidden;
+	border-radius: 28px;
 	animation: rise 0.45s var(--spring);
 }
 .dialog__in {
@@ -1309,8 +1207,7 @@ details.toc-m .toc {
 	padding: 0.75rem 0.95rem;
 	border: 0;
 	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.1);
-	box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+	background: rgba(255, 255, 255, 0.12);
 }
 @keyframes rise {
 	from {
@@ -1362,51 +1259,13 @@ details.toc-m .toc {
 	border-radius: 999px;
 	color: var(--text);
 	background: rgba(255, 255, 255, 0.08);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38);
 }
 [data-theme="cloud"] .dialog__res a {
 	background: rgba(255, 255, 255, 0.46);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 .dialog__res a:hover,
 .dialog__res a[aria-selected="true"] {
-	background: rgba(255, 255, 255, 0.14);
-	box-shadow:
-		inset 0 1px 0 rgba(255, 255, 255, 0.8),
-		inset 0 0 0 1px rgba(255, 255, 255, 0.55),
-		inset 0 0 16px rgba(255, 255, 255, 0.24);
-}
-.dialog__res a::after {
-	content: "";
-	position: absolute;
-	inset: 0;
-	border-radius: inherit;
-	pointer-events: none;
-	z-index: 3;
-	opacity: 0;
-	background: radial-gradient(
-		140px circle at var(--x) var(--y),
-		rgba(255, 255, 255, 0.55),
-		rgba(255, 255, 255, 0.16) 32%,
-		transparent 64%
-	);
-	mix-blend-mode: plus-lighter;
-	transition:
-		opacity 0.4s ease,
-		background 0.45s ease;
-}
-.dialog__res a.is-lit::after {
-	opacity: 1;
-}
-.dialog__res a.is-down::after {
-	opacity: 1;
-	background: radial-gradient(
-		100px circle at var(--x) var(--y),
-		rgba(255, 255, 255, 0.95),
-		rgba(255, 255, 255, 0.4) 30%,
-		transparent 66%
-	);
-	transition-duration: 0.08s;
+	background: rgba(255, 255, 255, 0.16);
 }
 .dialog__res b {
 	font-weight: 700;
@@ -1508,10 +1367,16 @@ details.toc-m .toc {
 	margin: 1.25rem 0;
 }
 .friends a {
+	display: block;
+	min-width: 0;
+	color: var(--text);
+}
+.friends lg-panel.card {
+	padding: 1rem;
+}
+.friends lg-panel.card > .lg-panel__body {
 	display: grid;
 	gap: 0.2rem;
-	padding: 1rem;
-	color: var(--text);
 }
 .friends a b {
 	font-size: 1rem;
@@ -1528,11 +1393,13 @@ details.toc-m .toc {
 	gap: 0.75rem;
 	margin: 1.25rem 0;
 }
-.pay-grid .card {
+.pay-grid lg-panel.card {
+	padding: 1rem;
+}
+.pay-grid lg-panel.card > .lg-panel__body {
 	display: grid;
 	gap: 0.5rem;
 	text-align: center;
-	padding: 1rem;
 }
 .pay-grid img {
 	width: 100%;
@@ -1576,7 +1443,9 @@ details.toc-m .toc {
 }
 .e404 {
 	text-align: center;
-	padding: 4rem 1rem;
+}
+lg-panel.e404 {
+	padding: 4rem 1.25rem;
 }
 .e404 h1 {
 	font-size: clamp(4rem, 16vw, 7rem);
@@ -1597,19 +1466,18 @@ details.toc-m .toc {
 
 /* ---------- back to top ---------- */
 .totop {
-	--rim: 2px;
 	--spot: 90px;
 	position: fixed;
 	right: 1rem;
 	bottom: 1rem;
 	z-index: 40;
-	width: 2.85rem;
-	height: 2.85rem;
-	border-radius: 50%;
-	corner-shape: round;
-	color: var(--text);
 	display: grid;
 	place-items: center;
+	width: 2.85rem;
+	height: 2.85rem;
+	padding: 0;
+	border-radius: 50%;
+	color: var(--text);
 	opacity: 0;
 	transform: translateY(10px);
 	pointer-events: none;
@@ -1622,8 +1490,12 @@ details.toc-m .toc {
 	transform: none;
 	pointer-events: auto;
 }
-.totop.on.is-pressed {
-	transform: scale(0.9);
+.totop > .lg-panel__body {
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	padding: 0;
 }
 .totop svg {
 	width: 1.2rem;
