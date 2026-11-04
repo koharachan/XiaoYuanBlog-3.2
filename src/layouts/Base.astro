@@ -84,6 +84,8 @@ if (document.documentMode && !/[?&]modern=1/.test(location.search)) {
 <script is:inline define:vars={{ cfg: { ga: analytics.googleAnalyticsId, clarity: analytics.microsoftClarityId, adsense: analytics.adsenseClient } }}>window.__xy = cfg;</script>
 </head>
 <body data-lg-backdrop=".bg__photo">
+<noscript><style>.veil{display:none !important}</style></noscript>
+<div class="veil is-boot" aria-hidden="true"></div>
 <Background />
 <a class="sr-only" href="#main">跳到正文</a>
 <Nav />

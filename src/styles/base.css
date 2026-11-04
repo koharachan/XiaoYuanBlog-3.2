@@ -403,33 +403,47 @@ lg-panel.card--glow::after {
 	transition: opacity 0.2s ease;
 }
 lg-panel.card--glow.is-lit::after,
-lg-panel.card--glow.is-down::after {
+lg-panel.card--glow.is-down::after,
+lg-panel.card--glow:hover::after {
 	opacity: 1;
+	transition: opacity 0.2s ease;
 }
-lg-panel.card--glow.is-pressed > .lg-panel__body {
-	transform: scale(0.985);
-	transition: transform 0.1s cubic-bezier(0.2, 0, 0.2, 1);
-}
-.ibtn,
-.btn,
-.chip,
+/* QxBlog keeps controls still: color and a 1px underline, no press scale. */
 .nav__links a,
 .menu__item,
 .drawer a,
-.termlist a {
-	transition: transform 0.52s var(--spring), background-color 0.25s, color 0.2s;
+.termlist a,
+.post-card h2 a,
+.friends a b,
+.search__results b {
+	background-image: linear-gradient(currentColor, currentColor);
+	background-repeat: no-repeat;
+	background-position: right bottom;
+	background-size: 0% 1px;
+	transition: background-size 0.3s ease-in-out, background-color 0.2s, color 0.2s;
 }
-.is-pressed:not(lg-panel) {
-	transform: scale(0.96);
-	transition-duration: 0.1s;
-	transition-timing-function: cubic-bezier(0.2, 0, 0.2, 1);
+.nav__links a:hover,
+.nav__links a[aria-current="page"],
+.menu__item:hover,
+.drawer a:hover,
+.drawer a[aria-current="page"],
+.termlist a:hover,
+.post-card:hover h2 a,
+.friends a:hover b,
+.search__results a:hover b,
+.search__results a[aria-selected="true"] b {
+	background-position: left bottom;
+	background-size: 100% 1px;
 }
 @media (prefers-reduced-motion: reduce) {
-	.is-pressed:not(lg-panel),
-	lg-panel.card--glow.is-pressed > .lg-panel__body {
-		transform: none;
-	}
-	lg-panel.card--glow::after {
+	lg-panel.card--glow::after,
+	.nav__links a,
+	.menu__item,
+	.drawer a,
+	.termlist a,
+	.post-card h2 a,
+	.friends a b,
+	.search__results b {
 		transition: none;
 	}
 }
@@ -557,11 +571,11 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 .nav__links a:hover,
 .nav__links a[aria-current="page"] {
 	color: var(--text);
-	background: rgba(255, 255, 255, 0.16);
+	background-color: rgba(255, 255, 255, 0.16);
 }
 [data-theme="cloud"] .nav__links a:hover,
 [data-theme="cloud"] .nav__links a[aria-current="page"] {
-	background: rgba(255, 255, 255, 0.5);
+	background-color: rgba(255, 255, 255, 0.5);
 }
 .ibtn {
 	position: relative;
@@ -635,14 +649,15 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 .menu__item:hover,
 .menu__item[aria-checked="true"] {
 	color: var(--text);
-	background: rgba(255, 255, 255, 0.16);
+	background-color: rgba(255, 255, 255, 0.16);
 }
 .menu__item[aria-checked="true"]::before {
 	content: "✓";
 	font-size: 0.8rem;
 	color: var(--primary);
 }
-/* mobile sheet. Centered without transform so the glass can sample the page. */
+/* mobile sheet slides in from the right. Resting open state is transform:none
+   so the glass can sample the page; the slide itself is only the transition. */
 .drawer {
 	position: fixed;
 	top: max(4.55rem, calc(env(safe-area-inset-top) + 4rem));
@@ -651,10 +666,12 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 	z-index: 45;
 	width: min(20rem, calc(100% - 1.25rem));
 	margin-inline: auto;
-	opacity: 0;
+	transform: translate3d(110%, 0, 0);
 	visibility: hidden;
 	pointer-events: none;
-	transition: opacity 0.16s ease, visibility 0.16s;
+	transition:
+		transform 0.46s cubic-bezier(0.22, 1, 0.36, 1),
+		visibility 0.46s;
 }
 .drawer__sheet {
 	--r: 28px;
@@ -666,7 +683,7 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 	gap: 0.28rem;
 }
 .drawer[data-open="true"] {
-	opacity: 1;
+	transform: none;
 	visibility: visible;
 	pointer-events: auto;
 }
@@ -683,7 +700,7 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 .drawer a:hover,
 .drawer a[aria-current="page"] {
 	color: var(--text);
-	background: rgba(255, 255, 255, 0.16);
+	background-color: rgba(255, 255, 255, 0.16);
 }
 
 /* ---------- home intro ---------- */
@@ -973,7 +990,7 @@ lg-panel.post-card > .lg-panel__body {
 .termlist a:hover,
 .termlist a[aria-current="page"] {
 	color: var(--text);
-	background: rgba(255, 255, 255, 0.14);
+	background-color: rgba(255, 255, 255, 0.14);
 }
 .termlist small {
 	font-family: var(--mono);
@@ -1335,19 +1352,30 @@ html.search-open {
 		inset 0 1px 0 rgba(255, 255, 255, 0.45),
 		inset 0 0 0 1px rgba(255, 255, 255, 0.16),
 		0 18px 50px rgba(0, 0, 0, 0.35);
-	animation: search-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.search[open] {
+	animation: search-in 0.46s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.search[open].is-closing {
+	animation: search-out 0.46s cubic-bezier(0.55, 0, 0.35, 1) both;
 }
 [data-theme="cloud"] .search__panel {
 	background: rgb(255 250 244 / 0.98);
 }
 @keyframes search-in {
 	from {
-		opacity: 0;
-		transform: scale(0.96) translateY(8px);
+		transform: translate3d(0, -100%, 0);
 	}
 	to {
-		opacity: 1;
 		transform: none;
+	}
+}
+@keyframes search-out {
+	from {
+		transform: none;
+	}
+	to {
+		transform: translate3d(0, -100%, 0);
 	}
 }
 .search__bar {
@@ -1408,8 +1436,6 @@ html.search-open {
 	border-radius: calc(var(--r) - 0.55rem);
 	color: var(--text);
 	background: rgba(255, 255, 255, 0.08);
-	animation: result-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-	animation-delay: calc(var(--i, 0) * 22ms);
 }
 .search__results b {
 	font-weight: 700;
@@ -1430,19 +1456,11 @@ html.search-open {
 }
 .search__results a:hover,
 .search__results a[aria-selected="true"] {
-	background: rgba(255, 255, 255, 0.18);
+	background-color: rgba(255, 255, 255, 0.18);
 }
 [data-theme="cloud"] .search__results a:hover,
 [data-theme="cloud"] .search__results a[aria-selected="true"] {
-	background: rgb(255 255 255 / 0.94);
-}
-@keyframes result-in {
-	from {
-		transform: translateY(8px);
-	}
-	to {
-		transform: none;
-	}
+	background-color: rgb(255 255 255 / 0.94);
 }
 .search__results mark {
 	background: none;
@@ -1549,8 +1567,23 @@ html.search-open {
 	padding: 1rem;
 }
 .friends lg-panel.card > .lg-panel__body {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	min-width: 0;
+}
+.friends__avatar {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	object-fit: cover;
+	flex: none;
+	background: var(--bg-2);
+}
+.friends__meta {
 	display: grid;
 	gap: 0.2rem;
+	min-width: 0;
 }
 .friends a b {
 	font-size: 1rem;
@@ -1633,19 +1666,56 @@ lg-panel.e404 {
 	color: var(--text-2);
 }
 
-@keyframes content-in {
-	from {
-		opacity: 0;
-		transform: translateY(8px);
-	}
-	to {
+/* Entrance matches QxBlog: 14px rise, opacity 0.5s / move 0.62s, stagger 55ms.
+   The class is added in script so a failed script still shows the page.
+   Motion is on the body, never the panel, so the glass filter stays put. */
+.qx-in {
+	opacity: 0;
+	transform: translate3d(0, 14px, 0);
+	transition:
+		opacity 0.5s cubic-bezier(0.22, 0.61, 0.36, 1) var(--d, 0ms),
+		transform 0.62s cubic-bezier(0.22, 0.61, 0.36, 1) var(--d, 0ms);
+}
+.qx-in.is-in {
+	opacity: 1;
+	transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+	.qx-in {
 		opacity: 1;
 		transform: none;
+		transition: none;
+	}
+	.veil {
+		display: none;
 	}
 }
-.reveal > .lg-panel__body {
-	animation: content-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-	animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+
+/* Page curtain. Same curves as QxBlog: cover 0.28s, leave upward 0.42s. */
+.veil {
+	position: fixed;
+	inset: 0;
+	z-index: 80;
+	background: var(--bg);
+	pointer-events: none;
+	transform: translate3d(0, 100%, 0);
+	transition: transform 0.38s cubic-bezier(0.85, 0, 0.15, 1);
+}
+.veil.is-boot,
+.veil.is-active {
+	transform: none;
+	pointer-events: auto;
+}
+.veil.is-active {
+	transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.veil.is-out {
+	pointer-events: none;
+	transform: translate3d(0, -100%, 0);
+	transition: transform 0.42s cubic-bezier(0.85, 0, 0.15, 1);
+}
+html.veil-on {
+	overflow: hidden;
 }
 
 /* ---------- back to top ---------- */

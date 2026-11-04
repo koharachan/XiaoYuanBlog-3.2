@@ -228,10 +228,7 @@ const prefetch = (cb: () => void) => {
 	if ("requestIdleCallback" in window) {
 		(
 			window as Window & {
-				requestIdleCallback: (
-					cb: () => void,
-					o?: { timeout: number },
-				) => void;
+				requestIdleCallback: (cb: () => void, o?: { timeout: number }) => void;
 			}
 		).requestIdleCallback(cb, { timeout: 1200 });
 	} else setTimeout(cb, 400);
@@ -264,6 +261,7 @@ function openSearch() {
 		input?.focus();
 		return;
 	}
+	dialog.classList.remove("is-closing");
 	lockPage();
 	if (typeof dialog.showModal === "function") dialog.showModal();
 	else dialog.setAttribute("open", "");
@@ -272,11 +270,29 @@ function openSearch() {
 		if (input?.value) render(input.value);
 	});
 }
-function closeSearch() {
+function finishClose() {
 	if (!dialog) return;
+	dialog.classList.remove("is-closing");
 	if (dialog.open && typeof dialog.close === "function") dialog.close();
 	else dialog.removeAttribute("open");
-	unlockPage();
+}
+function closeSearch() {
+	if (!dialog?.open) return;
+	if (reduceMotion) {
+		finishClose();
+		return;
+	}
+	if (dialog.classList.contains("is-closing")) return;
+	dialog.classList.add("is-closing");
+	let done = false;
+	const end = (event?: Event) => {
+		if (event && event.target !== dialog) return;
+		if (done) return;
+		done = true;
+		finishClose();
+	};
+	dialog.addEventListener("animationend", end, { once: true });
+	setTimeout(end, 520);
 }
 $$("[data-open-search]").forEach((b) =>
 	b.addEventListener("click", openSearch),
@@ -628,3 +644,141 @@ function thirdParty() {
 }
 if (document.readyState === "complete") idle(thirdParty);
 else addEventListener("load", () => idle(thirdParty), { once: true });
+
+/* ---------- entrance: in-view rise, same curve as QxBlog ---------- */
+if (!reduceMotion && "IntersectionObserver" in window) {
+	const hosts = $$(".reveal");
+	const nodes: HTMLElement[] = [];
+	for (const host of hosts) {
+		const body = host.matches("lg-panel")
+			? host.querySelector<HTMLElement>(".lg-panel__body")
+			: null;
+		const el = body ?? host;
+		const parent = host.parentElement;
+		const index = parent ? [...parent.children].indexOf(host) : 0;
+		el.style.setProperty("--d", `${Math.max(0, Math.min(index, 8)) * 55}ms`);
+		el.classList.add("qx-in");
+		nodes.push(el);
+	}
+	const io = new IntersectionObserver(
+		(entries) => {
+			for (const en of entries) {
+				if (!en.isIntersecting) continue;
+				en.target.classList.add("is-in");
+				io.unobserve(en.target);
+			}
+		},
+		{ rootMargin: "0px 0px -10% 0px", threshold: 0.02 },
+	);
+	for (const el of nodes) io.observe(el);
+}
+
+/* ---------- page curtain: cover from below, leave upward ---------- */
+const veil = document.querySelector<HTMLElement>(".veil");
+if (veil && !reduceMotion) {
+	const ENTER_MS = 220;
+	const EXIT_MS = 480;
+	const MEMO = "xy-nav";
+	let busy = false;
+	const lock = (on: boolean) =>
+		document.documentElement.classList.toggle("veil-on", on);
+	const lift = () => {
+		veil.classList.add("is-out");
+		let done = false;
+		const finish = () => {
+			if (done) return;
+			done = true;
+			veil.classList.remove("is-boot", "is-active", "is-out");
+			veil.style.display = "none";
+			lock(false);
+			busy = false;
+		};
+		veil.addEventListener(
+			"transitionend",
+			(event) => {
+				if (event.target === veil && event.propertyName === "transform")
+					finish();
+			},
+			{ once: true },
+		);
+		setTimeout(finish, EXIT_MS + 80);
+	};
+	let entering = false;
+	try {
+		entering = sessionStorage.getItem(MEMO) === "1";
+		if (entering) sessionStorage.removeItem(MEMO);
+	} catch {
+		entering = false;
+	}
+	if (entering) {
+		busy = true;
+		lock(true);
+		veil.style.display = "";
+		veil.style.transition = "none";
+		veil.classList.remove("is-boot", "is-out");
+		veil.classList.add("is-active");
+		void veil.offsetWidth;
+		veil.style.transition = "";
+		requestAnimationFrame(() => lift());
+	} else {
+		busy = true;
+		lock(true);
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => lift());
+		});
+	}
+	document.addEventListener("click", (event) => {
+		if (busy || event.defaultPrevented || event.button !== 0) return;
+		if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
+			return;
+		const anchor = (event.target as Element | null)?.closest?.("a[href]");
+		if (!(anchor instanceof HTMLAnchorElement)) return;
+		if (anchor.hasAttribute("download")) return;
+		const targetAttr = anchor.getAttribute("target");
+		if (targetAttr && targetAttr !== "_self") return;
+		const href = anchor.getAttribute("href");
+		if (
+			!href ||
+			href.startsWith("#") ||
+			href.startsWith("mailto:") ||
+			href.startsWith("tel:")
+		)
+			return;
+		let url: URL;
+		try {
+			url = new URL(anchor.href, location.href);
+		} catch {
+			return;
+		}
+		if (url.origin !== location.origin) return;
+		if (url.pathname === location.pathname && url.search === location.search)
+			return;
+		busy = true;
+		event.preventDefault();
+		lock(true);
+		veil.style.display = "";
+		veil.style.transition = "none";
+		veil.classList.remove("is-out", "is-boot");
+		void veil.offsetWidth;
+		veil.style.transition = "";
+		veil.classList.add("is-active");
+		setTimeout(() => {
+			try {
+				sessionStorage.setItem(MEMO, "1");
+			} catch {
+				/* private mode */
+			}
+			location.assign(anchor.href);
+		}, ENTER_MS);
+		setTimeout(() => {
+			if (busy && document.visibilityState === "visible") {
+				veil.classList.remove("is-active", "is-out", "is-boot");
+				veil.style.display = "none";
+				lock(false);
+				busy = false;
+			}
+		}, 6000);
+	});
+} else {
+	veil?.remove();
+}
