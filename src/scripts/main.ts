@@ -66,8 +66,96 @@ document.addEventListener("keydown", (e) => {
 	if (e.key === "Escape") {
 		closeMenus();
 		drawer?.setAttribute("data-open", "false");
+		burger?.setAttribute("aria-expanded", "false");
 	}
 });
+
+/* ---------- liquid glass: pointer light + press ---------- */
+const GLARE = ".glass, .card, .dialog__box, .totop, .ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a, .dialog__res a";
+const SQUISH = ".post-card, .intro, .ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a, .totop, .friends a, .adjacent a, .pay-grid .card, .dialog__res a";
+let lit: HTMLElement[] = [];
+let down: HTMLElement[] = [];
+let squish: HTMLElement | null = null;
+let glareFrame = 0;
+let pendingSpots: { el: HTMLElement; x: number; y: number }[] | null = null;
+let pendingTouch = false;
+
+function glareUnder(e: Event) {
+	const found: HTMLElement[] = [];
+	for (const node of e.composedPath()) {
+		if (node instanceof HTMLElement && node.matches(GLARE)) found.push(node);
+	}
+	return found;
+}
+function place(el: HTMLElement, x: number, y: number) {
+	el.style.setProperty("--x", `${x}px`);
+	el.style.setProperty("--y", `${y}px`);
+}
+function spotsFor(els: HTMLElement[], e: PointerEvent) {
+	return els.map((el) => {
+		const rect = el.getBoundingClientRect();
+		return { el, x: e.clientX - rect.left, y: e.clientY - rect.top };
+	});
+}
+function clearLit(keep: HTMLElement[]) {
+	for (const el of lit) {
+		if (!keep.includes(el)) el.classList.remove("is-lit");
+	}
+	lit = keep;
+}
+function applyPending() {
+	const spots = pendingSpots;
+	pendingSpots = null;
+	if (!spots) return;
+	if (pendingTouch) {
+		for (const s of spots) place(s.el, s.x, s.y);
+		return;
+	}
+	clearLit(spots.map((s) => s.el));
+	for (const s of spots) {
+		s.el.classList.add("is-lit");
+		place(s.el, s.x, s.y);
+	}
+}
+function releaseGlare(e: PointerEvent) {
+	squish?.classList.remove("is-pressed");
+	squish = null;
+	for (const el of down) el.classList.remove("is-down");
+	if (e.pointerType !== "mouse") clearLit([]);
+	down = [];
+}
+document.addEventListener(
+	"pointermove",
+	(e) => {
+		// composedPath() is empty once the event finishes, so capture targets now.
+		const stack = e.pointerType === "touch" ? down : glareUnder(e);
+		pendingTouch = e.pointerType === "touch";
+		pendingSpots = spotsFor(stack, e);
+		if (glareFrame) return;
+		glareFrame = requestAnimationFrame(() => {
+			glareFrame = 0;
+			applyPending();
+		});
+	},
+	{ passive: true },
+);
+document.addEventListener("pointerdown", (e) => {
+	const stack = glareUnder(e);
+	for (const s of spotsFor(stack, e)) {
+		s.el.classList.add("is-lit", "is-down");
+		place(s.el, s.x, s.y);
+	}
+	if (e.pointerType !== "mouse") lit = stack;
+	down = stack;
+	const target = e.target;
+	const hit = target instanceof Element ? target.closest<HTMLElement>(SQUISH) : null;
+	if (hit) {
+		hit.classList.add("is-pressed");
+		squish = hit;
+	}
+});
+document.addEventListener("pointerup", releaseGlare);
+document.addEventListener("pointercancel", releaseGlare);
 
 /* ---------- search ---------- */
 interface Doc {

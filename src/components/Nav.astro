@@ -7,7 +7,7 @@ const isCurrent = (url: string) => (url === "/" ? path === "/" || /^\/\d+\/$/.te
 const iePath = `/ie${path}`;
 ---
 <header class="nav">
-	<div class="wrap nav__in">
+	<div class="nav__in glass">
 		<a class="brand" href="/" aria-label={`${site.title} 首页`}>
 			<span>{site.title}</span>
 			<small>{site.tagline}</small>
@@ -20,16 +20,16 @@ const iePath = `/ie${path}`;
 		<button class="ibtn" type="button" data-open-search aria-label="搜索（快捷键 /）" title="搜索  /"><Icon name="search" /></button>
 		<div class="menu" data-menu data-open="false">
 			<button class="ibtn" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="切换主题" title="主题"><Icon name="palette" /></button>
-			<div class="menu__panel" role="menu">
-				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="neon"><span class="menu__sw menu__sw--neon"></span>夜间</button>
-				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="cloud"><span class="menu__sw menu__sw--cloud"></span>日间</button>
-				<a class="menu__item" role="menuitem" href={iePath}><span class="menu__sw menu__sw--ie"></span>经典 · IE 兼容</a>
+			<div class="menu__panel glass" role="menu">
+				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="neon">夜间</button>
+				<button class="menu__item" role="menuitemradio" aria-checked="false" type="button" data-set-theme="cloud">日间</button>
+				<a class="menu__item" role="menuitem" href={iePath}>经典版</a>
 			</div>
 		</div>
 		<button id="burger" class="ibtn burger" type="button" aria-label="菜单" aria-expanded="false" aria-controls="drawer"><Icon name="menu" /></button>
 	</div>
 </header>
-<nav id="drawer" class="drawer" data-open="false" aria-label="移动端导航">
+<nav id="drawer" class="drawer glass" data-open="false" aria-label="移动端导航">
 	{nav.map((l) => (
 		<a href={l.url} aria-current={isCurrent(l.url) ? "page" : undefined}>{l.name}</a>
 	))}
