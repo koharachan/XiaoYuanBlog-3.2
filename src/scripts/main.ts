@@ -7,8 +7,14 @@ import "../vendor/liquid-glass/components.js";
 
 type Theme = "neon" | "cloud";
 const html = document.documentElement;
-const $ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => root.querySelector<T>(sel);
-const $$ = <T extends Element = HTMLElement>(sel: string, root: ParentNode = document) => [...root.querySelectorAll<T>(sel)];
+const $ = <T extends Element = HTMLElement>(
+	sel: string,
+	root: ParentNode = document,
+) => root.querySelector<T>(sel);
+const $$ = <T extends Element = HTMLElement>(
+	sel: string,
+	root: ParentNode = document,
+) => [...root.querySelectorAll<T>(sel)];
 
 /* ---------- theme ---------- */
 function currentTheme(): Theme {
@@ -19,8 +25,16 @@ function setTheme(t: Theme) {
 	try {
 		localStorage.setItem("theme", t);
 	} catch {}
-	$$("[data-set-theme]").forEach((b) => b.setAttribute("aria-checked", String(b.getAttribute("data-set-theme") === t)));
-	$("meta[name=theme-color]")?.setAttribute("content", t === "cloud" ? "#f3ece3" : "#121820");
+	$$("[data-set-theme]").forEach((b) =>
+		b.setAttribute(
+			"aria-checked",
+			String(b.getAttribute("data-set-theme") === t),
+		),
+	);
+	$("meta[name=theme-color]")?.setAttribute(
+		"content",
+		t === "cloud" ? "#f3ece3" : "#121820",
+	);
 	syncGiscusTheme();
 }
 $$("[data-set-theme]").forEach((b) =>
@@ -29,7 +43,12 @@ $$("[data-set-theme]").forEach((b) =>
 		closeMenus();
 	}),
 );
-$$("[data-set-theme]").forEach((b) => b.setAttribute("aria-checked", String(b.getAttribute("data-set-theme") === currentTheme())));
+$$("[data-set-theme]").forEach((b) =>
+	b.setAttribute(
+		"aria-checked",
+		String(b.getAttribute("data-set-theme") === currentTheme()),
+	),
+);
 
 /* ---------- menus / drawer ---------- */
 function closeMenus(except?: Element | null) {
@@ -66,16 +85,21 @@ document.addEventListener("click", (e) => {
 	}
 });
 document.addEventListener("keydown", (e) => {
-	if (e.key === "Escape") {
-		closeMenus();
-		drawer?.setAttribute("data-open", "false");
-		burger?.setAttribute("aria-expanded", "false");
+	if (e.key !== "Escape") return;
+	if (dialog?.open) {
+		e.preventDefault();
+		closeSearch();
+		return;
 	}
+	closeMenus();
+	drawer?.setAttribute("data-open", "false");
+	burger?.setAttribute("aria-expanded", "false");
 });
 
 /* ---------- liquid glass: pointer light on the lens, press on small controls ---------- */
-const GLARE = "lg-panel";
-const SQUISH = ".ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a";
+const GLARE = "lg-panel.card--glow";
+const SQUISH =
+	".ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a, lg-panel.card--glow";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let lit: HTMLElement[] = [];
 let down: HTMLElement[] = [];
@@ -132,9 +156,11 @@ if (!reduceMotion) {
 	document.addEventListener(
 		"pointermove",
 		(e) => {
+			// Touch drags are scrolls. Measuring cards here forced layout mid-fling.
+			if (e.pointerType === "touch") return;
 			// composedPath() is empty once the event finishes, so capture targets now.
-			const stack = e.pointerType === "touch" ? down : glareUnder(e);
-			pendingTouch = e.pointerType === "touch";
+			const stack = glareUnder(e);
+			pendingTouch = false;
 			pendingSpots = spotsFor(stack, e);
 			if (glareFrame) return;
 			glareFrame = requestAnimationFrame(() => {
@@ -153,7 +179,8 @@ if (!reduceMotion) {
 		if (e.pointerType !== "mouse") lit = stack;
 		down = stack;
 		const target = e.target;
-		const hit = target instanceof Element ? target.closest<HTMLElement>(SQUISH) : null;
+		const hit =
+			target instanceof Element ? target.closest<HTMLElement>(SQUISH) : null;
 		if (hit) {
 			hit.classList.add("is-pressed");
 			squish = hit;
@@ -162,20 +189,6 @@ if (!reduceMotion) {
 	document.addEventListener("pointerup", releaseGlare);
 	document.addEventListener("pointercancel", releaseGlare);
 }
-
-/* The cloned wallpaper follows a viewport resize that swaps the responsive background. */
-const wallpaper = document.querySelector<HTMLElement>(".bg__photo");
-function syncGlassWallpaper() {
-	if (!wallpaper) return;
-	const cs = getComputedStyle(wallpaper);
-	for (const copy of document.querySelectorAll<HTMLElement>(".lg-surface__copy")) {
-		copy.style.backgroundImage = cs.backgroundImage;
-		copy.style.backgroundSize = cs.backgroundSize;
-		copy.style.backgroundPosition = cs.backgroundPosition;
-		copy.style.backgroundRepeat = cs.backgroundRepeat;
-	}
-}
-addEventListener("resize", syncGlassWallpaper, { passive: true });
 
 /* ---------- search ---------- */
 interface Doc {
@@ -191,48 +204,120 @@ const dialog = $<HTMLDialogElement>("#search");
 const input = $<HTMLInputElement>("#search-input");
 const results = $("#search-results");
 let docs: Doc[] | null = null;
+let docsPromise: Promise<void> | null = null;
 let sel = -1;
 
-function openSearch() {
-	if (!dialog) return;
-	if (typeof dialog.showModal === "function") dialog.showModal();
-	else dialog.setAttribute("open", "");
-	input?.focus();
-	if (!docs) {
-		fetch("/search.json")
+function loadDocs() {
+	if (docs) return Promise.resolve();
+	if (!docsPromise) {
+		docsPromise = fetch("/search.json")
 			.then((r) => r.json())
 			.then((j: Doc[]) => {
 				docs = j;
-				if (input?.value) render(input.value);
 			})
 			.catch(() => {
-				if (results) results.innerHTML = '<div class="empty">索引加载失败，请刷新重试。</div>';
+				docsPromise = null;
+				if (results)
+					results.innerHTML =
+						'<div class="empty">索引加载失败，请刷新重试。</div>';
 			});
 	}
+	return docsPromise;
+}
+const prefetch = (cb: () => void) => {
+	if ("requestIdleCallback" in window) {
+		(
+			window as Window & {
+				requestIdleCallback: (
+					cb: () => void,
+					o?: { timeout: number },
+				) => void;
+			}
+		).requestIdleCallback(cb, { timeout: 1200 });
+	} else setTimeout(cb, 400);
+};
+prefetch(() => {
+	loadDocs();
+});
+
+let lockedY = 0;
+function lockPage() {
+	lockedY = scrollY;
+	document.documentElement.classList.add("search-open");
+	document.body.style.position = "fixed";
+	document.body.style.top = `-${lockedY}px`;
+	document.body.style.left = "0";
+	document.body.style.right = "0";
+	document.body.style.width = "100%";
+}
+function unlockPage() {
+	document.documentElement.classList.remove("search-open");
+	document.body.style.position = "";
+	document.body.style.top = "";
+	document.body.style.left = "";
+	document.body.style.right = "";
+	document.body.style.width = "";
+	scrollTo({ top: lockedY, behavior: "auto" });
+}
+function openSearch() {
+	if (!dialog || dialog.open) {
+		input?.focus();
+		return;
+	}
+	lockPage();
+	if (typeof dialog.showModal === "function") dialog.showModal();
+	else dialog.setAttribute("open", "");
+	input?.focus();
+	loadDocs().then(() => {
+		if (input?.value) render(input.value);
+	});
 }
 function closeSearch() {
 	if (!dialog) return;
 	if (dialog.open && typeof dialog.close === "function") dialog.close();
 	else dialog.removeAttribute("open");
+	unlockPage();
 }
-$$("[data-open-search]").forEach((b) => b.addEventListener("click", openSearch));
+$$("[data-open-search]").forEach((b) =>
+	b.addEventListener("click", openSearch),
+);
+$$("[data-search-close]").forEach((b) =>
+	b.addEventListener("click", closeSearch),
+);
 dialog?.addEventListener("click", (e) => {
 	if (e.target === dialog) closeSearch();
 });
+dialog?.addEventListener("close", () => {
+	if (document.body.style.position === "fixed") unlockPage();
+});
 document.addEventListener("keydown", (e) => {
 	const tag = (e.target as HTMLElement).tagName;
-	const typing = tag === "INPUT" || tag === "TEXTAREA" || (e.target as HTMLElement).isContentEditable;
-	if ((e.key === "k" && (e.ctrlKey || e.metaKey)) || (e.key === "/" && !typing)) {
+	const typing =
+		tag === "INPUT" ||
+		tag === "TEXTAREA" ||
+		(e.target as HTMLElement).isContentEditable;
+	if (
+		(e.key === "k" && (e.ctrlKey || e.metaKey)) ||
+		(e.key === "/" && !typing)
+	) {
 		e.preventDefault();
 		openSearch();
 	}
 });
-const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] as string);
+const esc = (s: string) =>
+	s.replace(
+		/[&<>"]/g,
+		(c) =>
+			({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] as string,
+	);
 function hl(text: string, terms: string[]) {
 	let out = esc(text);
 	for (const t of terms) {
 		if (!t) continue;
-		out = out.replace(new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"), (m) => `<mark>${m}</mark>`);
+		out = out.replace(
+			new RegExp(t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi"),
+			(m) => `<mark>${m}</mark>`,
+		);
 	}
 	return out;
 }
@@ -266,12 +351,15 @@ function render(q: string) {
 		results.innerHTML = '<div class="empty">没有找到相关文章。</div>';
 		return;
 	}
-	results.innerHTML = scored
-		.map(
-			({ d }) =>
-				`<a href="${d.u}"><b>${hl(d.t, terms)}</b><span>${hl(d.d || snippet(d.b, terms), terms)}</span><small>${d.p} · ${esc(d.c)}${d.g.length ? ` · ${esc(d.g.join(" / "))}` : ""}</small></a>`,
-		)
-		.join("");
+	const frag = document.createDocumentFragment();
+	scored.forEach(({ d }, i) => {
+		const a = document.createElement("a");
+		a.href = d.u;
+		a.style.setProperty("--i", String(Math.min(i, 12)));
+		a.innerHTML = `<b>${hl(d.t, terms)}</b><span>${hl(d.d || snippet(d.b, terms), terms)}</span><small>${d.p} · ${esc(d.c)}${d.g.length ? ` · ${esc(d.g.join(" / "))}` : ""}</small>`;
+		frag.appendChild(a);
+	});
+	results.replaceChildren(frag);
 }
 function snippet(body: string, terms: string[]) {
 	const i = Math.max(0, body.toLowerCase().indexOf(terms[0]) - 30);
@@ -279,11 +367,17 @@ function snippet(body: string, terms: string[]) {
 }
 input?.addEventListener("input", () => render(input.value));
 input?.addEventListener("keydown", (e) => {
+	if (e.key === "Escape") {
+		e.preventDefault();
+		closeSearch();
+		return;
+	}
 	const items = $$("a", results ?? document);
 	if (!items.length) return;
 	if (e.key === "ArrowDown" || e.key === "ArrowUp") {
 		e.preventDefault();
-		sel = (sel + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+		sel =
+			(sel + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
 		items.forEach((a, i) => a.setAttribute("aria-selected", String(i === sel)));
 		items[sel].scrollIntoView({ block: "nearest" });
 	} else if (e.key === "Enter" && sel >= 0) {
@@ -292,8 +386,10 @@ input?.addEventListener("keydown", (e) => {
 });
 
 /* ---------- code copy ---------- */
-const copyIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
-const okIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>';
+const copyIcon =
+	'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>';
+const okIcon =
+	'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12l5 5L20 7"/></svg>';
 $$("pre.astro-code").forEach((pre) => {
 	const btn = document.createElement("button");
 	btn.className = "copy-btn";
@@ -309,7 +405,9 @@ $$("pre.astro-code").forEach((pre) => {
 			ta.value = code;
 			document.body.appendChild(ta);
 			ta.select();
-			const legacyCopy = (document as unknown as { execCommand?: (command: string) => boolean }).execCommand;
+			const legacyCopy = (
+				document as unknown as { execCommand?: (command: string) => boolean }
+			).execCommand;
 			legacyCopy?.call(document, "copy");
 			ta.remove();
 		}
@@ -322,12 +420,15 @@ $$("pre.astro-code").forEach((pre) => {
 	});
 	pre.appendChild(btn);
 	const lang = pre.getAttribute("data-language");
-	if (lang && lang !== "plaintext" && lang !== "text") pre.setAttribute("data-lang", lang);
+	if (lang && lang !== "plaintext" && lang !== "text")
+		pre.setAttribute("data-lang", lang);
 });
 
 /* ---------- lightbox ---------- */
 document.addEventListener("click", (e) => {
-	const img = (e.target as Element).closest<HTMLImageElement>(".prose img, .article__cover img");
+	const img = (e.target as Element).closest<HTMLImageElement>(
+		".prose img, .article__cover img",
+	);
 	if (!img || (e.target as Element).closest("a")) return;
 	const box = document.createElement("div");
 	box.className = "lightbox";
@@ -363,7 +464,13 @@ if (tocLinks.length && "IntersectionObserver" in window) {
 			tocLinks.forEach((a) => a.classList.remove("active"));
 			map.get(current)?.forEach((a) => {
 				a.classList.add("active");
-				a.scrollIntoView({ block: "nearest" });
+				const scroller = a.closest<HTMLElement>(".side--sticky");
+				if (!scroller) return;
+				const link = a.getBoundingClientRect();
+				const box = scroller.getBoundingClientRect();
+				if (link.top < box.top) scroller.scrollTop += link.top - box.top;
+				else if (link.bottom > box.bottom)
+					scroller.scrollTop += link.bottom - box.bottom;
 			});
 		},
 		{ rootMargin: "-10% 0px -75% 0px", threshold: 0 },
@@ -377,7 +484,8 @@ if (totop) {
 	const onScroll = () => totop.classList.toggle("on", scrollY > 600);
 	addEventListener("scroll", onScroll, { passive: true });
 	onScroll();
-	const goTop = () => scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+	const goTop = () =>
+		scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
 	totop.addEventListener("click", goTop);
 	totop.addEventListener("keydown", (e) => {
 		if (e.key === "Enter" || e.key === " ") {
@@ -412,7 +520,10 @@ function giscusTheme() {
 }
 function syncGiscusTheme() {
 	const frame = $<HTMLIFrameElement>("iframe.giscus-frame");
-	frame?.contentWindow?.postMessage({ giscus: { setConfig: { theme: giscusTheme() } } }, "https://giscus.app");
+	frame?.contentWindow?.postMessage(
+		{ giscus: { setConfig: { theme: giscusTheme() } } },
+		"https://giscus.app",
+	);
 }
 function loadGiscus() {
 	if (!comments || comments.dataset.loaded) return;
@@ -457,11 +568,23 @@ if (comments) {
 /* ---------- analytics / ads: after load, when idle ---------- */
 const idle = (cb: () => void, timeout = 4000) =>
 	"requestIdleCallback" in window
-		? (window as Window & { requestIdleCallback: (cb: () => void, o?: { timeout: number }) => void }).requestIdleCallback(cb, { timeout })
+		? (
+				window as Window & {
+					requestIdleCallback: (
+						cb: () => void,
+						o?: { timeout: number },
+					) => void;
+				}
+			).requestIdleCallback(cb, { timeout })
 		: setTimeout(cb, Math.min(timeout, 1500));
 
 function thirdParty() {
-	const cfg = (window as unknown as { __xy?: { ga?: string; clarity?: string; adsense?: string } }).__xy || {};
+	const cfg =
+		(
+			window as unknown as {
+				__xy?: { ga?: string; clarity?: string; adsense?: string };
+			}
+		).__xy || {};
 	if (cfg.ga) {
 		const s = document.createElement("script");
 		s.src = `https://www.googletagmanager.com/gtag/js?id=${cfg.ga}`;
@@ -478,7 +601,8 @@ function thirdParty() {
 		w.clarity =
 			w.clarity ||
 			function (this: unknown, ...args: unknown[]) {
-				((w.clarity as { q: unknown[] }).q = (w.clarity as { q: unknown[] }).q || []).push(args);
+				((w.clarity as { q: unknown[] }).q =
+					(w.clarity as { q: unknown[] }).q || []).push(args);
 			};
 		const s = document.createElement("script");
 		s.src = `https://www.clarity.ms/tag/${cfg.clarity}`;
@@ -497,7 +621,8 @@ function thirdParty() {
 			s.crossOrigin = "anonymous";
 			document.head.appendChild(s);
 		};
-		for (const ev of ["scroll", "pointerdown", "keydown", "touchstart"]) addEventListener(ev, loadAds, { once: true, passive: true });
+		for (const ev of ["scroll", "pointerdown", "keydown", "touchstart"])
+			addEventListener(ev, loadAds, { once: true, passive: true });
 		setTimeout(loadAds, 8000);
 	}
 }

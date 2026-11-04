@@ -12,7 +12,7 @@ const { term, posts } = Astro.props as { term: string; posts: Post[] };
 ---
 <Base title={`标签：${term}`} description={`标签「${term}」下的 ${posts.length} 篇文章。`}>
 	<div class="layout">
-		<Glass class="card reveal" variant="reading">
+		<Glass quiet class="card reveal" variant="reading">
 			<div class="page-head">
 				<h1>#{term}</h1>
 				<p>{posts.length} 篇文章 · <a href="/archive/">查看全部</a></p>

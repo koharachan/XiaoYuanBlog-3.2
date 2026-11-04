@@ -22,7 +22,7 @@ const isFirst = page.currentPage === 1;
 ---
 <Base title={isFirst ? undefined : `第 ${page.currentPage} 页`} iePath={isFirst ? "/ie/" : `/ie/${page.currentPage}/`}>
 	{isFirst && (
-		<Glass class="card intro" variant="reading">
+		<Glass quiet class="card intro" variant="reading">
 			<h1>{site.title}</h1>
 			<p class="intro__tag">{site.tagline}</p>
 			<p>{site.description}</p>

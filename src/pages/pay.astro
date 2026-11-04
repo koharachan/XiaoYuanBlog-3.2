@@ -6,14 +6,14 @@ import Base from "@/layouts/Base.astro";
 ---
 <Base title={sponsor.title} description={sponsor.description}>
 	<div class="layout layout--wide">
-		<Glass class="card article__body reveal" variant="reading">
+		<Glass quiet class="card article__body reveal" variant="reading">
 			<div class="page-head">
 				<h1><Icon name="heart" class="inline" size={28} /> {sponsor.title}</h1>
 				<p>{sponsor.description}</p>
 			</div>
 			<div class="pay-grid">
 				{sponsor.methods.map((m, i) => (
-					<Glass class="card reveal" style={`--i:${i}`}>
+					<Glass quiet class="card reveal" style={`--i:${i}`}>
 						{m.qr && <img src={m.qr} alt={`${m.name} 收款码`} width="300" height="300" loading="lazy" decoding="async" />}
 						<h3>{m.name}</h3>
 						{m.wallet && <code>{m.wallet}</code>}
