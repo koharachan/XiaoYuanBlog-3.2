@@ -12,7 +12,7 @@ const { Content } = await render(entry);
 		<h3 class="t">友情链接</h3>
 		<div class="ifriends clear">
 			{friends.map((f) => (
-				<a href={f.url} target="_blank"><b>{f.name}</b><small>{f.desc}</small></a>
+				<a href={f.url} target="_blank" rel="noopener">{f.avatar && <img src={f.avatar} alt="" width="36" height="36" />} <b>{f.name}</b><small>{f.desc}</small></a>
 			))}
 		</div>
 		<div class="iprose"><Content /></div>

@@ -51,9 +51,20 @@ export const footerLinks = [
 ];
 
 /** 友链页展示的朋友们 */
-export const friends = [
+export const friends: {
+	name: string;
+	url: string;
+	desc: string;
+	avatar?: string;
+}[] = [
 	{ name: "jinao的小窝", url: "https://cn.jinao.wang/", desc: "cn.jinao.wang" },
 	{ name: "洛嗷呜の小站", url: "https://luoaowoo.cn/", desc: "luoaowoo.cn" },
+	{
+		name: "QxBlog",
+		url: "https://blog.qxbit.me/",
+		desc: "关于代码、生活与沿途的思考。",
+		avatar: "https://blog.qxbit.me/img/Avatar.png",
+	},
 ];
 
 /** 评论：giscus（基于 GitHub Discussions） */

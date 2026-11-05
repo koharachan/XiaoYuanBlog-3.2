@@ -71,18 +71,22 @@ $$("[data-menu]").forEach((m) => {
 });
 const drawer = $("#drawer");
 const burger = $("#burger");
+function setDrawer(open: boolean) {
+	if (!drawer) return;
+	const next = open ? "true" : "false";
+	if (drawer.getAttribute("data-open") === next) return;
+	drawer.setAttribute("data-open", next);
+	burger?.setAttribute("aria-expanded", next);
+	drawer.classList.add("is-moving");
+	setTimeout(() => drawer.classList.remove("is-moving"), 180);
+}
 burger?.addEventListener("click", (e) => {
 	e.stopPropagation();
-	const open = drawer?.getAttribute("data-open") === "true";
-	drawer?.setAttribute("data-open", String(!open));
-	burger.setAttribute("aria-expanded", String(!open));
+	setDrawer(drawer?.getAttribute("data-open") !== "true");
 });
 document.addEventListener("click", (e) => {
 	if (!(e.target as Element).closest("[data-menu]")) closeMenus();
-	if (!(e.target as Element).closest("#drawer, #burger")) {
-		drawer?.setAttribute("data-open", "false");
-		burger?.setAttribute("aria-expanded", "false");
-	}
+	if (!(e.target as Element).closest("#drawer, #burger")) setDrawer(false);
 });
 document.addEventListener("keydown", (e) => {
 	if (e.key !== "Escape") return;
@@ -92,8 +96,7 @@ document.addEventListener("keydown", (e) => {
 		return;
 	}
 	closeMenus();
-	drawer?.setAttribute("data-open", "false");
-	burger?.setAttribute("aria-expanded", "false");
+	setDrawer(false);
 });
 
 /* ---------- liquid glass: pointer light on the lens, press on small controls ---------- */
@@ -259,24 +262,59 @@ function unlockPage() {
 	document.body.style.width = "";
 	scrollTo({ top: lockedY, behavior: "auto" });
 }
+function markSearchShown() {
+	dialog?.classList.add("is-shown");
+}
 function openSearch() {
 	if (!dialog || dialog.open) {
 		input?.focus();
 		return;
 	}
+	dialog.classList.remove("is-closing", "is-shown");
 	lockPage();
 	if (typeof dialog.showModal === "function") dialog.showModal();
 	else dialog.setAttribute("open", "");
 	input?.focus();
+	if (reduceMotion) markSearchShown();
+	else {
+		const panel = $(".search__panel", dialog);
+		const done = (event?: Event) => {
+			if (event && event.target !== panel) return;
+			if (dialog.classList.contains("is-closing")) return;
+			markSearchShown();
+		};
+		panel?.addEventListener("animationend", done, { once: true });
+		setTimeout(done, 200);
+	}
 	loadDocs().then(() => {
 		if (input?.value) render(input.value);
 	});
 }
-function closeSearch() {
+function finishClose() {
 	if (!dialog) return;
+	dialog.classList.remove("is-closing", "is-shown");
 	if (dialog.open && typeof dialog.close === "function") dialog.close();
 	else dialog.removeAttribute("open");
 	unlockPage();
+}
+function closeSearch() {
+	if (!dialog?.open) return;
+	if (reduceMotion || dialog.classList.contains("is-closing")) {
+		if (!dialog.classList.contains("is-closing")) finishClose();
+		return;
+	}
+	dialog.classList.remove("is-shown");
+	dialog.classList.add("is-closing");
+	const panel = $(".search__panel", dialog);
+	let done = false;
+	const end = (event?: Event) => {
+		if (event && event.target !== panel) return;
+		if (done) return;
+		done = true;
+		finishClose();
+	};
+	panel?.addEventListener("animationend", end, { once: true });
+	setTimeout(end, 200);
 }
 $$("[data-open-search]").forEach((b) =>
 	b.addEventListener("click", openSearch),

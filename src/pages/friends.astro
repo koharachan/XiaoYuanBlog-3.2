@@ -19,8 +19,11 @@ const { Content } = await render(entry);
 				{friends.map((f) => (
 					<a href={f.url} target="_blank" rel="noopener">
 						<Glass class="card card--glow">
-							<b>{f.name}</b>
-							<small>{f.desc}</small>
+							{f.avatar && <img class="friends__avatar" src={f.avatar} alt="" width="44" height="44" />}
+							<span class="friends__meta">
+								<b>{f.name}</b>
+								<small>{f.desc}</small>
+							</span>
 						</Glass>
 					</a>
 				))}
