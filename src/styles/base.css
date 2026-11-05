@@ -1421,18 +1421,33 @@ html.search-open {
 	overscroll-behavior: contain;
 	background: transparent;
 	padding: 0.2rem 0.55rem 0.7rem;
-	display: grid;
-	align-content: start;
-	gap: 0.35rem;
+	display: block;
 }
+/* Mobile Chrome sizes a grid item that contains -webkit-line-clamp to
+   min-height only, then paints the title over the next row. Keep every
+   result in normal block flow so the card grows with its text. */
 .search__results a {
-	display: grid;
-	gap: 0.12rem;
+	display: block;
+	position: static;
+	height: auto;
 	min-height: 44px;
+	margin: 0 0 0.45rem;
 	padding: 0.65rem 0.9rem;
 	border-radius: calc(var(--r) - 0.55rem);
 	color: var(--text);
 	background: rgba(255, 255, 255, 0.08);
+	transform: none;
+	animation: none;
+}
+.search__results a:last-child {
+	margin-bottom: 0;
+}
+.search__results b,
+.search__results small,
+.search__results a > span {
+	display: block;
+	position: static;
+	height: auto;
 }
 .search__results b {
 	font-weight: 700;
@@ -1442,11 +1457,9 @@ html.search-open {
 	background: rgb(255 255 255 / 0.78);
 }
 .search__results a > span {
-	display: -webkit-box;
-	-webkit-box-orient: vertical;
-	-webkit-line-clamp: 2;
-	line-clamp: 2;
+	margin-top: 0.12rem;
 	overflow: hidden;
+	max-height: 2.9em;
 	color: var(--text-2);
 	font-size: 0.88rem;
 	line-height: 1.45;
@@ -1464,6 +1477,8 @@ html.search-open {
 	color: var(--primary);
 }
 .search__results small {
+	display: block;
+	margin-top: 0.12rem;
 	color: var(--muted);
 	font-size: 0.8rem;
 	font-family: var(--mono);

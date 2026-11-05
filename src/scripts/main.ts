@@ -390,10 +390,9 @@ function render(q: string) {
 		return;
 	}
 	const frag = document.createDocumentFragment();
-	scored.forEach(({ d }, i) => {
+	scored.forEach(({ d }) => {
 		const a = document.createElement("a");
 		a.href = d.u;
-		a.style.setProperty("--i", String(Math.min(i, 12)));
 		a.innerHTML = `<b>${hl(d.t, terms)}</b><span>${hl(d.d || snippet(d.b, terms), terms)}</span><small>${d.p} · ${esc(d.c)}${d.g.length ? ` · ${esc(d.g.join(" / "))}` : ""}</small>`;
 		frag.appendChild(a);
 	});
