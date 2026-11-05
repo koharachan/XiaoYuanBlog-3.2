@@ -510,6 +510,13 @@ a:hover {
 	border-radius: 3px;
 	background: #fff;
 }
+.ifriends a img {
+	float: left;
+	width: 36px;
+	height: 36px;
+	margin: 2px 8px 0 0;
+	object-fit: cover;
+}
 .ifriends a small {
 	display: block;
 	color: #99a;

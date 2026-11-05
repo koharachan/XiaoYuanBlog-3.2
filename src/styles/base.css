@@ -654,7 +654,12 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 	opacity: 0;
 	visibility: hidden;
 	pointer-events: none;
-	transition: opacity 0.16s ease, visibility 0.16s;
+	transition: opacity 0.16s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.16s;
+}
+/* While the sheet is fading, drop the backdrop blur so the fade stays on the compositor. */
+.drawer.is-moving lg-panel.drawer__sheet .lg-surface__glass--material {
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
 }
 .drawer__sheet {
 	--r: 28px;
@@ -1335,7 +1340,21 @@ html.search-open {
 		inset 0 1px 0 rgba(255, 255, 255, 0.45),
 		inset 0 0 0 1px rgba(255, 255, 255, 0.16),
 		0 18px 50px rgba(0, 0, 0, 0.35);
-	animation: search-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.search[open] .search__panel {
+	animation: search-in 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+.search[open].is-shown .search__panel {
+	animation: none;
+	-webkit-backdrop-filter: blur(28px) saturate(1.8);
+	backdrop-filter: blur(28px) saturate(1.8);
+}
+.search[open].is-closing .search__panel {
+	animation: search-out 0.12s linear both;
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
 }
 [data-theme="cloud"] .search__panel {
 	background: rgb(255 250 244 / 0.98);
@@ -1343,11 +1362,17 @@ html.search-open {
 @keyframes search-in {
 	from {
 		opacity: 0;
-		transform: scale(0.96) translateY(8px);
 	}
 	to {
 		opacity: 1;
-		transform: none;
+	}
+}
+@keyframes search-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
 	}
 }
 .search__bar {
@@ -1408,8 +1433,6 @@ html.search-open {
 	border-radius: calc(var(--r) - 0.55rem);
 	color: var(--text);
 	background: rgba(255, 255, 255, 0.08);
-	animation: result-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-	animation-delay: calc(var(--i, 0) * 22ms);
 }
 .search__results b {
 	font-weight: 700;
@@ -1435,14 +1458,6 @@ html.search-open {
 [data-theme="cloud"] .search__results a:hover,
 [data-theme="cloud"] .search__results a[aria-selected="true"] {
 	background: rgb(255 255 255 / 0.94);
-}
-@keyframes result-in {
-	from {
-		transform: translateY(8px);
-	}
-	to {
-		transform: none;
-	}
 }
 .search__results mark {
 	background: none;
@@ -1549,8 +1564,23 @@ html.search-open {
 	padding: 1rem;
 }
 .friends lg-panel.card > .lg-panel__body {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	min-width: 0;
+}
+.friends__avatar {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	object-fit: cover;
+	flex: none;
+	background: var(--bg-2);
+}
+.friends__meta {
 	display: grid;
 	gap: 0.2rem;
+	min-width: 0;
 }
 .friends a b {
 	font-size: 1rem;
@@ -1636,16 +1666,28 @@ lg-panel.e404 {
 @keyframes content-in {
 	from {
 		opacity: 0;
-		transform: translateY(8px);
 	}
 	to {
 		opacity: 1;
-		transform: none;
 	}
 }
 .reveal > .lg-panel__body {
-	animation: content-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
-	animation-delay: calc(min(var(--i, 0), 8) * 40ms);
+	animation: content-in 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: calc(min(var(--i, 0), 2) * 28ms);
+}
+@media (prefers-reduced-motion: reduce) {
+	.reveal > .lg-panel__body,
+	.search[open] .search__panel,
+	.search[open].is-closing .search__panel {
+		animation: none;
+		opacity: 1;
+		transform: none;
+		transition: none;
+	}
+	.search[open] .search__panel {
+		-webkit-backdrop-filter: blur(28px) saturate(1.8);
+		backdrop-filter: blur(28px) saturate(1.8);
+	}
 }
 
 /* ---------- back to top ---------- */
