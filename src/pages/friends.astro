@@ -16,8 +16,8 @@ const { Content } = await render(entry);
 				<p>排名不分先后。欢迎互换。</p>
 			</div>
 			<div class="friends">
-				{friends.map((f) => (
-					<a href={f.url} target="_blank" rel="noopener">
+				{friends.map((f, i) => (
+					<a href={f.url} target="_blank" rel="noopener" style={`--i:${i}`}>
 						<Glass class="card card--glow">
 							{f.avatar && <img class="friends__avatar" src={f.avatar} alt="" width="44" height="44" />}
 							<span class="friends__meta">

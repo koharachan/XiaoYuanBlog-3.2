@@ -51,12 +51,17 @@ $$("[data-set-theme]").forEach((b) =>
 );
 
 /* ---------- menus / drawer ---------- */
+function armMotion(el: Element | null, ms = 240) {
+	if (!el) return;
+	el.classList.add("is-moving");
+	window.setTimeout(() => el.classList.remove("is-moving"), ms);
+}
 function closeMenus(except?: Element | null) {
 	$$("[data-menu]").forEach((m) => {
-		if (m !== except) {
-			m.setAttribute("data-open", "false");
-			$("button", m)?.setAttribute("aria-expanded", "false");
-		}
+		if (m === except || m.getAttribute("data-open") !== "true") return;
+		m.setAttribute("data-open", "false");
+		$("button", m)?.setAttribute("aria-expanded", "false");
+		armMotion(m);
 	});
 }
 $$("[data-menu]").forEach((m) => {
@@ -67,6 +72,7 @@ $$("[data-menu]").forEach((m) => {
 		closeMenus(m);
 		m.setAttribute("data-open", String(!open));
 		btn.setAttribute("aria-expanded", String(!open));
+		armMotion(m);
 	});
 });
 const drawer = $("#drawer");
@@ -77,8 +83,7 @@ function setDrawer(open: boolean) {
 	if (drawer.getAttribute("data-open") === next) return;
 	drawer.setAttribute("data-open", next);
 	burger?.setAttribute("aria-expanded", next);
-	drawer.classList.add("is-moving");
-	setTimeout(() => drawer.classList.remove("is-moving"), 180);
+	armMotion(drawer);
 }
 burger?.addEventListener("click", (e) => {
 	e.stopPropagation();
@@ -102,7 +107,7 @@ document.addEventListener("keydown", (e) => {
 /* ---------- liquid glass: pointer light on the lens, press on small controls ---------- */
 const GLARE = "lg-panel.card--glow";
 const SQUISH =
-	".ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a, lg-panel.card--glow";
+	".ibtn, .btn, .chip, .nav__links a, .menu__item, .drawer a, .termlist a, .pager a, .social a, .timeline li a, .toc a, .search__close, .totop, lg-panel.card--glow";
 const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
 let lit: HTMLElement[] = [];
 let down: HTMLElement[] = [];
@@ -474,9 +479,26 @@ document.addEventListener("click", (e) => {
 	big.src = img.currentSrc || img.src;
 	big.alt = img.alt;
 	box.appendChild(big);
+	let closing = false;
 	const close = () => {
-		box.remove();
-		document.removeEventListener("keydown", onKey);
+		if (closing) return;
+		closing = true;
+		let gone = false;
+		const remove = () => {
+			if (gone) return;
+			gone = true;
+			box.remove();
+			document.removeEventListener("keydown", onKey);
+		};
+		if (reduceMotion) {
+			remove();
+			return;
+		}
+		box.classList.add("is-closing");
+		box.addEventListener("animationend", (event) => {
+			if (event.target === box) remove();
+		});
+		window.setTimeout(remove, 160);
 	};
 	const onKey = (ev: KeyboardEvent) => ev.key === "Escape" && close();
 	box.addEventListener("click", close);
@@ -518,7 +540,12 @@ if (tocLinks.length && "IntersectionObserver" in window) {
 /* ---------- back to top ---------- */
 const totop = $("#totop");
 if (totop) {
-	const onScroll = () => totop.classList.toggle("on", scrollY > 600);
+	const onScroll = () => {
+		const on = scrollY > 600;
+		if (totop.classList.contains("on") === on) return;
+		totop.classList.toggle("on", on);
+		armMotion(totop);
+	};
 	addEventListener("scroll", onScroll, { passive: true });
 	onScroll();
 	const goTop = () =>
@@ -545,7 +572,11 @@ $("#share")?.addEventListener("click", async (e) => {
 			await navigator.clipboard.writeText(location.href);
 			const old = btn.innerHTML;
 			btn.textContent = "链接已复制";
-			setTimeout(() => (btn.innerHTML = old), 1500);
+			btn.classList.add("is-copied");
+			setTimeout(() => {
+				btn.innerHTML = old;
+				btn.classList.remove("is-copied");
+			}, 1500);
 		} catch {}
 	}
 });

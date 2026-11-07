@@ -158,7 +158,7 @@ input {
 }
 :focus-visible {
 	outline: 2px solid var(--primary);
-	outline-offset: 2px;
+	outline-offset: 4px;
 	border-radius: 4px;
 }
 [hidden] {
@@ -294,6 +294,10 @@ lg-panel .lg-surface__copy {
 	padding: 0;
 	border-radius: inherit;
 }
+/* Theme switch crossfades the tint. The blur layer itself is not animated. */
+lg-panel .lg-surface__tint {
+	transition: background-color 0.35s var(--ease);
+}
 lg-panel .lg-surface__shadow {
 	display: none;
 }
@@ -414,10 +418,19 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 .btn,
 .chip,
 .nav__links a,
-.menu__item,
-.drawer a,
-.termlist a {
-	transition: transform 0.52s var(--spring), background-color 0.25s, color 0.2s;
+.termlist a,
+.pager a,
+.social a,
+.timeline li a,
+.toc li a,
+.search__close,
+.footer a {
+	transition:
+		transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+		background-color 0.18s var(--ease),
+		color 0.16s var(--ease),
+		border-color 0.16s var(--ease),
+		outline-offset 0.15s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .is-pressed:not(lg-panel) {
 	transform: scale(0.96);
@@ -426,11 +439,22 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 }
 @media (prefers-reduced-motion: reduce) {
 	.is-pressed:not(lg-panel),
-	lg-panel.card--glow.is-pressed > .lg-panel__body {
+	lg-panel.card--glow.is-pressed > .lg-panel__body,
+	.totop.is-pressed > .lg-panel__body,
+	.burger svg,
+	.article__cover img,
+	.lightbox img {
 		transform: none;
 	}
 	lg-panel.card--glow::after {
 		transition: none;
+	}
+	.menu__item,
+	.drawer a,
+	.totop svg {
+		opacity: 1;
+		transform: none;
+		animation: none;
 	}
 }
 @media (prefers-reduced-transparency: reduce) {
@@ -585,6 +609,12 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 .burger {
 	display: inline-grid;
 }
+.burger svg {
+	transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.burger[aria-expanded="true"] svg {
+	transform: rotate(90deg);
+}
 @media (min-width: 54rem) {
 	.burger {
 		display: none;
@@ -619,6 +649,10 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 	visibility: visible;
 	pointer-events: auto;
 }
+.menu.is-moving lg-panel.menu__panel .lg-surface__glass--material {
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
 .menu__item {
 	position: relative;
 	display: flex;
@@ -641,6 +675,36 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 	content: "✓";
 	font-size: 0.8rem;
 	color: var(--primary);
+}
+.menu__item {
+	opacity: 0;
+	transform: translate3d(0, -6px, 0);
+	transition:
+		opacity 0.12s linear,
+		transform 0.12s linear,
+		background-color 0.16s var(--ease),
+		color 0.16s var(--ease);
+}
+.menu__item:nth-child(2) {
+	--stagger: 1;
+}
+.menu__item:nth-child(3) {
+	--stagger: 2;
+}
+.menu[data-open="true"] .menu__item {
+	opacity: 1;
+	transform: none;
+	transition:
+		opacity 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+		transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+		background-color 0.16s var(--ease),
+		color 0.16s var(--ease);
+	transition-delay: calc(var(--stagger, 0) * 28ms), calc(var(--stagger, 0) * 28ms), 0s, 0s;
+}
+.menu[data-open="true"] .menu__item.is-pressed {
+	transform: scale(0.96);
+	transition-duration: 0.1s;
+	transition-delay: 0s;
 }
 /* mobile sheet. Centered without transform so the glass can sample the page. */
 .drawer {
@@ -689,6 +753,45 @@ lg-panel.card--glow.is-pressed > .lg-panel__body {
 .drawer a[aria-current="page"] {
 	color: var(--text);
 	background: rgba(255, 255, 255, 0.16);
+}
+.drawer a {
+	opacity: 0;
+	transform: translate3d(0, 6px, 0);
+	transition:
+		opacity 0.12s linear,
+		transform 0.12s linear,
+		background-color 0.16s var(--ease),
+		color 0.16s var(--ease);
+}
+.drawer a:nth-child(2) {
+	--stagger: 1;
+}
+.drawer a:nth-child(3) {
+	--stagger: 2;
+}
+.drawer a:nth-child(4) {
+	--stagger: 3;
+}
+.drawer a:nth-child(5) {
+	--stagger: 4;
+}
+.drawer a:nth-child(n + 6) {
+	--stagger: 5;
+}
+.drawer[data-open="true"] a {
+	opacity: 1;
+	transform: none;
+	transition:
+		opacity 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+		transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+		background-color 0.16s var(--ease),
+		color 0.16s var(--ease);
+	transition-delay: calc(var(--stagger, 0) * 22ms), calc(var(--stagger, 0) * 22ms), 0s, 0s;
+}
+.drawer[data-open="true"] a.is-pressed {
+	transform: scale(0.96);
+	transition-duration: 0.1s;
+	transition-delay: 0s;
 }
 
 /* ---------- home intro ---------- */
@@ -862,6 +965,7 @@ lg-panel.post-card > .lg-panel__body {
 .chip[aria-current="page"] {
 	color: var(--primary);
 	border-color: var(--line-strong);
+	background: rgba(255, 255, 255, 0.2);
 }
 .chip small {
 	opacity: 0.6;
@@ -1014,8 +1118,10 @@ lg-panel.post-card > .lg-panel__body {
 	padding-left: 2.25rem;
 	font-size: 0.8rem;
 }
-.toc li a:hover {
+.toc li a:hover,
+.toc li a.active {
 	color: var(--text);
+	background: rgba(255, 255, 255, 0.08);
 }
 .toc li a.active {
 	color: var(--primary);
@@ -1046,6 +1152,9 @@ details.toc-m[open] summary::before {
 }
 details.toc-m .toc {
 	margin-top: 0.75rem;
+}
+details.toc-m[open] .toc {
+	animation: content-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @media (min-width: 64rem) {
 	details.toc-m {
@@ -1086,6 +1195,12 @@ lg-panel.article__body {
 	height: 100%;
 	max-height: 26rem;
 	object-fit: cover;
+	transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+	.article__cover:hover img {
+		transform: scale(1.025);
+	}
 }
 .notice {
 	display: flex;
@@ -1098,6 +1213,7 @@ lg-panel.article__body {
 	color: var(--text-2);
 	font-size: 0.9rem;
 	margin-bottom: 1.25rem;
+	animation: content-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .notice svg {
 	width: 1.1rem;
@@ -1150,6 +1266,10 @@ lg-panel.article__body {
 }
 .btn--primary:hover {
 	color: var(--bg);
+}
+.btn.is-copied {
+	background: color-mix(in srgb, var(--ok) 32%, transparent);
+	color: var(--text);
 }
 .btn svg {
 	width: 1rem;
@@ -1487,6 +1607,10 @@ html.search-open {
 	padding: 1.5rem;
 	text-align: center;
 	color: var(--muted);
+	animation: content-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.search__results a {
+	transition: background-color 0.16s var(--ease);
 }
 
 /* ---------- lightbox ---------- */
@@ -1499,12 +1623,46 @@ html.search-open {
 	place-items: center;
 	padding: 1rem;
 	cursor: zoom-out;
-	animation: fade 0.2s;
+	animation: fade 0.16s cubic-bezier(0.22, 1, 0.36, 1);
 }
 @keyframes fade {
 	from {
 		opacity: 0;
 	}
+	to {
+		opacity: 1;
+	}
+}
+@keyframes fade-out {
+	from {
+		opacity: 1;
+	}
+	to {
+		opacity: 0;
+	}
+}
+@keyframes rise-in {
+	from {
+		opacity: 0;
+		transform: scale(0.96);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+@keyframes rise-out {
+	from {
+		opacity: 1;
+		transform: none;
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.98);
+	}
+}
+.lightbox.is-closing {
+	animation: fade-out 0.12s linear both;
 }
 .lightbox img {
 	max-width: 100%;
@@ -1514,6 +1672,10 @@ html.search-open {
 	object-fit: contain;
 	border-radius: 6px;
 	box-shadow: var(--shadow);
+	animation: rise-in 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.lightbox.is-closing img {
+	animation: rise-out 0.12s linear both;
 }
 
 /* ---------- footer ---------- */
@@ -1583,6 +1745,8 @@ html.search-open {
 	align-items: center;
 	gap: 0.75rem;
 	min-width: 0;
+	animation: content-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+	animation-delay: calc(min(var(--i, 0), 8) * 32ms);
 }
 .friends__avatar {
 	width: 44px;
@@ -1692,8 +1856,14 @@ lg-panel.e404 {
 }
 @media (prefers-reduced-motion: reduce) {
 	.reveal > .lg-panel__body,
+	.friends lg-panel.card > .lg-panel__body,
 	.search[open] .search__panel,
-	.search[open].is-closing .search__panel {
+	.search[open].is-closing .search__panel,
+	.lightbox,
+	.lightbox img,
+	.notice,
+	.search__results .empty,
+	details.toc-m[open] .toc {
 		animation: none;
 		opacity: 1;
 		transform: none;
@@ -1702,6 +1872,19 @@ lg-panel.e404 {
 	.search[open] .search__panel {
 		-webkit-backdrop-filter: blur(28px) saturate(1.8);
 		backdrop-filter: blur(28px) saturate(1.8);
+	}
+	.menu[data-open="true"] .menu__item,
+	.drawer[data-open="true"] a,
+	.totop.on svg {
+		opacity: 1;
+		transform: none;
+	}
+	.is-pressed:not(lg-panel),
+	.menu[data-open="true"] .menu__item.is-pressed,
+	.drawer[data-open="true"] a.is-pressed,
+	lg-panel.card--glow.is-pressed > .lg-panel__body,
+	.totop.is-pressed > .lg-panel__body {
+		transform: none;
 	}
 }
 
@@ -1738,6 +1921,23 @@ lg-panel.e404 {
 .totop svg {
 	width: 1.2rem;
 	height: 1.2rem;
+	opacity: 0;
+	transform: translate3d(0, 6px, 0);
+	transition:
+		opacity 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+		transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.totop.on svg {
+	opacity: 1;
+	transform: none;
+}
+.totop.is-moving .lg-surface__glass--material {
+	-webkit-backdrop-filter: none;
+	backdrop-filter: none;
+}
+.totop.is-pressed > .lg-panel__body {
+	transform: scale(0.94);
+	transition: transform 0.1s cubic-bezier(0.2, 0, 0.2, 1);
 }
 .totop:hover {
 	border-color: var(--primary);
