@@ -90,10 +90,10 @@ const jsonLd = {
 
 			<nav class="adjacent" aria-label="上一篇 / 下一篇">
 				{post.prev ? (
-					<a class="prev" href={`/posts/${post.prev.slug}/`} rel="prev"><Glass class="card card--glow"><small>← 上一篇</small><span>{post.prev.title}</span></Glass></a>
+					<a class="prev" href={`/posts/${post.prev.slug}/`} rel="prev"><Glass class="card card--glow reveal" style="--i:2"><small>← 上一篇</small><span>{post.prev.title}</span></Glass></a>
 				) : <span />}
 				{post.next && (
-					<a class="next" href={`/posts/${post.next.slug}/`} rel="next"><Glass class="card card--glow"><small>下一篇 →</small><span>{post.next.title}</span></Glass></a>
+					<a class="next" href={`/posts/${post.next.slug}/`} rel="next"><Glass class="card card--glow reveal" style="--i:2"><small>下一篇 →</small><span>{post.next.title}</span></Glass></a>
 				)}
 			</nav>
 
@@ -101,7 +101,8 @@ const jsonLd = {
 				<Glass
 					quiet
 					id="comments"
-					class="card comments"
+					class="card comments reveal"
+					style="--i:2"
 					data-repo={giscus.repo}
 					data-repo-id={giscus.repoId}
 					data-category={giscus.category}
