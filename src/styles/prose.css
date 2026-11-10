@@ -199,6 +199,9 @@
 .copy-btn.ok {
 	color: var(--ok);
 }
+.copy-btn.ok svg {
+	animation: rise-in 0.16s cubic-bezier(0.22, 1, 0.36, 1);
+}
 .copy-btn svg {
 	width: 0.95rem;
 	height: 0.95rem;
@@ -251,6 +254,10 @@
 .prose summary {
 	cursor: pointer;
 	font-weight: 600;
+}
+.prose img,
+.article__cover img {
+	cursor: zoom-in;
 }
 .prose iframe,
 .prose video {
